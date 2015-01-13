@@ -1,4 +1,4 @@
-/*  Copyright 2014 MaidSafe.net limited
+/*  Copyright 2015 MaidSafe.net limited
 
     This MaidSafe Software is licensed to you under (1) the MaidSafe.net Commercial License,
     version 1.0 or later, or (2) The General Public License (GPL), version 3, depending on which
@@ -23,7 +23,17 @@ namespace maidsafe {
 
 namespace launcher {
 
-class Launcher {};
+class Launcher {
+ public:
+  Launcher();
+
+  Launcher(const Launcher&) = delete;
+  Launcher(Launcher&&) = delete;
+  Launcher& operator=(const Launcher&) = delete;
+  Launcher& operator=(Launcher&&) = delete;
+
+  void Stop();
+};
 
 }  // namespace launcher
 

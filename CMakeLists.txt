@@ -41,6 +41,8 @@ include(../../cmake_modules/standard_setup.cmake)
 #==================================================================================================#
 set(LauncherSourcesDir ${PROJECT_SOURCE_DIR}/src/maidsafe/launcher)
 ms_glob_dir(Launcher ${LauncherSourcesDir} Launcher)
+list(REMOVE_ITEM LauncherAllFiles "${LauncherSourcesDir}/launcher_main.cc")
+
 ms_glob_dir(LauncherTests ${LauncherSourcesDir}/tests Tests)
 list(REMOVE_ITEM LauncherTestsAllFiles "${LauncherSourcesDir}/tests/dummy_app.cc")
 
@@ -51,7 +53,11 @@ list(REMOVE_ITEM LauncherTestsAllFiles "${LauncherSourcesDir}/tests/dummy_app.cc
 ms_add_static_library(maidsafe_launcher ${LauncherAllFiles})
 target_include_directories(maidsafe_launcher PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE ${PROJECT_SOURCE_DIR}/src)
 # TODO - Once NFS has taken over Drive's duties, swap maidsafe_drive for maidsafe_nfs
-target_link_libraries(maidsafe_launcher maidsafe_common maidsafe_passport maidsafe_drive)
+target_link_libraries(maidsafe_launcher maidsafe_api maidsafe_drive)
+
+ms_add_executable(launcher "Production" "${LauncherSourcesDir}/launcher_main.cc")
+target_include_directories(launcher PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(launcher maidsafe_launcher)
 
 if(INCLUDE_TESTS)
   ms_add_executable(test_launcher "Tests/Launcher" ${LauncherTestsAllFiles})

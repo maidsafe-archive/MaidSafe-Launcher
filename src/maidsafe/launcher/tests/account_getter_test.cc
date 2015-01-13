@@ -1,4 +1,4 @@
-/*  Copyright 2015 MaidSafe.net limited
+/*  Copyright 2014 MaidSafe.net limited
 
     This MaidSafe Software is licensed to you under (1) the MaidSafe.net Commercial License,
     version 1.0 or later, or (2) The General Public License (GPL), version 3, depending on which
@@ -16,15 +16,26 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/launcher/launcher.h"
+#include "maidsafe/launcher/account_getter.h"
 
 #include "maidsafe/common/test.h"
+
+#include "maidsafe/routing/parameters.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
-namespace test {}  // namespace test
+namespace test {
+
+TEST(AccountGetterTest, FUNC_Constructor) {
+  auto account_getter_future = AccountGetter::CreateAccountGetter();
+  LOG(kVerbose) << "Started CreateAccountGetter thread";
+  std::unique_ptr<AccountGetter> account_getter;
+  ASSERT_NO_THROW(account_getter = account_getter_future.get());
+}
+
+}  // namespace test
 
 }  // namespace launcher
 
