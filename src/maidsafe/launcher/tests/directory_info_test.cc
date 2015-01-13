@@ -30,7 +30,8 @@ namespace test {
 
 testing::AssertionResult Matches(const DirectoryInfo& expected, const DirectoryInfo& actual) {
   return (expected.path == actual.path && expected.parent_id == actual.parent_id &&
-          expected.directory_id == actual.directory_id)
+          expected.directory_id == actual.directory_id &&
+          expected.access_rights == actual.access_rights)
              ? testing::AssertionSuccess()
              : testing::AssertionFailure();
 }
@@ -44,12 +45,12 @@ TEST(DirectoryInfoTest, BEH_ConstructAndAssign) {
   EXPECT_FALSE(directory_info.directory_id.IsInitialised());
 
   // C'tor taking value
-  const DirectoryInfo directory_info1(RandomAlphaNumericString(100),
-                                      drive::ParentId{Identity{RandomAlphaNumericString(64)}},
-                                      Identity{RandomAlphaNumericString(64)});
-  const DirectoryInfo directory_info2(RandomAlphaNumericString(100),
-                                      drive::ParentId{Identity{RandomAlphaNumericString(64)}},
-                                      Identity{RandomAlphaNumericString(64)});
+  const DirectoryInfo directory_info1(
+      RandomAlphaNumericString(100), drive::ParentId{Identity{RandomAlphaNumericString(64)}},
+      Identity{RandomAlphaNumericString(64)}, AccessRights::kReadOnly);
+  const DirectoryInfo directory_info2(
+      RandomAlphaNumericString(100), drive::ParentId{Identity{RandomAlphaNumericString(64)}},
+      Identity{RandomAlphaNumericString(64)}, AccessRights::kReadWrite);
 
   // Copy and move
   DirectoryInfo copied(directory_info1);
@@ -66,9 +67,9 @@ TEST(DirectoryInfoTest, BEH_ConstructAndAssign) {
 }
 
 TEST(DirectoryInfoTest, BEH_Serialisation) {
-  const DirectoryInfo directory_info(RandomAlphaNumericString(100),
-                                     drive::ParentId{Identity{RandomAlphaNumericString(64)}},
-                                     Identity{RandomAlphaNumericString(64)});
+  const DirectoryInfo directory_info(
+      RandomAlphaNumericString(100), drive::ParentId{Identity{RandomAlphaNumericString(64)}},
+      Identity{RandomAlphaNumericString(64)}, AccessRights::kReadOnly);
   auto serialised = Serialise(directory_info);
   auto parsed = Parse<DirectoryInfo>(serialised);
   EXPECT_TRUE(Matches(directory_info, parsed));
