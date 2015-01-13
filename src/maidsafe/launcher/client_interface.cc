@@ -18,10 +18,47 @@
 
 #include "maidsafe/launcher/client_interface.h"
 
+#include "maidsafe/common/serialisation/serialisation.h"
+
+#include "maidsafe/launcher/directory_info.h"
+
 namespace maidsafe {
 
 namespace launcher {
 
+ClientInterface::ClientInterface() : asio_service_(1), promise_() {}
+
+std::future<std::vector<DirectoryInfo>> ClientInterface::RegisterSessionKey(
+    asymm::PublicKey public_key, tcp::Port port) {
+  public_key_ = std::move(public_key);
+  port_ = port;
+  asio_service_.service().post([this] { this->DoRegisterSessionKey(); });
+  return promise_.get_future();
+}
+
+void ClientInterface::DoRegisterSessionKey() {
+  try {
+    tcp::ConnectionPtr tcp_connection{tcp::Connection::MakeShared(asio_service_, port_)};
+    tcp_connection->Start([this](std::string message) { HandleReply(std::move(message)); },
+                          [this] {});  // FIXME OnConnectionClosed
+    tcp_connection->Send(ConvertToString(public_key_));
+  } catch (const std::exception& e) {
+    LOG(kError) << boost::diagnostic_information(e);
+    promise_.set_exception(std::current_exception());
+  }
+}
+
+void ClientInterface::HandleReply(std::string message) {
+  try {
+    auto directories(ConvertFromString<std::vector<DirectoryInfo>>(std::move(message)));
+    if (directories.empty())
+      BOOST_THROW_EXCEPTION(MakeError(CommonErrors::uninitialised));
+    promise_.set_value(std::move(directories));
+  } catch (const std::exception& e) {
+    LOG(kError) << boost::diagnostic_information(e);
+    promise_.set_exception(std::current_exception());
+  }
+}
 
 }  // namespace launcher
 

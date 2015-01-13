@@ -50,7 +50,8 @@ list(REMOVE_ITEM LauncherTestsAllFiles "${LauncherSourcesDir}/tests/dummy_app.cc
 #==================================================================================================#
 ms_add_static_library(maidsafe_launcher ${LauncherAllFiles})
 target_include_directories(maidsafe_launcher PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_link_libraries(maidsafe_launcher maidsafe_common maidsafe_passport)
+# TODO - Once NFS has taken over Drive's duties, swap maidsafe_drive for maidsafe_nfs
+target_link_libraries(maidsafe_launcher maidsafe_common maidsafe_passport maidsafe_drive)
 
 if(INCLUDE_TESTS)
   ms_add_executable(test_launcher "Tests/Launcher" ${LauncherTestsAllFiles})

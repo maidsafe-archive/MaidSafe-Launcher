@@ -19,11 +19,52 @@
 #ifndef MAIDSAFE_LAUNCHER_CLIENT_INTERFACE_H_
 #define MAIDSAFE_LAUNCHER_CLIENT_INTERFACE_H_
 
+#include <future>
+#include <string>
+#include <thread>
+#include <vector>
+
+#include "maidsafe/common/asio_service.h"
+#include "maidsafe/common/rsa.h"
+#include "maidsafe/common/types.h"
+#include "maidsafe/common/tcp/connection.h"
+
+#include "maidsafe/launcher/directory_info.h"
+
 namespace maidsafe {
 
 namespace launcher {
 
-class ClientInterface {};
+// TODO(Fraser#5#): 2015-01-13 - Either pass in asio and make this inherit from
+// enable_shared_from_this, or document
+class ClientInterface {
+ public:
+  ClientInterface(const ClientInterface&) = delete;
+  ClientInterface(ClientInterface&&) = delete;
+  ClientInterface();
+
+  ClientInterface& operator=(const ClientInterface&) = delete;
+  ClientInterface& operator=(ClientInterface&&) = delete;
+
+  // TODO(Fraser#5#): 2015-01-13 - Block until promise set, or exit early, set exception in promise
+  // and stop asio.
+  ~ClientInterface();
+
+  // Once the future.get() returns, the session key is usable.  If future.get() throws, the session
+  // key is unusable.  The value returned from the future.get() will be the list of directories
+  // which this particular app is entitled to access.
+  std::future<std::vector<DirectoryInfo>> RegisterSessionKey(asymm::PublicKey public_key,
+                                                             tcp::Port port);
+
+ private:
+  void DoRegisterSessionKey();
+  void HandleReply(std::string reply);
+
+  AsioService asio_service_;
+  std::promise<std::vector<DirectoryInfo>> promise_;
+  asymm::PublicKey public_key_;
+  tcp::Port port_;
+};
 
 }  // namespace launcher
 
