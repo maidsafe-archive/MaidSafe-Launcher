@@ -16,7 +16,7 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/tests/test_utils.h"
+#include "maidsafe/launcher/tests/test_utils.h"
 
 #include <string>
 
@@ -25,6 +25,8 @@
 #include "maidsafe/common/utils.h"
 
 namespace maidsafe {
+
+namespace launcher {
 
 namespace test {
 
@@ -49,25 +51,6 @@ authentication::UserCredentials MakeUserCredentials(
   user_credentials.password = maidsafe::make_unique<authentication::UserCredentials::Password>(
       std::get<2>(user_credentials_tuple));
   return user_credentials;
-}
-
-}  // namespace test
-
-namespace launcher {
-
-namespace test {
-
-std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple() {
-  return maidsafe::test::GetRandomUserCredentialsTuple();
-}
-
-authentication::UserCredentials GetRandomUserCredentials() {
-  return maidsafe::test::GetRandomUserCredentials();
-}
-
-authentication::UserCredentials MakeUserCredentials(
-    const std::tuple<std::string, uint32_t, std::string>& credentials_tuple) {
-  return maidsafe::test::MakeUserCredentials(credentials_tuple);
 }
 
 }  // namespace test

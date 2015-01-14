@@ -24,8 +24,6 @@
 #include "maidsafe/common/log.h"
 #include "maidsafe/common/utils.h"
 
-#include "maidsafe/launcher/client_interface.h"
-
 int main(int argc, char* argv[]) {
   bool connected_to_launcher{false}, should_hang{false};
   int exit_code{0};

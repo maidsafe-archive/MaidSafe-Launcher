@@ -30,7 +30,7 @@ extern "C" char** environ;
 
 #include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"
-#include "maidsafe/tests/test_utils.h"
+#include "maidsafe/launcher/tests/test_utils.h"
 
 namespace maidsafe {
 

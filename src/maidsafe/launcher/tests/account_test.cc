@@ -23,7 +23,7 @@
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/test.h"
 #include "maidsafe/common/utils.h"
-#include "maidsafe/tests/test_utils.h"
+#include "maidsafe/launcher/tests/test_utils.h"
 
 namespace maidsafe {
 

@@ -28,6 +28,8 @@
 
 namespace maidsafe {
 
+namespace launcher {
+
 namespace test {
 
 std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple();
@@ -60,19 +62,6 @@ testing::AssertionResult ThrowsAs(std::function<void()> statement,
   }
   return testing::AssertionFailure() << failure_message.str();
 }
-
-}  // namespace test
-
-namespace launcher {
-
-namespace test {
-
-std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple();
-
-authentication::UserCredentials GetRandomUserCredentials();
-
-authentication::UserCredentials MakeUserCredentials(
-    const std::tuple<std::string, uint32_t, std::string>& credentials_tuple);
 
 }  // namespace test
 

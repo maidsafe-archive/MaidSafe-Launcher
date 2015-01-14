@@ -21,10 +21,14 @@
 #include <string>
 #include <utility>
 
+#include "cereal/types/string.hpp"
+
 #include "maidsafe/common/error.h"
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/utils.h"
 #include "maidsafe/common/authentication/user_credential_utils.h"
+#include "maidsafe/common/serialisation/serialisation.h"
+#include "maidsafe/common/serialisation/types/asio_and_boost_asio.h"
 
 namespace maidsafe {
 
@@ -32,19 +36,19 @@ namespace launcher {
 
 ImmutableData EncryptAccount(const authentication::UserCredentials& user_credentials,
                              Account& account) {
-  protobuf::Account proto_account;
-  proto_account.set_serialised_passport(account.passport->Encrypt(user_credentials)->string());
-  proto_account.set_timestamp(GetTimeStamp());
-  proto_account.set_ip(account.ip.to_string());
-  proto_account.set_port(account.port);
+  uint64_t serialised_timestamp{GetTimeStamp()};
+  boost::optional<Identity> unique_user_id, root_parent_id;
   if (account.unique_user_id.IsInitialised())
-    proto_account.set_unique_user_id(account.unique_user_id.string());
+    unique_user_id = account.unique_user_id;
   if (account.root_parent_id.IsInitialised())
-    proto_account.set_root_parent_id(account.root_parent_id.string());
+    root_parent_id = account.root_parent_id;
 
-  account.timestamp = TimeStampToPtime(proto_account.timestamp());
+  NonEmptyString serialised_account{ConvertToString(account.passport->Encrypt(user_credentials),
+                                                    serialised_timestamp, account.ip, account.port,
+                                                    unique_user_id, root_parent_id)};
 
-  NonEmptyString serialised_account{proto_account.SerializeAsString()};
+  account.timestamp = TimeStampToPtime(serialised_timestamp);
+
   crypto::SecurePassword secure_password{authentication::CreateSecurePassword(user_credentials)};
   return ImmutableData{
       crypto::SymmEncrypt(authentication::Obfuscate(user_credentials, serialised_account),
@@ -71,18 +75,17 @@ Account::Account(const ImmutableData& encrypted_account,
                                             authentication::DeriveSymmEncryptKey(secure_password),
                                             authentication::DeriveSymmEncryptIv(secure_password)))};
 
-  protobuf::Account proto_account;
-  if (!proto_account.ParseFromString(serialised_account.string()))
-    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::parsing_error));
-  crypto::CipherText encrypted_passport{NonEmptyString(proto_account.serialised_passport())};
+  crypto::CipherText encrypted_passport;
+  uint64_t serialised_timestamp{0};
+  boost::optional<Identity> optional_unique_user_id, optional_root_parent_id;
+  ConvertFromString(serialised_account.string(), encrypted_passport, serialised_timestamp, ip, port,
+                    optional_unique_user_id, optional_root_parent_id);
   passport = maidsafe::make_unique<passport::Passport>(encrypted_passport, user_credentials);
-  timestamp = TimeStampToPtime(proto_account.timestamp());
-  ip = boost::asio::ip::address::from_string(proto_account.ip());
-  port = static_cast<uint16_t>(proto_account.port());
-  if (proto_account.has_unique_user_id())
-    unique_user_id = Identity(proto_account.unique_user_id());
-  if (proto_account.has_root_parent_id())
-    root_parent_id = Identity(proto_account.root_parent_id());
+  timestamp = TimeStampToPtime(serialised_timestamp);
+  if (optional_unique_user_id)
+    unique_user_id = *optional_unique_user_id;
+  if (optional_root_parent_id)
+    root_parent_id = *optional_root_parent_id;
 }
 
 Account::Account(Account&& other) MAIDSAFE_NOEXCEPT
