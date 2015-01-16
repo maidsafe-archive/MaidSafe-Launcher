@@ -86,3 +86,9 @@ if(INCLUDE_TESTS)
   ms_add_gtests(test_launcher)
   ms_test_summary_output()
 endif()
+
+
+#==================================================================================================#
+# Launcher UI                                                                                      #
+#==================================================================================================#
+add_subdirectory(${LauncherSourcesDir}/ui)
