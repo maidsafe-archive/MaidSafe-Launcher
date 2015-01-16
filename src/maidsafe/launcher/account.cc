@@ -43,9 +43,10 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
   if (account.root_parent_id.IsInitialised())
     root_parent_id = account.root_parent_id;
 
-  NonEmptyString serialised_account{ConvertToString(account.passport->Encrypt(user_credentials),
-                                                    serialised_timestamp, account.ip, account.port,
-                                                    unique_user_id, root_parent_id)};
+  NonEmptyString serialised_account{
+      ConvertToString(account.passport->Encrypt(user_credentials), serialised_timestamp, account.ip,
+                      account.port, unique_user_id, root_parent_id, account.config_file_aes_key,
+                      account.config_file_aes_iv, account.apps_reference_count)};
 
   account.timestamp = TimeStampToPtime(serialised_timestamp);
 
@@ -56,7 +57,16 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
                           authentication::DeriveSymmEncryptIv(secure_password)).data};
 }
 
-Account::Account() : passport(), timestamp(), ip(), port(0), unique_user_id(), root_parent_id() {}
+Account::Account()
+    : passport(),
+      timestamp(),
+      ip(),
+      port(0),
+      unique_user_id(),
+      root_parent_id(),
+      config_file_aes_key(),
+      config_file_aes_iv(),
+      apps_reference_count() {}
 
 Account::Account(const passport::MaidAndSigner& maid_and_signer)
     : passport(maidsafe::make_unique<passport::Passport>(maid_and_signer)),
@@ -64,11 +74,22 @@ Account::Account(const passport::MaidAndSigner& maid_and_signer)
       ip(),
       port(0),
       unique_user_id(),
-      root_parent_id() {}
+      root_parent_id(),
+      config_file_aes_key(RandomString(crypto::AES256_KeySize)),
+      config_file_aes_iv(RandomString(crypto::AES256_IVSize)),
+      apps_reference_count() {}
 
 Account::Account(const ImmutableData& encrypted_account,
                  const authentication::UserCredentials& user_credentials)
-    : passport(), timestamp(), ip(), port(0), unique_user_id(), root_parent_id() {
+    : passport(),
+      timestamp(),
+      ip(),
+      port(0),
+      unique_user_id(),
+      root_parent_id(),
+      config_file_aes_key(),
+      config_file_aes_iv(),
+      apps_reference_count() {
   crypto::SecurePassword secure_password{authentication::CreateSecurePassword(user_credentials)};
   NonEmptyString serialised_account{authentication::Obfuscate(
       user_credentials, crypto::SymmDecrypt(crypto::CipherText{encrypted_account.data()},
@@ -79,7 +100,8 @@ Account::Account(const ImmutableData& encrypted_account,
   uint64_t serialised_timestamp{0};
   boost::optional<Identity> optional_unique_user_id, optional_root_parent_id;
   ConvertFromString(serialised_account.string(), encrypted_passport, serialised_timestamp, ip, port,
-                    optional_unique_user_id, optional_root_parent_id);
+                    optional_unique_user_id, optional_root_parent_id, config_file_aes_key,
+                    config_file_aes_iv, apps_reference_count);
   passport = maidsafe::make_unique<passport::Passport>(encrypted_passport, user_credentials);
   timestamp = TimeStampToPtime(serialised_timestamp);
   if (optional_unique_user_id)
@@ -94,9 +116,12 @@ Account::Account(Account&& other) MAIDSAFE_NOEXCEPT
       ip(std::move(other.ip)),
       port(std::move(other.port)),
       unique_user_id(std::move(other.unique_user_id)),
-      root_parent_id(std::move(other.root_parent_id)) {}
+      root_parent_id(std::move(other.root_parent_id)),
+      config_file_aes_key(std::move(other.config_file_aes_key)),
+      config_file_aes_iv(std::move(other.config_file_aes_iv)),
+      apps_reference_count(std::move(other.apps_reference_count)) {}
 
-Account& Account::operator=(Account other) {
+Account& Account::operator=(Account&& other) {
   swap(*this, other);
   return *this;
 }
@@ -109,6 +134,9 @@ void swap(Account& lhs, Account& rhs) MAIDSAFE_NOEXCEPT {
   swap(lhs.port, rhs.port);
   swap(lhs.unique_user_id, rhs.unique_user_id);
   swap(lhs.root_parent_id, rhs.root_parent_id);
+  swap(lhs.config_file_aes_key, rhs.config_file_aes_key);
+  swap(lhs.config_file_aes_iv, rhs.config_file_aes_iv);
+  swap(lhs.apps_reference_count, rhs.apps_reference_count);
 }
 
 }  // namespace launcher

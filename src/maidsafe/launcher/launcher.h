@@ -19,20 +19,59 @@
 #ifndef MAIDSAFE_LAUNCHER_LAUNCHER_H_
 #define MAIDSAFE_LAUNCHER_LAUNCHER_H_
 
+#include <cstdint>
+#include <memory>
+#include <string>
+
+#include "maidsafe/passport/passport.h"
+#include "maidsafe/nfs/client/maid_node_nfs.h"
+
+#include "maidsafe/launcher/account_handler.h"
+
 namespace maidsafe {
 
 namespace launcher {
 
+class AccountGetter;
+
 class Launcher {
  public:
-  Launcher();
+  using Keyword = std::string;
+  using Pin = uint32_t;
+  using Password = std::string;
 
   Launcher(const Launcher&) = delete;
   Launcher(Launcher&&) = delete;
   Launcher& operator=(const Launcher&) = delete;
   Launcher& operator=(Launcher&&) = delete;
 
-  void Stop();
+  // Retrieves and decrypts account info and logs in to an existing account.  Throws on error.
+  static std::unique_ptr<Launcher> Login(Keyword keyword, Pin pin, Password password);
+
+  // This function should be used when creating a new account, i.e. where a account has never
+  // been put to the network.  Internally saves the first encrypted account after creating the new
+  // account.  Throws on error.
+  static std::unique_ptr<Launcher> CreateAccount(Keyword keyword, Pin pin, Password password);
+
+  // Throws on error, with strong exception guarantee.  After calling, the class should be
+  // destructed as it is no longer connected to the network.
+  void LogoutAndStop();
+
+  // Adds an instance of 'app_name' to the map of recognised apps, or increments the reference
+  // count for this app if it already exists.
+  void AddApp(const std::string& app_name, const std::string& app_path_and_args);
+
+  void RegisterAppSession();
+
+ private:
+  // For already existing accounts.
+  Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& account_getter);
+
+  // For new accounts.  Throws on failure to create account.
+  Launcher(Keyword keyword, Pin pin, Password password, passport::MaidAndSigner&& maid_and_signer);
+
+  std::shared_ptr<nfs_client::MaidNodeNfs> maid_node_nfs_;
+  AccountHandler account_handler_;
 };
 
 }  // namespace launcher
