@@ -87,10 +87,10 @@ if(MSVC)
   source_group("Auto Compiled\\App Icon File" FILES ${UiAppIconResource})
 endif()
 
+
 #==================================================================================================#
 # Define MaidSafe libraries and executables                                                        #
 #==================================================================================================#
-
 add_executable(safe_launcher ${UiMain}
                              ${HelpersAllFiles}
                              ${ControllersAllFiles}
@@ -123,6 +123,7 @@ if(MSVC)
 endif()
 
 message(STATUS "Found Qt5. Launcher UI enabled.")
+
 
 #==================================================================================================#
 # Generate Qt .pro file.                                                                           #
