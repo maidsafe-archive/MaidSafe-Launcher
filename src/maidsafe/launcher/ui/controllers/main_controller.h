@@ -19,9 +19,11 @@
 #ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
 #define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include <memory>
 
+#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
+#include "maidsafe/launcher/ui/controllers/main_window.h"
+#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 #include "maidsafe/launcher/ui/models/api_model.h"
 
 namespace maidsafe {
@@ -44,6 +46,9 @@ class MainController : public QObject {
  private slots:
   void UnhandledException();
   void EventLoopStarted();
+
+ private:
+  std::unique_ptr<MainWindow> main_window_;
 };
 
 }  // namespace controllers

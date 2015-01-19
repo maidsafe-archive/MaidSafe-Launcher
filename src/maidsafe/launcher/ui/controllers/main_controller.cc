@@ -20,8 +20,6 @@
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
-#include "QQuickView"
-
 namespace maidsafe {
 
 namespace launcher {
@@ -36,9 +34,8 @@ MainController::MainController(QObject* parent)
 }
 
 void MainController::EventLoopStarted() {
-  QQuickView* view = new QQuickView;
-  view->setSource(QUrl{"qrc:/views/MainWindow.qml"});
-  view->show();
+  main_window_.reset(new MainWindow{QUrl{"qrc:/views/MainWindow.qml"}});
+  main_window_->show();
 }
 
 bool MainController::eventFilter(QObject* object, QEvent* event) {

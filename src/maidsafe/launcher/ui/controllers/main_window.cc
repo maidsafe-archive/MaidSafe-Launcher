@@ -16,9 +16,37 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.2
+#include "maidsafe/launcher/ui/controllers/main_window.h"
 
-Rectangle {
-  id: rootWindow
-  color: "black"
+#include <QDesktopWidget>
+
+namespace maidsafe {
+
+namespace launcher {
+
+namespace ui {
+
+namespace controllers {
+
+MainWindow::MainWindow(const QUrl& source_qml_file, QWindow* parent /*= nullptr*/)
+  : QQuickView{source_qml_file, parent}
+{
+  setWidth(300);
+  setHeight(400);
+
+  setResizeMode(QQuickView::SizeRootObjectToView);
+
+  auto screen_width(QDesktopWidget{}.screen()->width());
+  auto screen_height(QDesktopWidget{}.screen()->height());
+  setGeometry(screen_width / 2 - width() / 2, screen_height / 2 - height() / 2, width(), height());
 }
+
+MainWindow::~MainWindow() = default;
+
+}  // namespace controllers
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe

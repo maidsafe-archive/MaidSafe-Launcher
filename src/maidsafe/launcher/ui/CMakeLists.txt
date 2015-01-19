@@ -101,6 +101,9 @@ add_executable(safe_launcher ${UiMain}
                              ${UiAppIconResource})
 target_include_directories(safe_launcher PRIVATE "../../../")
 target_link_libraries(safe_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
+if(UNIX)
+  set_source_files_properties(${ControllersAllFiles} PROPERTIES COMPILE_FLAGS -Wno-float-equal)
+endif()
 
 if(MSVC)
   set_target_properties(safe_launcher PROPERTIES WIN32_EXECUTABLE TRUE)

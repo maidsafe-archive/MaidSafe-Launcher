@@ -16,9 +16,34 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.2
+#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
+#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
 
-Rectangle {
-  id: rootWindow
-  color: "black"
-}
+#include <QQuickView>
+
+namespace maidsafe {
+
+namespace launcher {
+
+namespace ui {
+
+namespace controllers {
+
+class MainWindow : public QQuickView
+{
+  Q_OBJECT
+
+public:
+  MainWindow(const QUrl& source_qml_file, QWindow* parent = nullptr);
+  ~MainWindow() override;
+};
+
+}  // namespace controllers
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
