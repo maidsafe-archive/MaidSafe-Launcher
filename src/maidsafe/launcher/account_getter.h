@@ -25,7 +25,7 @@
 #include <mutex>
 #include <vector>
 
-#include "boost/asio/ip/udp.hpp"
+#include "asio/ip/udp.hpp"
 
 #include "maidsafe/common/asio_service.h"
 #include "maidsafe/common/rsa.h"

@@ -20,12 +20,15 @@
 #define MAIDSAFE_LAUNCHER_ACCOUNT_H_
 
 #include <cstdint>
+#include <map>
 #include <memory>
+#include <string>
 
-#include "boost/asio/ip/address.hpp"
+#include "asio/ip/address.hpp"
 #include "boost/date_time/posix_time/ptime.hpp"
 
 #include "maidsafe/common/config.h"
+#include "maidsafe/common/crypto.h"
 #include "maidsafe/common/types.h"
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/passport/passport.h"
@@ -54,16 +57,19 @@ struct Account {
           const authentication::UserCredentials& user_credentials);
 
   // Move-constructible and move-assignable only.
-  Account(Account&& other) MAIDSAFE_NOEXCEPT;
-  Account& operator=(Account other);
   Account(const Account&) = delete;
+  Account(Account&& other) MAIDSAFE_NOEXCEPT;
+  Account& operator=(const Account&&) = delete;
+  Account& operator=(Account&& other) MAIDSAFE_NOEXCEPT;
 
   std::unique_ptr<passport::Passport> passport;
   boost::posix_time::ptime timestamp;
-  boost::asio::ip::address ip;
+  asio::ip::address ip;
   uint16_t port;
-  // Optional elements - used by Drive if available.
   Identity unique_user_id, root_parent_id;
+  crypto::AES256Key config_file_aes_key;
+  crypto::AES256InitialisationVector config_file_aes_iv;
+  std::map<std::string, uint32_t> apps_reference_count;
 };
 
 void swap(Account& lhs, Account& rhs) MAIDSAFE_NOEXCEPT;
