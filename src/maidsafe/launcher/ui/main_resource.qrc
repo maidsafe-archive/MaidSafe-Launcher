@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/fonts/OpenSans-Light.ttf</file>
+        <file>resources/fonts/OpenSans-Regular.ttf</file>
+        <file>resources/fonts/OpenSans-Semibold.ttf</file>
+        <file>resources/js/brushes.js</file>
+        <file>views/MainWindow.qml</file>
+    </qresource>
+</RCC>
