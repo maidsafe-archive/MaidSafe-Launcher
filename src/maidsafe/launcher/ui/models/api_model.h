@@ -34,7 +34,7 @@ class APIModel : public QObject {
   Q_OBJECT
 
  public:
-  explicit APIModel(QObject* parent = 0);
+  explicit APIModel(QObject* parent = nullptr);
 };
 
 }  // namespace models

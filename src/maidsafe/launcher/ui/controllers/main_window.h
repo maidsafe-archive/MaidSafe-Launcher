@@ -16,21 +16,38 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.2
-import MainController 1.0
+#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
+#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
 
-Item {
-  id: rootMainWindowItem
-  objectName: "rootMainWindowItem"
+#include <QQuickView>
 
-  Loader {
-    id: rootLoader
-    objectName: "rootLoader"
+namespace maidsafe {
 
-    anchors.fill: parent
-    source: mainController.currentView === MainController.HandleAccount ?
-              "account_handling/AccountHandlerView.qml"
-            :
-              "account_handling/AccountHandlerView.qml"
-  }
-}
+namespace launcher {
+
+namespace ui {
+
+namespace controllers {
+
+class MainWindow : public QQuickView {
+  Q_OBJECT
+
+ public:
+  MainWindow(QWindow* parent = nullptr);
+  ~MainWindow() override;
+
+  void CenterToScreen();
+
+ private Q_SLOTS:
+  void StatusChanged(const QQuickView::Status status);
+};
+
+}  // namespace controllers
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_

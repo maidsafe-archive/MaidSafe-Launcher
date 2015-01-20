@@ -101,6 +101,9 @@ ms_add_executable(safe_app_launcher "Production" ${UiMain}
                                                  ${UiAppIconResource})
 target_include_directories(safe_app_launcher PRIVATE "../../../")
 target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
+if(UNIX)
+  set_source_files_properties(${ControllersAllFiles} PROPERTIES COMPILE_FLAGS -Wno-float-equal)
+endif()
 
 if(MSVC)
   set_target_properties(safe_app_launcher PROPERTIES WIN32_EXECUTABLE TRUE)
@@ -128,7 +131,7 @@ message(STATUS "Found Qt5. Launcher UI enabled.")
 #==================================================================================================#
 # Generate Qt .pro file.                                                                           #
 #==================================================================================================#
-set(QtPROHelper ${CMAKE_BINARY_DIR}/safe_launcher_mock.pro)
+set(QtPROHelper ${CMAKE_BINARY_DIR}/safe_app_launcher_mock.pro)
 file(WRITE ${QtPROHelper} "#This File is Auto-Generated. Do Not Edit Manually.")
 file(APPEND ${QtPROHelper} "\nQT += qml quick widgets")
 file(APPEND ${QtPROHelper} "\nTARGET = safe_app_launcher")

@@ -16,13 +16,8 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-
-#include <memory>
-
+#include "maidsafe/launcher/ui/controllers/account_handler_controller.h"
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/controllers/main_window.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
 namespace maidsafe {
@@ -31,60 +26,27 @@ namespace launcher {
 
 namespace ui {
 
-namespace models {
-
-class APIModel;
-
-}  // namespace models
-
 namespace controllers {
 
-class AccountHandlerController;
+AccountHandlerController::AccountHandlerController(QObject* parent)
+    : QObject{parent} {
+}
 
-class MainController : public QObject {
-  Q_OBJECT
+AccountHandlerController::AccountHandlingViews AccountHandlerController::currentView() const {
+  return current_view_;
+}
 
-  Q_ENUMS(MainViews)
-  Q_PROPERTY(MainViews currentView READ currentView NOTIFY currentViewChanged FINAL)
-
- public:
-  enum MainViews {
-    HandleAccount,
-  };
-
-  explicit MainController(QObject* parent = 0);
-
-  MainViews currentView() const;
-  void setCurrentView(const MainViews new_current_view);
-  Q_SIGNAL void currentViewChanged(MainViews arg);
-
- protected:
-  bool eventFilter(QObject* object, QEvent* event);
-
- private Q_SLOTS:
-  void UnhandledException();
-  void EventLoopStarted();
-
- private:
-  void RegisterQmlTypes() const;
-  void RegisterQtMetaTypes() const;
-  void SetContexProperties () const;
-
- private:
-  models::APIModel* api_model_{nullptr};
-  AccountHandlerController* account_handler_controller_{nullptr};
-  std::unique_ptr<MainWindow> main_window_;
-
-  MainViews current_view_{HandleAccount};
-};
+void AccountHandlerController::setCurrentView(const AccountHandlingViews new_current_view) {
+  if (new_current_view != current_view_) {
+    current_view_ = new_current_view;
+    emit currentViewChanged(current_view_);
+  }
+}
 
 }  // namespace controllers
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-

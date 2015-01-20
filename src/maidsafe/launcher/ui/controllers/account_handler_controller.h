@@ -16,21 +16,47 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.2
-import MainController 1.0
+#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_ACCOUNT_HANDLER_CONTROLLER_H_
+#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_ACCOUNT_HANDLER_CONTROLLER_H_
 
-Item {
-  id: rootMainWindowItem
-  objectName: "rootMainWindowItem"
+#include <QObject>
 
-  Loader {
-    id: rootLoader
-    objectName: "rootLoader"
+namespace maidsafe {
 
-    anchors.fill: parent
-    source: mainController.currentView === MainController.HandleAccount ?
-              "account_handling/AccountHandlerView.qml"
-            :
-              "account_handling/AccountHandlerView.qml"
-  }
-}
+namespace launcher {
+
+namespace ui {
+
+namespace controllers {
+
+class AccountHandlerController : public QObject {
+  Q_OBJECT
+
+  Q_ENUMS(AccountHandlingViews)
+  Q_PROPERTY(AccountHandlingViews currentView READ currentView NOTIFY currentViewChanged FINAL)
+
+ public:
+  enum AccountHandlingViews {
+    LoginView,
+    CreateAccountView,
+  };
+
+  explicit AccountHandlerController(QObject* parent = nullptr);
+
+  AccountHandlingViews currentView() const;
+  void setCurrentView(const AccountHandlingViews new_current_view);
+  Q_SIGNAL void currentViewChanged(AccountHandlingViews arg);
+
+ private:
+  AccountHandlingViews current_view_{CreateAccountView};
+};
+
+}  // namespace controllers
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_ACCOUNT_HANDLER_CONTROLLER_H_

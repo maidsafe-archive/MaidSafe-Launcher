@@ -16,13 +16,10 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-
-#include <memory>
+#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
+#define MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
 
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/controllers/main_window.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
 namespace maidsafe {
@@ -33,58 +30,17 @@ namespace ui {
 
 namespace models {
 
-class APIModel;
+class AccountHandlerModel : public QObject {
+ public:
+  explicit AccountHandlerModel(QObject* parent = nullptr);
+};
 
 }  // namespace models
 
-namespace controllers {
-
-class AccountHandlerController;
-
-class MainController : public QObject {
-  Q_OBJECT
-
-  Q_ENUMS(MainViews)
-  Q_PROPERTY(MainViews currentView READ currentView NOTIFY currentViewChanged FINAL)
-
- public:
-  enum MainViews {
-    HandleAccount,
-  };
-
-  explicit MainController(QObject* parent = 0);
-
-  MainViews currentView() const;
-  void setCurrentView(const MainViews new_current_view);
-  Q_SIGNAL void currentViewChanged(MainViews arg);
-
- protected:
-  bool eventFilter(QObject* object, QEvent* event);
-
- private Q_SLOTS:
-  void UnhandledException();
-  void EventLoopStarted();
-
- private:
-  void RegisterQmlTypes() const;
-  void RegisterQtMetaTypes() const;
-  void SetContexProperties () const;
-
- private:
-  models::APIModel* api_model_{nullptr};
-  AccountHandlerController* account_handler_controller_{nullptr};
-  std::unique_ptr<MainWindow> main_window_;
-
-  MainViews current_view_{HandleAccount};
-};
-
-}  // namespace controllers
-
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-
+#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_

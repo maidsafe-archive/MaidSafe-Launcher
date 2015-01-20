@@ -5,5 +5,9 @@
         <file>resources/fonts/OpenSans-Semibold.ttf</file>
         <file>resources/js/brushes.js</file>
         <file>views/MainWindow.qml</file>
+        <file>views/account_handling/AccountHandlerView.qml</file>
+        <file>views/account_handling/CreateAccount.qml</file>
+        <file>views/account_handling/Login.qml</file>
+        <file>views/account_handling/login_bg.png</file>
     </qresource>
 </RCC>

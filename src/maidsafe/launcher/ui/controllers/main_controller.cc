@@ -17,10 +17,11 @@
     use of the MaidSafe Software.                                                                 */
 
 #include "maidsafe/launcher/ui/controllers/main_controller.h"
+
+#include "maidsafe/launcher/ui/controllers/account_handler_controller.h"
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
-
-#include "QQuickView"
+#include "maidsafe/launcher/ui/models/api_model.h"
 
 namespace maidsafe {
 
@@ -31,14 +32,33 @@ namespace ui {
 namespace controllers {
 
 MainController::MainController(QObject* parent)
-    : QObject(parent) {
+    : QObject{parent},
+      api_model_{new models::APIModel{this}},
+      account_handler_controller_{new AccountHandlerController{this}} {
+  RegisterQtMetaTypes();
+  RegisterQmlTypes();
   QTimer::singleShot(0, this, SLOT(EventLoopStarted()));
 }
 
 void MainController::EventLoopStarted() {
-  QQuickView* view = new QQuickView;
-  view->setSource(QUrl{"qrc:/views/MainWindow.qml"});
-  view->show();
+  main_window_.reset(new MainWindow);
+
+  SetContexProperties();
+
+  main_window_->setSource(QUrl{"qrc:/views/MainWindow.qml"});
+  main_window_->setWidth(300);
+  main_window_->setHeight(400);
+  main_window_->CenterToScreen();
+  main_window_->show();
+}
+
+MainController::MainViews MainController::currentView() const { return current_view_; }
+
+void MainController::setCurrentView(const MainViews new_current_view) {
+  if (new_current_view != current_view_) {
+    current_view_ = new_current_view;
+    emit currentViewChanged(current_view_);
+  }
 }
 
 bool MainController::eventFilter(QObject* object, QEvent* event) {
@@ -53,6 +73,30 @@ void MainController::UnhandledException() {
   // TODO (spandan) inform the user
   qApp->quit();
 }
+
+void MainController::RegisterQmlTypes() const {
+  qmlRegisterUncreatableType<MainController>(
+        "MainController",
+        1, 0,
+        "MainController",
+        "Error!! Attempting to access uncreatable type - MainController");
+  qmlRegisterUncreatableType<AccountHandlerController>(
+        "AccountHandler",
+        1, 0,
+        "AccountHandlerController",
+        "Error!! Attempting to access uncreatable type - AccountHandlerController");
+
+}
+
+void MainController::RegisterQtMetaTypes() const {
+  qRegisterMetaType<MainController::MainViews>("MainViews");
+}
+
+void MainController::SetContexProperties() const {
+  auto root_context(main_window_->rootContext());
+  root_context->setContextProperty("mainController", this);
+}
+
 
 }  // namespace controllers
 

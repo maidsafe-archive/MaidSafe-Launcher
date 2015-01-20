@@ -16,14 +16,10 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-
-#include <memory>
-
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/controllers/main_window.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+
+#include <QDebug>
+#include <QDesktopWidget>
 
 namespace maidsafe {
 
@@ -31,60 +27,56 @@ namespace launcher {
 
 namespace ui {
 
-namespace models {
-
-class APIModel;
-
-}  // namespace models
-
 namespace controllers {
 
-class AccountHandlerController;
+MainWindow::MainWindow(QWindow* parent)
+    : QQuickView{parent} {
+  connect(this,
+          SIGNAL(statusChanged(QQuickView::Status)),
+          this,
+          SLOT(StatusChanged(QQuickView::Status)),
+          Qt::UniqueConnection);
 
-class MainController : public QObject {
-  Q_OBJECT
+  setResizeMode(QQuickView::SizeRootObjectToView);
+}
 
-  Q_ENUMS(MainViews)
-  Q_PROPERTY(MainViews currentView READ currentView NOTIFY currentViewChanged FINAL)
+MainWindow::~MainWindow() = default;
 
- public:
-  enum MainViews {
-    HandleAccount,
-  };
+void MainWindow::CenterToScreen() {
+  auto screen_width(QDesktopWidget{}.screen()->width());
+  auto screen_height(QDesktopWidget{}.screen()->height());
+  setGeometry(screen_width / 2 - width() / 2, screen_height / 2 - height() / 2, width(), height());
+}
 
-  explicit MainController(QObject* parent = 0);
-
-  MainViews currentView() const;
-  void setCurrentView(const MainViews new_current_view);
-  Q_SIGNAL void currentViewChanged(MainViews arg);
-
- protected:
-  bool eventFilter(QObject* object, QEvent* event);
-
- private Q_SLOTS:
-  void UnhandledException();
-  void EventLoopStarted();
-
- private:
-  void RegisterQmlTypes() const;
-  void RegisterQtMetaTypes() const;
-  void SetContexProperties () const;
-
- private:
-  models::APIModel* api_model_{nullptr};
-  AccountHandlerController* account_handler_controller_{nullptr};
-  std::unique_ptr<MainWindow> main_window_;
-
-  MainViews current_view_{HandleAccount};
-};
+void MainWindow::StatusChanged(const QQuickView::Status status) {
+  switch (status) {
+   case QQuickView::Null:
+    qDebug() << "Status: Null.";
+//    LOG() << "Status: Null.";
+    break;
+   case QQuickView::Ready:
+    qDebug() << "Status: Ready.";
+//    LOG() << "Status: Ready.";
+    break;
+   case QQuickView::Loading:
+    qDebug() << "Status: Loading.";
+//    LOG() << "Status: Loading.";
+    break;
+   case QQuickView::Error:
+    qDebug() << "Status: ERROR.";
+//    LOG() << "Status: ERROR.";
+    break;
+   default:
+    qDebug() << "Status: Unknown.";
+//    LOG() << "Status: Unknown.";
+    break;
+  }
+}
 
 }  // namespace controllers
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-
