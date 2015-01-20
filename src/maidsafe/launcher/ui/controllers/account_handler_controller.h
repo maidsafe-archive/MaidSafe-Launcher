@@ -32,8 +32,23 @@ namespace controllers {
 class AccountHandlerController : public QObject {
   Q_OBJECT
 
+  Q_ENUMS(AccountHandlingViews)
+  Q_PROPERTY(AccountHandlingViews currentView READ currentView NOTIFY currentViewChanged FINAL)
+
  public:
+  enum AccountHandlingViews {
+    LoginView,
+    CreateAccountView,
+  };
+
   explicit AccountHandlerController(QObject* parent = nullptr);
+
+  AccountHandlingViews currentView() const;
+  void setCurrentView(const AccountHandlingViews new_current_view);
+  Q_SIGNAL void currentViewChanged(AccountHandlingViews arg);
+
+ private:
+  AccountHandlingViews current_view_{CreateAccountView};
 };
 
 }  // namespace controllers

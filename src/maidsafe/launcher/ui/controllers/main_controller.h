@@ -39,11 +39,24 @@ class APIModel;
 
 namespace controllers {
 
+class AccountHandlerController;
+
 class MainController : public QObject {
   Q_OBJECT
 
+  Q_ENUMS(MainViews)
+  Q_PROPERTY(MainViews currentView READ currentView NOTIFY currentViewChanged FINAL)
+
  public:
+  enum MainViews {
+    HandleAccount,
+  };
+
   explicit MainController(QObject* parent = 0);
+
+  MainViews currentView() const;
+  void setCurrentView(const MainViews new_current_view);
+  Q_SIGNAL void currentViewChanged(MainViews arg);
 
  protected:
   bool eventFilter(QObject* object, QEvent* event);
@@ -53,8 +66,15 @@ class MainController : public QObject {
   void EventLoopStarted();
 
  private:
-  models::APIModel* api_model_;
+  void RegisterQmlTypes();
+  void RegisterQtMetaTypes();
+
+ private:
+  models::APIModel* api_model_{nullptr};
+  AccountHandlerController* account_handler_controller_{nullptr};
   std::unique_ptr<MainWindow> main_window_;
+
+  MainViews current_view_{HandleAccount};
 };
 
 }  // namespace controllers

@@ -32,6 +32,17 @@ AccountHandlerController::AccountHandlerController(QObject* parent)
     : QObject{parent} {
 }
 
+AccountHandlerController::AccountHandlingViews AccountHandlerController::currentView() const {
+  return current_view_;
+}
+
+void AccountHandlerController::setCurrentView(const AccountHandlingViews new_current_view) {
+  if (new_current_view != current_view_) {
+    current_view_ = new_current_view;
+    emit currentViewChanged(current_view_);
+  }
+}
+
 }  // namespace controllers
 
 }  // namespace ui
