@@ -66,8 +66,9 @@ class MainController : public QObject {
   void EventLoopStarted();
 
  private:
-  void RegisterQmlTypes();
-  void RegisterQtMetaTypes();
+  void RegisterQmlTypes() const;
+  void RegisterQtMetaTypes() const;
+  void SetContexProperties () const;
 
  private:
   models::APIModel* api_model_{nullptr};

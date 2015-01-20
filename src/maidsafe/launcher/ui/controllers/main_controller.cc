@@ -70,7 +70,7 @@ void MainController::UnhandledException() {
   qApp->quit();
 }
 
-void MainController::RegisterQmlTypes() {
+void MainController::RegisterQmlTypes() const {
   qmlRegisterUncreatableType<MainController>(
         "MainController",
         1, 0,
@@ -84,9 +84,13 @@ void MainController::RegisterQmlTypes() {
 
 }
 
-void MainController::RegisterQtMetaTypes() {
+void MainController::RegisterQtMetaTypes() const { }
 
+void MainController::SetContexProperties() const {
+  auto root_context(main_window_->rootContext());
+  root_context->setContextProperty("main_controller", this);
 }
+
 
 }  // namespace controllers
 
