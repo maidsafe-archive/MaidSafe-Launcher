@@ -87,6 +87,31 @@ if(MSVC)
   source_group("Auto Compiled\\App Icon File" FILES ${UiAppIconResource})
 endif()
 
+#==================================================================================================#
+# Define localisation files.                                                                       #
+#==================================================================================================#
+file(GLOB CompiledLocalisationFiles ${PROJECT_SOURCE_DIR}/resources/translations/*.ts)
+
+if(UPDATE_LOCALISATION_RESOURCES)
+  set(LocalisationLanguages en fr es)
+  set(LocalisationSources ${AllUiSourceFiles} ${ViewsAllFiles} ${CustomComponentsAllFiles})
+  set(LocalisationTsFiles)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources)
+  file(COPY ${CompiledLocalisationFiles} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources)
+  foreach(Language ${LocalisationLanguages})
+    list(APPEND LocalisationTsFiles ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources/${Language}.ts)
+  endforeach()
+  qt5_create_translation(LocalisationQmFiles ${LocalisationSources} ${LocalisationTsFiles})
+  message(STATUS "NOTE: Translation Source Update Configured")
+  message(STATUS "      Make Sure to Post-Build Transfer ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources")
+  message(STATUS "                                  -->  ${PROJECT_SOURCE_DIR}/resources/translations")
+  message(STATUS "      Do **not** make a clean build with UPDATE_LOCALISATION_RESOURCES=ON")
+else()
+  qt5_add_translation(LocalisationQmFiles ${CompiledLocalisationFiles})
+endif()
+unset(UPDATE_LOCALISATION_RESOURCES CACHE)
+source_group("Auto Compiled\\Localisation Files" FILES ${LocalisationQmFiles})
+
 
 #==================================================================================================#
 # Define MaidSafe libraries and executables                                                        #
@@ -97,6 +122,7 @@ ms_add_executable(safe_app_launcher "Production" ${UiMain}
                                                  ${ResourceFilesUiResourcesDir}
                                                  ${ViewsAllFiles}
                                                  ${CustomComponentsAllFiles}
+                                                 ${LocalisationQmFiles}
                                                  ${UiAppIconResource})
 target_include_directories(safe_app_launcher PRIVATE "../../../")
 target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher

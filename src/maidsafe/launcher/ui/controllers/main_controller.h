@@ -21,7 +21,6 @@
 
 #include <memory>
 
-#include <QDebug>
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/main_window.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
@@ -58,7 +57,7 @@ class MainController : public QObject {
  protected:
   bool eventFilter(QObject* object, QEvent* event);
 
- private Q_SLOTS:
+ private slots:  // NOLINT - Viv
   void UnhandledException();
   void EventLoopStarted();
 
@@ -77,7 +76,7 @@ class MainController : public QObject {
 
 }  // namespace controllers
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 

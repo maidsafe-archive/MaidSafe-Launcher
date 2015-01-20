@@ -33,12 +33,12 @@ class MainWindow : public QQuickView {
   Q_OBJECT
 
  public:
-  MainWindow(QWindow* parent = nullptr);
+  explicit MainWindow(QWindow* parent = nullptr);
   ~MainWindow() override;
 
   void CenterToScreen();
 
- private Q_SLOTS:
+ private slots:  // NOLINT - Viv
   void StatusChanged(const QQuickView::Status status);
 };
 
