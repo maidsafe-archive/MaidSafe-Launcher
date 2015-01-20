@@ -91,7 +91,7 @@ endif()
 #==================================================================================================#
 # Define MaidSafe libraries and executables                                                        #
 #==================================================================================================#
-add_executable(safe_launcher ${UiMain}
+add_executable(safe_app_launcher ${UiMain}
                              ${HelpersAllFiles}
                              ${ControllersAllFiles}
                              ${ModelsAllFiles}
@@ -99,14 +99,14 @@ add_executable(safe_launcher ${UiMain}
                              ${ViewsAllFiles}
                              ${CustomComponentsAllFiles}
                              ${UiAppIconResource})
-target_include_directories(safe_launcher PRIVATE "../../../")
-target_link_libraries(safe_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
+target_include_directories(safe_app_launcher PRIVATE "../../../")
+target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
 if(UNIX)
   set_source_files_properties(${ControllersAllFiles} PROPERTIES COMPILE_FLAGS -Wno-float-equal)
 endif()
 
 if(MSVC)
-  set_target_properties(safe_launcher PROPERTIES WIN32_EXECUTABLE TRUE)
+  set_target_properties(safe_app_launcher PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
 
@@ -115,7 +115,7 @@ endif()
 #==================================================================================================#
 include(../../../../../../cmake_modules/standard_flags.cmake)
 
-target_compile_definitions(safe_launcher PRIVATE $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT>)
+target_compile_definitions(safe_app_launcher PRIVATE $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT>)
 
 if(MSVC)
   string(REGEX REPLACE "/Zm[0-9]+ " "/Zm500 " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -131,10 +131,10 @@ message(STATUS "Found Qt5. Launcher UI enabled.")
 #==================================================================================================#
 # Generate Qt .pro file.                                                                           #
 #==================================================================================================#
-set(QtPROHelper ${CMAKE_BINARY_DIR}/safe_launcher_mock.pro)
+set(QtPROHelper ${CMAKE_BINARY_DIR}/safe_app_launcher_mock.pro)
 file(WRITE ${QtPROHelper} "#This File is Auto-Generated. Do Not Edit Manually.")
 file(APPEND ${QtPROHelper} "\nQT += qml quick widgets")
-file(APPEND ${QtPROHelper} "\nTARGET = safe_launcher")
+file(APPEND ${QtPROHelper} "\nTARGET = safe_app_launcher")
 
 file(APPEND ${QtPROHelper} "\n\nSOURCES += ")
 set(SourceFilesCollection ${UiMain} ${AllUiSourceFiles})
