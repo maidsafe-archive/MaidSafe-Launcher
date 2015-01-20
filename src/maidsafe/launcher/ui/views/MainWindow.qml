@@ -31,6 +31,6 @@ Item {
     source: mainController.currentView === MainController.HandleAccount ?
               "account_handling/AccountHandlerView.qml"
             :
-              ""
+              "account_handling/AccountHandlerView.qml"
   }
 }

@@ -58,9 +58,6 @@ class MainController : public QObject {
   void setCurrentView(const MainViews new_current_view);
   Q_SIGNAL void currentViewChanged(MainViews arg);
 
-  // States:
-//  void
-
  protected:
   bool eventFilter(QObject* object, QEvent* event);
 

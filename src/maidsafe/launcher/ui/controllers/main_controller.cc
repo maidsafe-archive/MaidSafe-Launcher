@@ -88,7 +88,9 @@ void MainController::RegisterQmlTypes() const {
 
 }
 
-void MainController::RegisterQtMetaTypes() const { }
+void MainController::RegisterQtMetaTypes() const {
+  qRegisterMetaType<MainController::MainViews>("MainViews");
+}
 
 void MainController::SetContexProperties() const {
   auto root_context(main_window_->rootContext());
