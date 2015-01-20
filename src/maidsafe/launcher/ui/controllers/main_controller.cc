@@ -39,6 +39,8 @@ MainController::MainController(QObject* parent)
   RegisterQmlTypes();
   SetContexProperties();
 
+  installEventFilter(this);
+
   QTimer::singleShot(0, this, SLOT(EventLoopStarted()));
 }
 

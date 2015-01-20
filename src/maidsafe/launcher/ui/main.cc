@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   application.addLibraryPath(qApp->applicationDirPath() + "/plugins");
   application.setOrganizationDomain("http://www.maidsafe.net");
   application.setOrganizationName("MaidSafe.net Ltd.");
-  application.setApplicationName("App-Launcher");
+  application.setApplicationName("SAFE App Launcher");
 
   try {
     ms::controllers::MainController main_controller;

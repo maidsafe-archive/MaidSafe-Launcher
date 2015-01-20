@@ -60,6 +60,7 @@ void Application::SetErrorHandler(boost::optional<controllers::MainController&> 
 }
 
 bool Application::IsUniqueInstance() {
+  shared_memory_.setKey("SAFE_APP_LAUNCHER");
   return shared_memory_.create(1);
 }
 
