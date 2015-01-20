@@ -17,8 +17,20 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.2
+import MainController 1.0
 
-Rectangle {
-  id: rootWindow
-  color: "black"
+Item {
+  id: rootMainWindowItem
+  objectName: "rootMainWindowItem"
+
+  Loader {
+    id: rootLoader
+    objectName: "rootLoader"
+
+    anchors.fill: parent
+    source: mainController.currentView === MainController.HandleAccount ?
+              "account_handling/AccountHandlerView.qml"
+            :
+              ""
+  }
 }

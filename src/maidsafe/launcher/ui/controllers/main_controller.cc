@@ -41,7 +41,11 @@ MainController::MainController(QObject* parent)
 }
 
 void MainController::EventLoopStarted() {
-  main_window_.reset(new MainWindow{QUrl{"qrc:/views/MainWindow.qml"}});
+  main_window_.reset(new MainWindow);
+
+  SetContexProperties();
+
+  main_window_->setSource(QUrl{"qrc:/views/MainWindow.qml"});
   main_window_->setWidth(300);
   main_window_->setHeight(400);
   main_window_->CenterToScreen();
@@ -88,7 +92,7 @@ void MainController::RegisterQtMetaTypes() const { }
 
 void MainController::SetContexProperties() const {
   auto root_context(main_window_->rootContext());
-  root_context->setContextProperty("main_controller", this);
+  root_context->setContextProperty("mainController", this);
 }
 
 

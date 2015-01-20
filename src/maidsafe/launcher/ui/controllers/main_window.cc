@@ -29,8 +29,8 @@ namespace ui {
 
 namespace controllers {
 
-MainWindow::MainWindow(const QUrl& source_qml_file, QWindow* parent)
-    : QQuickView{source_qml_file, parent} {
+MainWindow::MainWindow(QWindow* parent)
+    : QQuickView{parent} {
   connect(this,
           SIGNAL(statusChanged(QQuickView::Status)),
           this,

@@ -33,7 +33,7 @@ class MainWindow : public QQuickView {
   Q_OBJECT
 
  public:
-  MainWindow(const QUrl& source_qml_file, QWindow* parent = nullptr);
+  MainWindow(QWindow* parent = nullptr);
   ~MainWindow() override;
 
   void CenterToScreen();
