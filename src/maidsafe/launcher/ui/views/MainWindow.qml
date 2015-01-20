@@ -16,7 +16,7 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.2
+import QtQuick 2.1
 import MainController 1.0
 
 Item {
@@ -31,6 +31,6 @@ Item {
     source: mainController.currentView === MainController.HandleAccount ?
               "account_handling/AccountHandlerView.qml"
             :
-              "account_handling/AccountHandlerView.qml"
+              ""
   }
 }

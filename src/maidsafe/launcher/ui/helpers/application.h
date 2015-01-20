@@ -16,8 +16,16 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/launcher/ui/controllers/application.h"
-#include "maidsafe/launcher/ui/controllers/main_controller.h"
+#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
+#define MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
+
+#include <memory>
+#include <string>
+
+#include "boost/optional.hpp"
+
+#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
+#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
 namespace maidsafe {
 
@@ -25,49 +33,42 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
+namespace controllers { class MainController; }  // namespace controllers
 
-ExceptionEvent::ExceptionEvent(const QString& exception_message, Type type)
-    : QEvent(type),
-      exception_message_(exception_message) {}
+namespace helpers {
 
-QString ExceptionEvent::ExceptionMessage() {
-  return exception_message_;
-}
+class ExceptionEvent : public QEvent {
+ public:
+  ExceptionEvent(const QString& exception_message, Type type = QEvent::User);
+  ~ExceptionEvent() {}
+  QString ExceptionMessage();
 
-Application::Application(int argc, char** argv)
-    : QApplication(argc, argv),
-      handler_object_(),
-      shared_memory_() {}
+ private:
+  ExceptionEvent(const ExceptionEvent&);
+  ExceptionEvent& operator=(const ExceptionEvent&);
 
-bool Application::notify(QObject* receiver, QEvent* event) {
-  try {
-    return QApplication::notify(receiver, event);
-  } catch(...) {
-    if (handler_object_) {
-      QApplication::instance()->postEvent(&(*handler_object_),
-                                          new ExceptionEvent(tr("Unknown Exception")));
-    } else {
-      QApplication::quit();
-    }
-  }
-  return false;
-}
+  QString exception_message_;
+};
 
-void Application::SetErrorHandler(boost::optional<MainController&> handler_object) {
-  if (handler_object)
-    handler_object_ = handler_object;
-}
+class Application : public QApplication {
+ public:
+  Application(int argc, char** argv);
+  virtual bool notify(QObject* receiver, QEvent* event);
+  void SetErrorHandler(boost::optional<controllers::MainController&> handler_object);
+  bool IsUniqueInstance();
 
-bool Application::IsUniqueInstance() {
-  return shared_memory_.create(1);
-}
+ private:
+  boost::optional<controllers::MainController&> handler_object_;
+  QSharedMemory shared_memory_;
+};
 
-}  // namespace controllers
+}  // namespace helpers
 
 }  // namespace ui 
 
 }  // namespace launcher
 
 }  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
 

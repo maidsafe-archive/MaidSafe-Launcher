@@ -16,7 +16,7 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/launcher/ui/controllers/main_window.h"
+#include "maidsafe/launcher/ui/helpers/main_window.h"
 
 #include <QDebug>
 #include <QDesktopWidget>
@@ -27,7 +27,7 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
+namespace helpers {
 
 MainWindow::MainWindow(QWindow* parent)
     : QQuickView{parent} {
@@ -73,7 +73,7 @@ void MainWindow::StatusChanged(const QQuickView::Status status) {
   }
 }
 
-}  // namespace controllers
+}  // namespace helpers
 
 }  // namespace ui
 

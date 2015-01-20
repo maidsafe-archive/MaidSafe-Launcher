@@ -27,6 +27,8 @@ namespace launcher {
 
 namespace ui {
 
+namespace helpers { class MainWindow; }  // namespace helpers
+
 namespace controllers {
 
 class AccountHandlerController : public QObject {
@@ -46,6 +48,8 @@ class AccountHandlerController : public QObject {
   AccountHandlingViews currentView() const;
   void setCurrentView(const AccountHandlingViews new_current_view);
   Q_SIGNAL void currentViewChanged(AccountHandlingViews arg);
+
+  void Invoke(helpers::MainWindow* main_window);
 
  private:
   AccountHandlingViews current_view_{CreateAccountView};

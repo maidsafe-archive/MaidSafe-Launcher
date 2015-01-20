@@ -19,6 +19,7 @@
 #include "maidsafe/launcher/ui/controllers/account_handler_controller.h"
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include "maidsafe/launcher/ui/helpers/main_window.h"
 
 namespace maidsafe {
 
@@ -41,6 +42,13 @@ void AccountHandlerController::setCurrentView(const AccountHandlingViews new_cur
     current_view_ = new_current_view;
     emit currentViewChanged(current_view_);
   }
+}
+
+void AccountHandlerController::Invoke(helpers::MainWindow* main_window) {
+  main_window->setWidth(300);
+  main_window->setHeight(400);
+  main_window->CenterToScreen();
+  main_window->show();
 }
 
 }  // namespace controllers

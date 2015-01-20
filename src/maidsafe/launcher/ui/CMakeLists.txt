@@ -92,9 +92,8 @@ endif()
 # Define MaidSafe libraries and executables                                                        #
 #==================================================================================================#
 ms_add_executable(safe_app_launcher "Production" ${UiMain}
-                                                 ${HelpersAllFiles}
-                                                 ${ControllersAllFiles}
-                                                 ${ModelsAllFiles}
+                                                 ${AllUiSourceFiles}
+                                                 ${AllUiHeaderFiles}
                                                  ${ResourceFilesUiResourcesDir}
                                                  ${ViewsAllFiles}
                                                  ${CustomComponentsAllFiles}
@@ -102,7 +101,7 @@ ms_add_executable(safe_app_launcher "Production" ${UiMain}
 target_include_directories(safe_app_launcher PRIVATE "../../../")
 target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
 if(UNIX)
-  set_source_files_properties(${ControllersAllFiles} PROPERTIES COMPILE_FLAGS -Wno-float-equal)
+  set_source_files_properties(${AllUiSourceFiles} PROPERTIES COMPILE_FLAGS -Wno-float-equal)
 endif()
 
 if(MSVC)
