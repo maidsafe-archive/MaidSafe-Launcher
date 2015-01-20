@@ -21,8 +21,9 @@
 
 #include <memory>
 
+#include <QDebug>
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/controllers/main_window.h"
+#include "maidsafe/launcher/ui/helpers/main_window.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
 namespace maidsafe {
@@ -31,11 +32,7 @@ namespace launcher {
 
 namespace ui {
 
-namespace models {
-
-class APIModel;
-
-}  // namespace models
+namespace models { class APIModel; }  // namespace models
 
 namespace controllers {
 
@@ -55,7 +52,7 @@ class MainController : public QObject {
   explicit MainController(QObject* parent = 0);
 
   MainViews currentView() const;
-  void setCurrentView(const MainViews new_current_view);
+  void SetCurrentView(const MainViews new_current_view);
   Q_SIGNAL void currentViewChanged(MainViews arg);
 
  protected:
@@ -68,12 +65,12 @@ class MainController : public QObject {
  private:
   void RegisterQmlTypes() const;
   void RegisterQtMetaTypes() const;
-  void SetContexProperties () const;
+  void SetContexProperties();
 
  private:
   models::APIModel* api_model_{nullptr};
   AccountHandlerController* account_handler_controller_{nullptr};
-  std::unique_ptr<MainWindow> main_window_;
+  std::unique_ptr<helpers::MainWindow> main_window_{new helpers::MainWindow};
 
   MainViews current_view_{HandleAccount};
 };

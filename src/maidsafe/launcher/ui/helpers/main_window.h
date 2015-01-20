@@ -16,8 +16,8 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
-#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
+#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_
+#define MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_
 
 #include <QQuickView>
 
@@ -27,7 +27,7 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
+namespace helpers {
 
 class MainWindow : public QQuickView {
   Q_OBJECT
@@ -42,7 +42,7 @@ class MainWindow : public QQuickView {
   void StatusChanged(const QQuickView::Status status);
 };
 
-}  // namespace controllers
+}  // namespace helpers
 
 }  // namespace ui
 
@@ -50,4 +50,4 @@ class MainWindow : public QQuickView {
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_WINDOW_H_
+#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_

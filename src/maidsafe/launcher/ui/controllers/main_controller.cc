@@ -37,24 +37,19 @@ MainController::MainController(QObject* parent)
       account_handler_controller_{new AccountHandlerController{this}} {
   RegisterQtMetaTypes();
   RegisterQmlTypes();
+  SetContexProperties();
+
   QTimer::singleShot(0, this, SLOT(EventLoopStarted()));
 }
 
 void MainController::EventLoopStarted() {
-  main_window_.reset(new MainWindow);
-
-  SetContexProperties();
-
   main_window_->setSource(QUrl{"qrc:/views/MainWindow.qml"});
-  main_window_->setWidth(300);
-  main_window_->setHeight(400);
-  main_window_->CenterToScreen();
-  main_window_->show();
+  account_handler_controller_->Invoke(main_window_.get());
 }
 
 MainController::MainViews MainController::currentView() const { return current_view_; }
 
-void MainController::setCurrentView(const MainViews new_current_view) {
+void MainController::SetCurrentView(const MainViews new_current_view) {
   if (new_current_view != current_view_) {
     current_view_ = new_current_view;
     emit currentViewChanged(current_view_);
@@ -85,16 +80,14 @@ void MainController::RegisterQmlTypes() const {
         1, 0,
         "AccountHandlerController",
         "Error!! Attempting to access uncreatable type - AccountHandlerController");
-
 }
 
-void MainController::RegisterQtMetaTypes() const {
-  qRegisterMetaType<MainController::MainViews>("MainViews");
-}
+void MainController::RegisterQtMetaTypes() const { }
 
-void MainController::SetContexProperties() const {
+void MainController::SetContexProperties() {
   auto root_context(main_window_->rootContext());
   root_context->setContextProperty("mainController", this);
+  root_context->setContextProperty("accountHandlerController", account_handler_controller_);
 }
 
 
