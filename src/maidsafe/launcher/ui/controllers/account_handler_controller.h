@@ -32,7 +32,7 @@ namespace controllers {
 class AccountHandlerController : public QObject {
   Q_OBJECT
 
-public:
+ public:
   explicit AccountHandlerController(QObject* parent = nullptr);
 };
 

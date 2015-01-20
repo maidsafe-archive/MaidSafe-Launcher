@@ -30,9 +30,8 @@ namespace ui {
 
 namespace models {
 
-class AccountHandlerModel : public QObject
-{
-public:
+class AccountHandlerModel : public QObject {
+ public:
   explicit AccountHandlerModel(QObject* parent = nullptr);
 };
 

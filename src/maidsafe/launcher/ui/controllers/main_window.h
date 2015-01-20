@@ -29,13 +29,17 @@ namespace ui {
 
 namespace controllers {
 
-class MainWindow : public QQuickView
-{
+class MainWindow : public QQuickView {
   Q_OBJECT
 
-public:
+ public:
   MainWindow(const QUrl& source_qml_file, QWindow* parent = nullptr);
   ~MainWindow() override;
+
+  void CenterToScreen();
+
+ private Q_SLOTS:
+  void StatusChanged(const QQuickView::Status status);
 };
 
 }  // namespace controllers

@@ -27,7 +27,7 @@ namespace ui {
 namespace models {
 
 AccountHandlerModel::AccountHandlerModel(QObject* parent)
-  : QObject{parent} {}
+    : QObject{parent} {}
 
 }  // namespace models
 

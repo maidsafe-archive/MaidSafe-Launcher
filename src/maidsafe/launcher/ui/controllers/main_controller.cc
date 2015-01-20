@@ -19,6 +19,7 @@
 #include "maidsafe/launcher/ui/controllers/main_controller.h"
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include "maidsafe/launcher/ui/models/api_model.h"
 
 namespace maidsafe {
 
@@ -29,12 +30,16 @@ namespace ui {
 namespace controllers {
 
 MainController::MainController(QObject* parent)
-    : QObject(parent) {
+    : QObject{parent},
+      api_model_{new models::APIModel{this}} {
   QTimer::singleShot(0, this, SLOT(EventLoopStarted()));
 }
 
 void MainController::EventLoopStarted() {
   main_window_.reset(new MainWindow{QUrl{"qrc:/views/MainWindow.qml"}});
+  main_window_->setWidth(300);
+  main_window_->setHeight(400);
+  main_window_->CenterToScreen();
   main_window_->show();
 }
 

@@ -24,13 +24,18 @@
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/controllers/main_window.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
-#include "maidsafe/launcher/ui/models/api_model.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
 namespace ui {
+
+namespace models {
+
+class APIModel;
+
+}  // namespace models
 
 namespace controllers {
 
@@ -43,11 +48,12 @@ class MainController : public QObject {
  protected:
   bool eventFilter(QObject* object, QEvent* event);
 
- private slots:
+ private Q_SLOTS:
   void UnhandledException();
   void EventLoopStarted();
 
  private:
+  models::APIModel* api_model_;
   std::unique_ptr<MainWindow> main_window_;
 };
 

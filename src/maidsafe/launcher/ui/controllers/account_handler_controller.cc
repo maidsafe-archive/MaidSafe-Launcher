@@ -29,8 +29,7 @@ namespace ui {
 namespace controllers {
 
 AccountHandlerController::AccountHandlerController(QObject* parent)
-  : QObject{parent}
-{
+    : QObject{parent} {
 }
 
 }  // namespace controllers

@@ -18,6 +18,7 @@
 
 #include "maidsafe/launcher/ui/controllers/main_window.h"
 
+#include <QDebug>
 #include <QDesktopWidget>
 
 namespace maidsafe {
@@ -28,20 +29,49 @@ namespace ui {
 
 namespace controllers {
 
-MainWindow::MainWindow(const QUrl& source_qml_file, QWindow* parent /*= nullptr*/)
-  : QQuickView{source_qml_file, parent}
-{
-  setWidth(300);
-  setHeight(400);
+MainWindow::MainWindow(const QUrl& source_qml_file, QWindow* parent)
+    : QQuickView{source_qml_file, parent} {
+  connect(this,
+          SIGNAL(statusChanged(QQuickView::Status)),
+          this,
+          SLOT(StatusChanged(QQuickView::Status)),
+          Qt::UniqueConnection);
 
   setResizeMode(QQuickView::SizeRootObjectToView);
+}
 
+MainWindow::~MainWindow() = default;
+
+void MainWindow::CenterToScreen() {
   auto screen_width(QDesktopWidget{}.screen()->width());
   auto screen_height(QDesktopWidget{}.screen()->height());
   setGeometry(screen_width / 2 - width() / 2, screen_height / 2 - height() / 2, width(), height());
 }
 
-MainWindow::~MainWindow() = default;
+void MainWindow::StatusChanged(const QQuickView::Status status) {
+  switch (status) {
+   case QQuickView::Null:
+    qDebug() << "Status: Null.";
+//    LOG() << "Status: Null.";
+    break;
+   case QQuickView::Ready:
+    qDebug() << "Status: Ready.";
+//    LOG() << "Status: Ready.";
+    break;
+   case QQuickView::Loading:
+    qDebug() << "Status: Loading.";
+//    LOG() << "Status: Loading.";
+    break;
+   case QQuickView::Error:
+    qDebug() << "Status: ERROR.";
+//    LOG() << "Status: ERROR.";
+    break;
+   default:
+    qDebug() << "Status: Unknown.";
+//    LOG() << "Status: Unknown.";
+    break;
+  }
+}
 
 }  // namespace controllers
 
