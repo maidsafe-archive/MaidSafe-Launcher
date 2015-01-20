@@ -91,14 +91,14 @@ endif()
 #==================================================================================================#
 # Define MaidSafe libraries and executables                                                        #
 #==================================================================================================#
-add_executable(safe_app_launcher ${UiMain}
-                             ${HelpersAllFiles}
-                             ${ControllersAllFiles}
-                             ${ModelsAllFiles}
-                             ${ResourceFilesUiResourcesDir}
-                             ${ViewsAllFiles}
-                             ${CustomComponentsAllFiles}
-                             ${UiAppIconResource})
+ms_add_executable(safe_app_launcher "Production" ${UiMain}
+                                                 ${HelpersAllFiles}
+                                                 ${ControllersAllFiles}
+                                                 ${ModelsAllFiles}
+                                                 ${ResourceFilesUiResourcesDir}
+                                                 ${ViewsAllFiles}
+                                                 ${CustomComponentsAllFiles}
+                                                 ${UiAppIconResource})
 target_include_directories(safe_app_launcher PRIVATE "../../../")
 target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
 if(UNIX)
