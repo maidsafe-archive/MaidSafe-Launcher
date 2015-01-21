@@ -35,8 +35,6 @@ namespace models { class APIModel; }  // namespace models
 
 namespace controllers {
 
-class AccountHandlerController;
-
 class MainController : public QObject {
   Q_OBJECT
 
@@ -66,10 +64,14 @@ class MainController : public QObject {
   void RegisterQtMetaTypes() const;
   void SetContexProperties();
 
+  // AccountHandling
+  Q_SLOT void LoginCompleted();
+  Q_SIGNAL void InvokeAccountHandlerController();
+
  private:
-  models::APIModel* api_model_{nullptr};
-  AccountHandlerController* account_handler_controller_{nullptr};
   std::unique_ptr<helpers::MainWindow> main_window_{new helpers::MainWindow};
+  models::APIModel* api_model_{nullptr};
+  QObject* account_handler_controller_{nullptr};
 
   MainViews current_view_{HandleAccount};
 };

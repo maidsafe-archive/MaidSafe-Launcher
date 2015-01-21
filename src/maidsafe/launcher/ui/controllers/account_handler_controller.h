@@ -43,15 +43,29 @@ class AccountHandlerController : public QObject {
     CreateAccountView,
   };
 
-  explicit AccountHandlerController(QObject* parent = nullptr);
+  AccountHandlerController(helpers::MainWindow& main_window, QObject* parent);
 
   AccountHandlingViews currentView() const;
   void setCurrentView(const AccountHandlingViews new_current_view);
   Q_SIGNAL void currentViewChanged(AccountHandlingViews arg);
 
-  void Invoke(helpers::MainWindow* main_window);
+  Q_INVOKABLE void login(const QString& pin, const QString& keyword,
+                         const QString& password);
+  Q_INVOKABLE void showLoginView();
+
+  Q_INVOKABLE void createAccount(const QString& pin, const QString& keyword,
+                                 const QString& password);
+  Q_INVOKABLE void showCreateAccountView();
+
+
+ private slots:  // NOLINT - Spandan
+  void Invoke();
+
+ signals:  // NOLINT - Spandan
+  void LoginCompleted();
 
  private:
+  helpers::MainWindow& main_window_;
   AccountHandlingViews current_view_{CreateAccountView};
 };
 

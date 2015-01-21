@@ -16,7 +16,7 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.1
+import QtQuick 2.4
 import MainController 1.0
 
 Item {

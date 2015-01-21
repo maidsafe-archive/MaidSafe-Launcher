@@ -16,25 +16,38 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-.pragma library
+import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
+import "../resources/js/brushes.js" as DefaultBrushes
 
-var focusBlack = "#1C1C1B"
-var white = "#FFFFFF"
+TextField {
+  FontLoader { id: arialFont; name: "Arial" }
 
-var selectionBlue = "#D4E4F4"
-var lightBlue = "#88B8E4"
-var normalBlue = "#5791CD"
-var darkBlue = "#457BAF"
-var darkerBlue = "#1D5086"
+  property bool isMarkerTextVisible : true
 
-var disabledGray = "#DADAD9"
-var lightGray = "#ECECEC"
-var darkerGray = "#B2B2B1"
-var labelGray = "#6F6F6E"
-var borderGray = "#9D9C9C"
-var playerTimeLineGray = "#4D4D4D"
-
-var darkRed = "#981919"
-var normalRed = "#E6332A"
-
-var transparent = "#00000000"
+  font.pixelSize: 12
+  horizontalAlignment: Qt.AlignHCenter
+  style: TextFieldStyle {
+    background: Rectangle {
+      border {
+        color: {
+          if (!control.enabled) {
+            DefaultBrushes.disabledGray
+          } else if (control.activeFocus) {
+            DefaultBrushes.focusBlack
+          } else {
+            DefaultBrushes.borderGray
+          }
+        }
+        width: 1
+      }
+      implicitHeight: 30
+      implicitWidth: 225
+    }
+    font: arialFont.name
+    selectionColor: DefaultBrushes.selectionBlue
+    selectedTextColor: DefaultBrushes.focusBlack
+    textColor: !control.enabled ? DefaultBrushes.disabledGray : DefaultBrushes.focusBlack
+  }
+}

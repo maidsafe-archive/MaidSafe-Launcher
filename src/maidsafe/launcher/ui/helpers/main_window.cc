@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWindow* parent)
   connect(this,
           SIGNAL(statusChanged(QQuickView::Status)),
           this,
-          SLOT(StatusChanged(QQuickView::Status)),
+          SLOT(StatusChanged(const QQuickView::Status)),
           Qt::UniqueConnection);
 
   setResizeMode(QQuickView::SizeRootObjectToView);

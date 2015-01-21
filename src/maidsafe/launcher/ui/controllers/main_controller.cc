@@ -34,10 +34,16 @@ namespace controllers {
 MainController::MainController(QObject* parent)
     : QObject{parent},
       api_model_{new models::APIModel{this}},
-      account_handler_controller_{new AccountHandlerController{this}} {
+      account_handler_controller_{new AccountHandlerController{*main_window_, this}} {
   RegisterQtMetaTypes();
   RegisterQmlTypes();
   SetContexProperties();
+
+  // TODO(Spandan) There is crash right now on my system (Ubunut).
+  // connections
+  connect(this, SIGNAL(InvokeAccountHandlerController()),
+          account_handler_controller_, SLOT(Invoke()),
+          Qt::UniqueConnection);
 
   installEventFilter(this);
 
@@ -45,8 +51,13 @@ MainController::MainController(QObject* parent)
 }
 
 void MainController::EventLoopStarted() {
+  // TODO(Spandan) move this to the constructor. There is crash right now on my system (Ubunut).
+//  connect(this, SIGNAL(InvokeAccountHandlerController()),
+//          account_handler_controller_, SLOT(Invoke()),
+//          Qt::UniqueConnection);
+
   main_window_->setSource(QUrl{"qrc:/views/MainWindow.qml"});
-  account_handler_controller_->Invoke(main_window_.get());
+  emit InvokeAccountHandlerController();
 }
 
 MainController::MainViews MainController::currentView() const { return current_view_; }
@@ -57,6 +68,8 @@ void MainController::SetCurrentView(const MainViews new_current_view) {
     emit currentViewChanged(current_view_);
   }
 }
+
+void MainController::LoginCompleted() {}
 
 bool MainController::eventFilter(QObject* object, QEvent* event) {
   if (object == this && event->type() >= QEvent::User && event->type() <= QEvent::MaxUser) {

@@ -29,8 +29,11 @@ namespace ui {
 
 namespace controllers {
 
-AccountHandlerController::AccountHandlerController(QObject* parent)
-    : QObject{parent} {
+AccountHandlerController::AccountHandlerController(
+    helpers::MainWindow& main_window, QObject* parent)
+    : QObject{parent},
+      main_window_{main_window} {
+  connect(this, SIGNAL(LoginCompleted()), parent, SLOT(LoginCompleted()), Qt::UniqueConnection);
 }
 
 AccountHandlerController::AccountHandlingViews AccountHandlerController::currentView() const {
@@ -44,11 +47,25 @@ void AccountHandlerController::setCurrentView(const AccountHandlingViews new_cur
   }
 }
 
-void AccountHandlerController::Invoke(helpers::MainWindow* main_window) {
-  main_window->setWidth(300);
-  main_window->setHeight(400);
-  main_window->CenterToScreen();
-  main_window->show();
+void AccountHandlerController::login(const QString& pin, const QString& keyword,
+                                     const QString& password) {
+  (void)pin; (void)keyword; (void)password;
+}
+
+void AccountHandlerController::showLoginView() { setCurrentView(LoginView); }
+
+void AccountHandlerController::createAccount(const QString& pin, const QString& keyword,
+                                             const QString& password) {
+  (void)pin; (void)keyword; (void)password;
+}
+
+void AccountHandlerController::showCreateAccountView() { setCurrentView(CreateAccountView); }
+
+void AccountHandlerController::Invoke() {
+  main_window_.setWidth(300);
+  main_window_.setHeight(400);
+  main_window_.CenterToScreen();
+  main_window_.show();
 }
 
 }  // namespace controllers
