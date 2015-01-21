@@ -39,7 +39,7 @@ class APIModel : public QObject {
 
 }  // namespace models
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 

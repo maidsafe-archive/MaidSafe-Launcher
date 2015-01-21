@@ -39,6 +39,8 @@ MainController::MainController(QObject* parent)
   RegisterQmlTypes();
   SetContexProperties();
 
+  installEventFilter(this);
+
   QTimer::singleShot(0, this, SLOT(EventLoopStarted()));
 }
 
@@ -65,7 +67,7 @@ bool MainController::eventFilter(QObject* object, QEvent* event) {
 }
 
 void MainController::UnhandledException() {
-  // TODO (spandan) inform the user
+  // TODO(Spandan) inform the user
   qApp->quit();
 }
 
@@ -93,7 +95,7 @@ void MainController::SetContexProperties() {
 
 }  // namespace controllers
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 

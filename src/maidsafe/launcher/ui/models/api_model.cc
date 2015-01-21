@@ -34,7 +34,7 @@ APIModel::APIModel(QObject* parent)
 
 }  // namespace models
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 

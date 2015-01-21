@@ -50,26 +50,26 @@ void MainWindow::CenterToScreen() {
 
 void MainWindow::StatusChanged(const QQuickView::Status status) {
   switch (status) {
-   case QQuickView::Null:
-    qDebug() << "Status: Null.";
-//    LOG() << "Status: Null.";
-    break;
-   case QQuickView::Ready:
-    qDebug() << "Status: Ready.";
-//    LOG() << "Status: Ready.";
-    break;
-   case QQuickView::Loading:
-    qDebug() << "Status: Loading.";
-//    LOG() << "Status: Loading.";
-    break;
-   case QQuickView::Error:
-    qDebug() << "Status: ERROR.";
-//    LOG() << "Status: ERROR.";
-    break;
-   default:
-    qDebug() << "Status: Unknown.";
-//    LOG() << "Status: Unknown.";
-    break;
+    case QQuickView::Null:
+      qDebug() << "Status: Null.";
+//      LOG() << "Status: Null.";
+      break;
+    case QQuickView::Ready:
+      qDebug() << "Status: Ready.";
+//      LOG() << "Status: Ready.";
+      break;
+    case QQuickView::Loading:
+      qDebug() << "Status: Loading.";
+//      LOG() << "Status: Loading.";
+      break;
+    case QQuickView::Error:
+      qDebug() << "Status: ERROR.";
+//      LOG() << "Status: ERROR.";
+      break;
+    default:
+      qDebug() << "Status: Unknown.";
+//      LOG() << "Status: Unknown.";
+      break;
   }
 }
 

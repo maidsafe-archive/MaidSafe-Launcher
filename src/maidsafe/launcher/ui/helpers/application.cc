@@ -38,7 +38,25 @@ QString ExceptionEvent::ExceptionMessage() {
 Application::Application(int argc, char** argv)
     : QApplication(argc, argv),
       handler_object_(),
-      shared_memory_() {}
+      translators_(),
+      current_translator_(),
+      shared_memory_() {
+  CreateTranslators();
+  SwitchLanguage("en");
+}
+
+QStringList Application::AvailableTranslations() {
+  return QStringList(translators_.keys());
+}
+
+void Application::SwitchLanguage(QString language) {
+  if (current_translator_)
+    removeTranslator(current_translator_);
+
+  current_translator_ = translators_.value(language, nullptr);
+  if (current_translator_)
+    installTranslator(current_translator_);
+}
 
 bool Application::notify(QObject* receiver, QEvent* event) {
   try {
@@ -60,12 +78,25 @@ void Application::SetErrorHandler(boost::optional<controllers::MainController&> 
 }
 
 bool Application::IsUniqueInstance() {
+  shared_memory_.setKey("SAFE_APP_LAUNCHER");
   return shared_memory_.create(1);
+}
+
+void Application::CreateTranslators() {
+  if (!translators_.isEmpty())
+    return;
+  QStringList languages;
+  languages << "en" << "fr" << "es";
+  foreach(QString language, languages) {
+    QTranslator* translator = new QTranslator(instance());
+    translator->load(language);
+    translators_.insert(language, translator);
+  }
 }
 
 }  // namespace helpers
 
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 
