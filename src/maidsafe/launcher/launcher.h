@@ -21,12 +21,20 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
+#include <set>
 #include <string>
 
+#include "boost/filesystem/path.hpp"
+
+#include "maidsafe/directory_info.h"
+#include "maidsafe/common/on_scope_exit.h"
 #include "maidsafe/passport/passport.h"
 #include "maidsafe/nfs/client/maid_node_nfs.h"
 
 #include "maidsafe/launcher/account_handler.h"
+#include "maidsafe/launcher/app_handler.h"
+#include "maidsafe/launcher/app_details.h"
 
 namespace maidsafe {
 
@@ -53,15 +61,44 @@ class Launcher {
   // account.  Throws on error.
   static std::unique_ptr<Launcher> CreateAccount(Keyword keyword, Pin pin, Password password);
 
-  // Throws on error, with strong exception guarantee.  After calling, the class should be
-  // destructed as it is no longer connected to the network.
+  // Saves session, and logs out of the network.  After calling, the class should be destructed as
+  // it is no longer connected to the network.  Throws on error, with strong exception guarantee.
   void LogoutAndStop();
 
-  // Adds an instance of 'app_name' to the map of recognised apps, or increments the reference
-  // count for this app if it already exists.
-  void AddApp(const std::string& app_name, const std::string& app_path_and_args);
+  // Returns the set of apps which have been added.  If 'locally_available' is false, only apps
+  // which have been added on other machines are returned (i.e. there is no local config file entry
+  // for these apps).  If 'locally_available' is true, only apps which have been added on this
+  // machine are returned.  These sets are mutually exclusive.  Doesn't throw.
+  std::set<AppDetails> GetApps(bool locally_available) const;
 
-  void RegisterAppSession();
+  // Adds an instance of 'app_name' to the set of recognised apps.
+  void AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args);
+
+  // Update functions all throw on error (e.g. if the indicated app doesn't exist in the set) with
+  // strong exception guarantee.
+  void UpdateAppName(const std::string& app_name, const std::string& new_name);
+  void UpdateAppPath(const std::string& app_name, const boost::filesystem::path& new_path);
+  void UpdateAppArgs(const std::string& app_name, const std::string& new_args);
+  void UpdateAppSafeDriveAccess(const std::string& app_name,
+                                DirectoryInfo::AccessRights new_rights);
+  void UpdateAppIcon(const std::string& app_name, const SerialisedData& new_icon);
+
+  // Removes an instance of 'app_name' from the set of locally available apps (i.e. apps which have
+  // been added on this machine and which have an entry in the local config file).  Throws with
+  // strong exception guarantee if 'app_name' isn't in the set.
+  void RemoveAppLocally(const std::string& app_name);
+
+  // Removes an instance of 'app_name' from the set of non-locally available apps (i.e. apps which
+  // have only been added on a different machine and which don't have an entry in the local config
+  // file).  Throws with strong exception guarantee if 'app_name' isn't in the set.
+  void RemoveAppFromNetwork(const std::string& app_name);
+
+  // Save the account to the network.                        If this throws, the application should not continue running.  timeout / conn dropped?
+  void SaveSession();
+
+  // Launches a new instance of the app indicated by 'app_name' as a detached child.  Throws on
+  // error, with strong exception guarantee.
+  void LaunchApp(const std::string& app_name);
 
  private:
   // For already existing accounts.
@@ -70,8 +107,14 @@ class Launcher {
   // For new accounts.  Throws on failure to create account.
   Launcher(Keyword keyword, Pin pin, Password password, passport::MaidAndSigner&& maid_and_signer);
 
+  void RevertOperation(AppHandler::Snapshot snapshot);
+
+  tcp::Port StartListening();
+
   std::shared_ptr<nfs_client::MaidNodeNfs> maid_node_nfs_;
   AccountHandler account_handler_;
+  mutable std::mutex account_mutex_;
+  AppHandler app_handler_;
 };
 
 }  // namespace launcher

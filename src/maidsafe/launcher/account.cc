@@ -21,6 +21,7 @@
 #include <string>
 #include <utility>
 
+#include "cereal/types/set.hpp"
 #include "cereal/types/string.hpp"
 
 #include "maidsafe/common/error.h"
@@ -30,9 +31,33 @@
 #include "maidsafe/common/serialisation/serialisation.h"
 #include "maidsafe/common/serialisation/types/asio_and_boost_asio.h"
 
+#include "maidsafe/launcher/app_details.h"
+
 namespace maidsafe {
 
 namespace launcher {
+
+namespace {
+
+std::string SerialiseApps(const std::set<AppDetails>& apps) {
+  // Omit machine-specific 'path' and 'args', since we don't want this to persist in the Account.
+  // They're held in the config file.
+  std::string result;
+  for (const auto& app : apps)
+    result += ConvertToString(app.name, app.permitted_dirs, app.icon);
+  return result;
+}
+
+void ParseApps(std::stringstream& serialised_apps, std::set<AppDetails>& apps) {
+  while (serialised_apps) {
+    AppDetails app_details;
+    ConvertFromStream(serialised_apps, app_details.name, app_details.permitted_dirs,
+                      app_details.icon);
+    apps.emplace(std::move(app_details));
+  }
+}
+
+}  // unnamed namespace
 
 ImmutableData EncryptAccount(const authentication::UserCredentials& user_credentials,
                              Account& account) {
@@ -43,10 +68,10 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
   if (account.root_parent_id.IsInitialised())
     root_parent_id = account.root_parent_id;
 
-  NonEmptyString serialised_account{
-      ConvertToString(account.passport->Encrypt(user_credentials), serialised_timestamp, account.ip,
-                      account.port, unique_user_id, root_parent_id, account.config_file_aes_key,
-                      account.config_file_aes_iv, account.apps_reference_count)};
+  NonEmptyString serialised_account{ConvertToString(
+      account.passport->Encrypt(user_credentials), serialised_timestamp, account.ip, account.port,
+      unique_user_id, root_parent_id, account.config_file_aes_key, account.config_file_aes_iv,
+      SerialiseApps(account.apps))};
 
   account.timestamp = TimeStampToPtime(serialised_timestamp);
 
@@ -66,7 +91,7 @@ Account::Account()
       root_parent_id(),
       config_file_aes_key(),
       config_file_aes_iv(),
-      apps_reference_count() {}
+      apps() {}
 
 Account::Account(const passport::MaidAndSigner& maid_and_signer)
     : passport(maidsafe::make_unique<passport::Passport>(maid_and_signer)),
@@ -77,7 +102,7 @@ Account::Account(const passport::MaidAndSigner& maid_and_signer)
       root_parent_id(),
       config_file_aes_key(RandomString(crypto::AES256_KeySize)),
       config_file_aes_iv(RandomString(crypto::AES256_IVSize)),
-      apps_reference_count() {}
+      apps() {}
 
 Account::Account(const ImmutableData& encrypted_account,
                  const authentication::UserCredentials& user_credentials)
@@ -89,7 +114,7 @@ Account::Account(const ImmutableData& encrypted_account,
       root_parent_id(),
       config_file_aes_key(),
       config_file_aes_iv(),
-      apps_reference_count() {
+      apps() {
   crypto::SecurePassword secure_password{authentication::CreateSecurePassword(user_credentials)};
   NonEmptyString serialised_account{authentication::Obfuscate(
       user_credentials, crypto::SymmDecrypt(crypto::CipherText{encrypted_account.data()},
@@ -99,15 +124,17 @@ Account::Account(const ImmutableData& encrypted_account,
   crypto::CipherText encrypted_passport;
   uint64_t serialised_timestamp{0};
   boost::optional<Identity> optional_unique_user_id, optional_root_parent_id;
-  ConvertFromString(serialised_account.string(), encrypted_passport, serialised_timestamp, ip, port,
+  std::stringstream str_stream{serialised_account.string()};
+  ConvertFromStream(str_stream, encrypted_passport, serialised_timestamp, ip, port,
                     optional_unique_user_id, optional_root_parent_id, config_file_aes_key,
-                    config_file_aes_iv, apps_reference_count);
+                    config_file_aes_iv);
   passport = maidsafe::make_unique<passport::Passport>(encrypted_passport, user_credentials);
   timestamp = TimeStampToPtime(serialised_timestamp);
   if (optional_unique_user_id)
     unique_user_id = *optional_unique_user_id;
   if (optional_root_parent_id)
     root_parent_id = *optional_root_parent_id;
+  ParseApps(str_stream, apps);
 }
 
 Account::Account(Account&& other) MAIDSAFE_NOEXCEPT
@@ -119,10 +146,18 @@ Account::Account(Account&& other) MAIDSAFE_NOEXCEPT
       root_parent_id(std::move(other.root_parent_id)),
       config_file_aes_key(std::move(other.config_file_aes_key)),
       config_file_aes_iv(std::move(other.config_file_aes_iv)),
-      apps_reference_count(std::move(other.apps_reference_count)) {}
+      apps(std::move(other.apps)) {}
 
 Account& Account::operator=(Account&& other) {
-  swap(*this, other);
+  passport = std::move(other.passport);
+  timestamp = std::move(other.timestamp);
+  ip = std::move(other.ip);
+  port = std::move(other.port);
+  unique_user_id = std::move(other.unique_user_id);
+  root_parent_id = std::move(other.root_parent_id);
+  config_file_aes_key = std::move(other.config_file_aes_key);
+  config_file_aes_iv = std::move(other.config_file_aes_iv);
+  apps = std::move(other.apps);
   return *this;
 }
 
@@ -136,7 +171,7 @@ void swap(Account& lhs, Account& rhs) MAIDSAFE_NOEXCEPT {
   swap(lhs.root_parent_id, rhs.root_parent_id);
   swap(lhs.config_file_aes_key, rhs.config_file_aes_key);
   swap(lhs.config_file_aes_iv, rhs.config_file_aes_iv);
-  swap(lhs.apps_reference_count, rhs.apps_reference_count);
+  swap(lhs.apps, rhs.apps);
 }
 
 }  // namespace launcher

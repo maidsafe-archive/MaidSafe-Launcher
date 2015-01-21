@@ -76,8 +76,10 @@ AccountHandler::AccountHandler(AccountHandler&& other) MAIDSAFE_NOEXCEPT
       current_account_version_(std::move(other.current_account_version_)),
       user_credentials_(std::move(other.user_credentials_)) {}
 
-AccountHandler& AccountHandler::operator=(AccountHandler other) {
-  swap(*this, other);
+AccountHandler& AccountHandler::operator=(AccountHandler&& other) {
+  account_ = std::move(other.account_);
+  current_account_version_ = std::move(other.current_account_version_);
+  user_credentials_ = std::move(other.user_credentials_);
   return *this;
 }
 

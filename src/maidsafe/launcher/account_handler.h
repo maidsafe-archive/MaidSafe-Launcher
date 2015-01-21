@@ -33,6 +33,7 @@ namespace launcher {
 
 class AccountGetter;
 
+// This class is not threadsafe.
 class AccountHandler {
  public:
   // This constructor should be used before logging in to an existing account, i.e. where the
@@ -46,10 +47,11 @@ class AccountHandler {
                  nfs_client::MaidNodeNfs& maid_node_nfs);
 
   // Move-constructible and move-assignable only.
-  AccountHandler(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
-  AccountHandler& operator=(AccountHandler other);
-  friend void swap(AccountHandler& lhs, AccountHandler& rhs) MAIDSAFE_NOEXCEPT;
   AccountHandler(const AccountHandler&) = delete;
+  AccountHandler(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
+  AccountHandler& operator=(const AccountHandler&) = delete;
+  AccountHandler& operator=(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
+  friend void swap(AccountHandler& lhs, AccountHandler& rhs) MAIDSAFE_NOEXCEPT;
 
   // Retrieves and decrypts account info when logging in to an existing account.  'account_getter'
   // should already be joined to the network.  Throws on error, including already having logged in.
@@ -60,11 +62,10 @@ class AccountHandler {
   // network.  Throws on error, with strong exception guarantee.
   void Save(nfs_client::MaidNodeNfs& maid_node_nfs);
 
-  Account& account() { return account_; }
-  const Account& account() const { return account_; }
+  // Give full access to the account
+  Account account_;
 
  private:
-  Account account_;
   StructuredDataVersions::VersionName current_account_version_;
   authentication::UserCredentials user_credentials_;
 };

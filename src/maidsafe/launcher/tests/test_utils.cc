@@ -20,9 +20,12 @@
 
 #include <string>
 
+#include "maidsafe/directory_info.h"
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/utils.h"
+
+#include "maidsafe/launcher/account.h"
 
 namespace maidsafe {
 
@@ -51,6 +54,110 @@ authentication::UserCredentials MakeUserCredentials(
   user_credentials.password = maidsafe::make_unique<authentication::UserCredentials::Password>(
       std::get<2>(user_credentials_tuple));
   return user_credentials;
+}
+
+DirectoryInfo CreateRandomDirectoryInfo() {
+  return DirectoryInfo(RandomAlphaNumericString((RandomUint32() % 10) + 10),
+                       drive::ParentId(drive::DirectoryId(RandomString(64))),
+                       drive::DirectoryId(RandomString(64)),
+                       static_cast<DirectoryInfo::AccessRights>(RandomUint32() % 3));
+}
+
+AppDetails CreateRandomAppDetails() {
+  AppDetails app;
+  app.name = RandomAlphaNumericString((RandomUint32() % 10) + 10);
+  app.path = RandomAlphaNumericString((RandomUint32() % 10) + 10);
+  app.args = RandomAlphaNumericString((RandomUint32() % 10) + 10);
+  int count = (RandomUint32() % 10) + 1;
+  for (int i = 0; i < count; ++i)
+    app.permitted_dirs.insert(CreateRandomDirectoryInfo());
+  std::string icon(RandomString((RandomUint32() % 1000) + 10));
+  app.icon.assign(icon.begin(), icon.end());
+  return app;
+}
+
+testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual) {
+  if (expected.name != actual.name) {
+    return testing::AssertionFailure() << "Expected name (" << expected.name
+                                       << ") does not match actual name (" << actual.name << ")";
+  }
+  if (expected.path != actual.path) {
+    return testing::AssertionFailure() << "Expected path (" << expected.path
+                                       << ") does not match actual path (" << actual.path << ")";
+  }
+  if (expected.args != actual.args) {
+    return testing::AssertionFailure() << "Expected args (" << expected.args
+                                       << ") do not match actual args (" << actual.args << ")";
+  }
+  bool failed_permitted_dirs{expected.permitted_dirs.size() != actual.permitted_dirs.size()};
+  auto expected_itr(expected.permitted_dirs.begin());
+  auto actual_itr(actual.permitted_dirs.begin());
+  while (!failed_permitted_dirs && expected_itr != expected.permitted_dirs.end()) {
+    if (expected_itr->path != actual_itr->path)
+      failed_permitted_dirs = true;
+    if (expected_itr->parent_id != actual_itr->parent_id)
+      failed_permitted_dirs = true;
+    if (expected_itr->directory_id != actual_itr->directory_id)
+      failed_permitted_dirs = true;
+    if ((expected_itr++)->access_rights != (actual_itr++)->access_rights)
+      failed_permitted_dirs = true;
+  }
+  if (failed_permitted_dirs) {
+    std::string output("Expected permitted dirs do not match actual permitted dirs.");
+
+    auto print_dir([&output](const DirectoryInfo& dir) {
+      output += "    path:          " + dir.path.string();
+      output += "    parent_id:     " + HexSubstr(dir.parent_id.data);
+      output += "    directory_id:  " + HexSubstr(dir.directory_id);
+      switch (dir.access_rights) {
+        case DirectoryInfo::AccessRights::kNone:
+          output += "    access_rights: kNone\n";
+        case DirectoryInfo::AccessRights::kReadOnly:
+          output += "    access_rights: kReadOnly\n";
+        case DirectoryInfo::AccessRights::kReadWrite:
+          output += "    access_rights: kReadWrite\n";
+        default:
+          BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
+      }
+    });
+
+    output += "\n\n  Expected dirs:\n";
+    expected_itr = expected.permitted_dirs.begin();
+    while (expected_itr != expected.permitted_dirs.end())
+      print_dir(*expected_itr++);
+
+    output += "\n\n  Actual dirs:\n";
+    actual_itr = actual.permitted_dirs.begin();
+    while (actual_itr != actual.permitted_dirs.end())
+      print_dir(*actual_itr++);
+    return testing::AssertionFailure() << output << '\n';
+  }
+
+  if (expected.icon != actual.icon) {
+    return testing::AssertionFailure()
+           << "Expected icon ("
+           << HexEncode(std::string(expected.icon.begin(), expected.icon.end()))
+           << ") does not match actual icon ("
+           << HexEncode(std::string(actual.icon.begin(), actual.icon.end())) << ")";
+  }
+  return testing::AssertionSuccess();
+}
+
+testing::AssertionResult Equals(const std::set<AppDetails>& expected,
+                                const std::set<AppDetails>& actual) {
+  if (expected.size() != actual.size()) {
+    return testing::AssertionFailure() << "Expected size (" << expected.size()
+                                       << ") does not match actual size (" << actual.size() << ")";
+  }
+  auto expected_itr(expected.begin());
+  auto actual_itr(actual.begin());
+  int count{0};
+  while (expected_itr != expected.end()) {
+    if (!Equals(*expected_itr++, *actual_itr++))
+      return testing::AssertionFailure() << "Failed to match apps at index " << count;
+    ++count;
+  }
+  return testing::AssertionSuccess();
 }
 
 }  // namespace test

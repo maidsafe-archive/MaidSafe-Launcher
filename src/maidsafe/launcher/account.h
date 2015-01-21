@@ -20,8 +20,8 @@
 #define MAIDSAFE_LAUNCHER_ACCOUNT_H_
 
 #include <cstdint>
-#include <map>
 #include <memory>
+#include <set>
 #include <string>
 
 #include "asio/ip/address.hpp"
@@ -32,6 +32,8 @@
 #include "maidsafe/common/types.h"
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/passport/passport.h"
+
+#include "maidsafe/launcher/app_details.h"
 
 namespace maidsafe {
 
@@ -59,7 +61,7 @@ struct Account {
   // Move-constructible and move-assignable only.
   Account(const Account&) = delete;
   Account(Account&& other) MAIDSAFE_NOEXCEPT;
-  Account& operator=(const Account&&) = delete;
+  Account& operator=(const Account&) = delete;
   Account& operator=(Account&& other) MAIDSAFE_NOEXCEPT;
 
   std::unique_ptr<passport::Passport> passport;
@@ -69,7 +71,7 @@ struct Account {
   Identity unique_user_id, root_parent_id;
   crypto::AES256Key config_file_aes_key;
   crypto::AES256InitialisationVector config_file_aes_iv;
-  std::map<std::string, uint32_t> apps_reference_count;
+  std::set<AppDetails> apps;
 };
 
 void swap(Account& lhs, Account& rhs) MAIDSAFE_NOEXCEPT;

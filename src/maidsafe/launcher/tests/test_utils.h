@@ -28,7 +28,11 @@
 
 namespace maidsafe {
 
+struct DirectoryInfo;
+
 namespace launcher {
+
+struct AppDetails;
 
 namespace test {
 
@@ -62,6 +66,15 @@ testing::AssertionResult ThrowsAs(std::function<void()> statement,
   }
   return testing::AssertionFailure() << failure_message.str();
 }
+
+DirectoryInfo CreateRandomDirectoryInfo();
+
+AppDetails CreateRandomAppDetails();
+
+testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual);
+
+testing::AssertionResult Equals(const std::set<AppDetails>& expected,
+                                const std::set<AppDetails>& actual);
 
 }  // namespace test
 
