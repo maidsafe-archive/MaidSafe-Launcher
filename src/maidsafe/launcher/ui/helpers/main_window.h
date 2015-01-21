@@ -16,16 +16,10 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_APPLICATION_H_
-#define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_APPLICATION_H_
+#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_
+#define MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_
 
-#include <memory>
-#include <string>
-
-#include "boost/optional.hpp"
-
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include <QQuickView>
 
 namespace maidsafe {
 
@@ -33,42 +27,27 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
+namespace helpers {
 
-class MainController;
+class MainWindow : public QQuickView {
+  Q_OBJECT
 
-class ExceptionEvent : public QEvent {
  public:
-  ExceptionEvent(const QString& exception_message, Type type = QEvent::User);
-  ~ExceptionEvent() {}
-  QString ExceptionMessage();
+  explicit MainWindow(QWindow* parent = nullptr);
+  ~MainWindow() override;
 
- private:
-  ExceptionEvent(const ExceptionEvent&);
-  ExceptionEvent& operator=(const ExceptionEvent&);
+  void CenterToScreen();
 
-  QString exception_message_;
+ private slots:  // NOLINT - Viv
+  void StatusChanged(const QQuickView::Status status);
 };
 
-class Application : public QApplication {
- public:
-  Application(int argc, char** argv);
-  virtual bool notify(QObject* receiver, QEvent* event);
-  void SetErrorHandler(boost::optional<MainController&> handler_object);
-  bool IsUniqueInstance();
+}  // namespace helpers
 
- private:
-  boost::optional<MainController&> handler_object_;
-  QSharedMemory shared_memory_;
-};
-
-}  // namespace controllers
-
-}  // namespace ui 
+}  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_APPLICATION_H_
-
+#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_

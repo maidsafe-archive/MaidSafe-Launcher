@@ -16,34 +16,16 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
+import AccountHandler 1.0
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+import "../../custom_components"
 
-namespace maidsafe {
+Image {
+  source: "/resources/images/login_bg.png"
 
-namespace launcher {
-
-namespace ui {
-
-namespace models {
-
-class APIModel : public QObject {
-  Q_OBJECT
-
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
-
-}  // namespace models
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-
+  CustomTextField {
+    height: 30
+    width: 100
+  }
+}

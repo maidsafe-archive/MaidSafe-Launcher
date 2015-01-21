@@ -21,7 +21,7 @@
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
-#include "maidsafe/launcher/ui/controllers/application.h"
+#include "maidsafe/launcher/ui/helpers/application.h"
 #include "maidsafe/launcher/ui/controllers/main_controller.h"
 
 #include "maidsafe/common/config.h"
@@ -31,7 +31,7 @@
 namespace ms = maidsafe::launcher::ui;
 
 int main(int argc, char *argv[]) {
-  ms::controllers::Application application(argc, argv);
+  ms::helpers::Application application(argc, argv);
   auto log_options(maidsafe::log::Logging::Instance().Initialise(argc, argv));
 
 #ifdef MAIDSAFE_WIN32
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   application.addLibraryPath(qApp->applicationDirPath() + "/plugins");
   application.setOrganizationDomain("http://www.maidsafe.net");
   application.setOrganizationName("MaidSafe.net Ltd.");
-  application.setApplicationName("App-Launcher");
+  application.setApplicationName("SAFE App Launcher");
 
   try {
     ms::controllers::MainController main_controller;

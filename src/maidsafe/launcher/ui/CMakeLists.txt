@@ -51,17 +51,17 @@ include(../../../../../../cmake_modules/standard_setup.cmake)
 # Set up all files as GLOBs.                                                                       #
 #==================================================================================================#
 set(UiMain ${PROJECT_SOURCE_DIR}/main.cc)
-source_group("Auto Compiled\\Qt MOC Files" FILES "${CMAKE_BINARY_DIR}/launcher_ui_automoc.cpp")
+source_group("Auto Compiled\\Qt MOC Files" FILES "${CMAKE_CURRENT_BINARY_DIR}/safe_app_launcher_automoc.cpp")
 
-ms_glob_dir(Helpers ${PROJECT_SOURCE_DIR}/helpers "Helpers\\\\")
+ms_glob_dir(Helpers ${PROJECT_SOURCE_DIR}/helpers Helpers)
 
 set(QtPchHeader ${PROJECT_SOURCE_DIR}/helpers/qt_push_headers.h)
 if(NOT MSVC)
   list(REMOVE_ITEM HelpersSources ${PROJECT_SOURCE_DIR}/helpers/qt_push_headers.cc)
 endif()
 
-ms_glob_dir(Controllers ${PROJECT_SOURCE_DIR}/controllers "Controllers\\\\")
-ms_glob_dir(Models ${PROJECT_SOURCE_DIR}/models "Models\\\\")
+ms_glob_dir(Controllers ${PROJECT_SOURCE_DIR}/controllers Controllers)
+ms_glob_dir(Models ${PROJECT_SOURCE_DIR}/models Models)
 
 qt5_add_resources(ResourceFilesUiResourcesDir ${PROJECT_SOURCE_DIR}/main_resource.qrc)
 source_group("Auto Compiled\\Resource Files" FILES ${ResourceFilesUiResourcesDir})
@@ -87,23 +87,51 @@ if(MSVC)
   source_group("Auto Compiled\\App Icon File" FILES ${UiAppIconResource})
 endif()
 
+#==================================================================================================#
+# Define localisation files.                                                                       #
+#==================================================================================================#
+file(GLOB CompiledLocalisationFiles ${PROJECT_SOURCE_DIR}/resources/translations/*.ts)
+
+if(UPDATE_LOCALISATION_RESOURCES)
+  set(LocalisationLanguages en fr es)
+  set(LocalisationSources ${AllUiSourceFiles} ${ViewsAllFiles} ${CustomComponentsAllFiles})
+  set(LocalisationTsFiles)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources)
+  file(COPY ${CompiledLocalisationFiles} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources)
+  foreach(Language ${LocalisationLanguages})
+    list(APPEND LocalisationTsFiles ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources/${Language}.ts)
+  endforeach()
+  qt5_create_translation(LocalisationQmFiles ${LocalisationSources} ${LocalisationTsFiles})
+  message(STATUS "NOTE: Translation Source Update Configured")
+  message(STATUS "      Make Sure to Post-Build Transfer ${CMAKE_CURRENT_BINARY_DIR}/Translation_Sources")
+  message(STATUS "                                  -->  ${PROJECT_SOURCE_DIR}/resources/translations")
+  message(STATUS "      Do **not** make a clean build with UPDATE_LOCALISATION_RESOURCES=ON")
+else()
+  qt5_add_translation(LocalisationQmFiles ${CompiledLocalisationFiles})
+endif()
+unset(UPDATE_LOCALISATION_RESOURCES CACHE)
+source_group("Auto Compiled\\Localisation Files" FILES ${LocalisationQmFiles})
+
 
 #==================================================================================================#
 # Define MaidSafe libraries and executables                                                        #
 #==================================================================================================#
-add_executable(safe_launcher ${UiMain}
-                             ${HelpersAllFiles}
-                             ${ControllersAllFiles}
-                             ${ModelsAllFiles}
-                             ${ResourceFilesUiResourcesDir}
-                             ${ViewsAllFiles}
-                             ${CustomComponentsAllFiles}
-                             ${UiAppIconResource})
-target_include_directories(safe_launcher PRIVATE "../../../")
-target_link_libraries(safe_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
+ms_add_executable(safe_app_launcher "Production" ${UiMain}
+                                                 ${AllUiSourceFiles}
+                                                 ${AllUiHeaderFiles}
+                                                 ${ResourceFilesUiResourcesDir}
+                                                 ${ViewsAllFiles}
+                                                 ${CustomComponentsAllFiles}
+                                                 ${LocalisationQmFiles}
+                                                 ${UiAppIconResource})
+target_include_directories(safe_app_launcher PRIVATE "../../../")
+target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
+if(UNIX)
+  set_source_files_properties(${AllUiSourceFiles} PROPERTIES COMPILE_FLAGS -Wno-float-equal)
+endif()
 
 if(MSVC)
-  set_target_properties(safe_launcher PROPERTIES WIN32_EXECUTABLE TRUE)
+  set_target_properties(safe_app_launcher PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
 
@@ -112,7 +140,7 @@ endif()
 #==================================================================================================#
 include(../../../../../../cmake_modules/standard_flags.cmake)
 
-target_compile_definitions(safe_launcher PRIVATE $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT>)
+target_compile_definitions(safe_app_launcher PRIVATE $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT>)
 
 if(MSVC)
   string(REGEX REPLACE "/Zm[0-9]+ " "/Zm500 " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -128,10 +156,10 @@ message(STATUS "Found Qt5. Launcher UI enabled.")
 #==================================================================================================#
 # Generate Qt .pro file.                                                                           #
 #==================================================================================================#
-set(QtPROHelper ${CMAKE_BINARY_DIR}/safe_launcher_mock.pro)
+set(QtPROHelper ${CMAKE_BINARY_DIR}/safe_app_launcher_mock.pro)
 file(WRITE ${QtPROHelper} "#This File is Auto-Generated. Do Not Edit Manually.")
 file(APPEND ${QtPROHelper} "\nQT += qml quick widgets")
-file(APPEND ${QtPROHelper} "\nTARGET = safe_launcher")
+file(APPEND ${QtPROHelper} "\nTARGET = safe_app_launcher")
 
 file(APPEND ${QtPROHelper} "\n\nSOURCES += ")
 set(SourceFilesCollection ${UiMain} ${AllUiSourceFiles})
@@ -147,9 +175,17 @@ endforeach()
 file(APPEND ${QtPROHelper} "\n\nRESOURCES += $$quote(${PROJECT_SOURCE_DIR}/main_resource.qrc)")
 
 if(MSVC)
+  if(POLICY CMP0026)
+    cmake_policy(PUSH)
+    cmake_policy(SET CMP0026 OLD)
+  endif()
   ms_get_dependencies(maidsafe_launcher OptimizedDependencies DebugDependencies ON)
   get_target_property(ReleaseLocation maidsafe_launcher LOCATION_RELEASE)
   get_target_property(DebugLocation maidsafe_launcher LOCATION_DEBUG)
+  if(POLICY CMP0026)
+    cmake_policy(POP)
+  endif()
+
   list(INSERT OptimizedDependencies 0 "\"${ReleaseLocation}\"")
   list(INSERT DebugDependencies 0 "\"${DebugLocation}\"")
   file(APPEND ${QtPROHelper} "\n\n*:CONFIG(release, debug|release): LIBS += ")

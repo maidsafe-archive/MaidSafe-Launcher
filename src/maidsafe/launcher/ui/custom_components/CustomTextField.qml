@@ -16,34 +16,38 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
+import "../resources/js/brushes.js" as DefaultBrushes
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+TextField {
+  FontLoader { id: arialFont; name: "Arial" }
 
-namespace maidsafe {
+  property bool isMarkerTextVisible : true
 
-namespace launcher {
-
-namespace ui {
-
-namespace models {
-
-class APIModel : public QObject {
-  Q_OBJECT
-
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
-
-}  // namespace models
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-
+  font.pixelSize: 12
+  horizontalAlignment: Qt.AlignHCenter
+  style: TextFieldStyle {
+    background: Rectangle {
+      border {
+        color: {
+          if (!control.enabled) {
+            DefaultBrushes.disabledGray
+          } else if (control.activeFocus) {
+            DefaultBrushes.focusBlack
+          } else {
+            DefaultBrushes.borderGray
+          }
+        }
+        width: 1
+      }
+      implicitHeight: 30
+      implicitWidth: 225
+    }
+    font: arialFont.name
+    selectionColor: DefaultBrushes.selectionBlue
+    selectedTextColor: DefaultBrushes.focusBlack
+    textColor: !control.enabled ? DefaultBrushes.disabledGray : DefaultBrushes.focusBlack
+  }
+}

@@ -16,7 +16,7 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/launcher/ui/controllers/application.h"
+#include "maidsafe/launcher/ui/helpers/application.h"
 #include "maidsafe/launcher/ui/controllers/main_controller.h"
 
 namespace maidsafe {
@@ -25,7 +25,7 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
+namespace helpers {
 
 ExceptionEvent::ExceptionEvent(const QString& exception_message, Type type)
     : QEvent(type),
@@ -38,7 +38,25 @@ QString ExceptionEvent::ExceptionMessage() {
 Application::Application(int argc, char** argv)
     : QApplication(argc, argv),
       handler_object_(),
-      shared_memory_() {}
+      translators_(),
+      current_translator_(),
+      shared_memory_() {
+  CreateTranslators();
+  SwitchLanguage("en");
+}
+
+QStringList Application::AvailableTranslations() {
+  return QStringList(translators_.keys());
+}
+
+void Application::SwitchLanguage(QString language) {
+  if (current_translator_)
+    removeTranslator(current_translator_);
+
+  current_translator_ = translators_.value(language, nullptr);
+  if (current_translator_)
+    installTranslator(current_translator_);
+}
 
 bool Application::notify(QObject* receiver, QEvent* event) {
   try {
@@ -54,18 +72,31 @@ bool Application::notify(QObject* receiver, QEvent* event) {
   return false;
 }
 
-void Application::SetErrorHandler(boost::optional<MainController&> handler_object) {
+void Application::SetErrorHandler(boost::optional<controllers::MainController&> handler_object) {
   if (handler_object)
     handler_object_ = handler_object;
 }
 
 bool Application::IsUniqueInstance() {
+  shared_memory_.setKey("SAFE_APP_LAUNCHER");
   return shared_memory_.create(1);
 }
 
-}  // namespace controllers
+void Application::CreateTranslators() {
+  if (!translators_.isEmpty())
+    return;
+  QStringList languages;
+  languages << "en" << "fr" << "es";
+  foreach(QString language, languages) {
+    QTranslator* translator = new QTranslator(instance());
+    translator->load(language);
+    translators_.insert(language, translator);
+  }
+}
 
-}  // namespace ui 
+}  // namespace helpers
+
+}  // namespace ui
 
 }  // namespace launcher
 

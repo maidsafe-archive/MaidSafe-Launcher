@@ -16,11 +16,21 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-import QtQuick 2.2
+import QtQuick 2.4
+import MainController 1.0
 
-Rectangle {
-  id: rootWindow
-  color: "black"
-  height: 500
-  width: 500
+Item {
+  id: rootMainWindowItem
+  objectName: "rootMainWindowItem"
+
+  Loader {
+    id: rootLoader
+    objectName: "rootLoader"
+
+    anchors.fill: parent
+    source: mainController.currentView === MainController.HandleAccount ?
+              "account_handling/AccountHandlerView.qml"
+            :
+              ""
+  }
 }

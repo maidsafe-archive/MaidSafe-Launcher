@@ -16,11 +16,7 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include "maidsafe/launcher/ui/models/account_handler_model.h"
 
 namespace maidsafe {
 
@@ -30,12 +26,8 @@ namespace ui {
 
 namespace models {
 
-class APIModel : public QObject {
-  Q_OBJECT
-
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
+AccountHandlerModel::AccountHandlerModel(QObject* parent)
+    : QObject{parent} {}
 
 }  // namespace models
 
@@ -45,5 +37,4 @@ class APIModel : public QObject {
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
 

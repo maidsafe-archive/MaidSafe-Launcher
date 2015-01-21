@@ -16,8 +16,13 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
+#define MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
+
+#include <memory>
+#include <string>
+
+#include "boost/optional.hpp"
 
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
@@ -28,16 +33,42 @@ namespace launcher {
 
 namespace ui {
 
-namespace models {
+namespace controllers { class MainController; }  // namespace controllers
 
-class APIModel : public QObject {
-  Q_OBJECT
+namespace helpers {
 
+class ExceptionEvent : public QEvent {
  public:
-  explicit APIModel(QObject* parent = nullptr);
+  ExceptionEvent(const QString& exception_message, Type type = QEvent::User);
+  ~ExceptionEvent() {}
+  QString ExceptionMessage();
+
+ private:
+  ExceptionEvent(const ExceptionEvent&);
+  ExceptionEvent& operator=(const ExceptionEvent&);
+
+  QString exception_message_;
 };
 
-}  // namespace models
+class Application : public QApplication {
+ public:
+  Application(int argc, char** argv);
+  QStringList AvailableTranslations();
+  void SwitchLanguage(QString language);
+  virtual bool notify(QObject* receiver, QEvent* event);
+  void SetErrorHandler(boost::optional<controllers::MainController&> handler_object);
+  bool IsUniqueInstance();
+
+ private:
+  void CreateTranslators();
+
+  boost::optional<controllers::MainController&> handler_object_;
+  QMap<QString, QTranslator*> translators_;
+  QTranslator* current_translator_;
+  QSharedMemory shared_memory_;
+};
+
+}  // namespace helpers
 
 }  // namespace ui
 
@@ -45,5 +76,5 @@ class APIModel : public QObject {
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
 
