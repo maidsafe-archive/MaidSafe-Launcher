@@ -121,8 +121,7 @@ AppHandler::Snapshot AppHandler::GetSnapshot() const {
   try {
     snapshot.config_file = config_file_path_.parent_path() / RandomAlphaNumericString(10);
     fs::copy_file(config_file_path_, snapshot.config_file);
-  }
-  catch (const std::exception& e) {
+  } catch (const std::exception& e) {
     LOG(kError) << "Failed to copy config file from " << config_file_path_ << " to "
                 << snapshot.config_file << ": " << e.what();
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::filesystem_io_error));
@@ -146,8 +145,7 @@ void AppHandler::ApplySnapshot(Snapshot snapshot) {
   // Replace config file
   try {
     fs::rename(snapshot.config_file, config_file_path_);
-  }
-  catch (const std::exception& e) {
+  } catch (const std::exception& e) {
     LOG(kError) << "Failed to move config file from " << snapshot.config_file << " to "
                 << config_file_path_ << ": " << e.what();
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::filesystem_io_error));
@@ -233,7 +231,8 @@ void AppHandler::ReadConfigFile() {
 
   // Parse the set of local apps.
   std::stringstream str_stream{serialised_contents.string()};
-  while (str_stream) {
+  std::size_t app_count(ConvertFromStream<std::size_t>(str_stream));
+  for (std::size_t i{0}; i < app_count; ++i) {
     AppDetails app_details;
     ConvertFromStream(str_stream, app_details.name, app_details.permitted_dirs);
     local_apps_.insert(std::move(app_details));
@@ -241,9 +240,9 @@ void AppHandler::ReadConfigFile() {
 }
 
 void AppHandler::WriteConfigFile() const {
-  // Serialise the set of local apps.  Omit their 'permitted_dirs' field since they're held in the
-  // serialised Account.
-  std::string serialised_contents;
+  // Serialise the set of local apps.  Omit their 'permitted_dirs' and 'icon' fields since they're
+  // held in the serialised Account.
+  std::string serialised_contents(ConvertToString(local_apps_.size()));
   for (const auto& app : local_apps_)
     serialised_contents += ConvertToString(app.name, app.path, app.args);
 
