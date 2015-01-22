@@ -27,6 +27,7 @@
 #include "maidsafe/common/test.h"
 #endif
 
+#include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"
 
 namespace maidsafe {
@@ -62,8 +63,8 @@ Launcher::Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& a
     : maid_node_nfs_(), account_handler_(), account_mutex_(), app_handler_() {
   account_handler_.Login(ConvertToCredentials(keyword, pin, password), account_getter);
   maid_node_nfs_ =
-      nfs_client::MaidNodeNfs::MakeShared(account_handler_.account_.passport->GetMaid());
-  app_handler_.Initialise(GetConfigFilePath(), &account_handler_.account_, &account_mutex_);
+      nfs_client::MaidNodeNfs::MakeShared(account_handler_.account_->passport->GetMaid());
+  app_handler_.Initialise(GetConfigFilePath(), account_handler_.account_.get(), &account_mutex_);
 }
 
 Launcher::Launcher(Keyword keyword, Pin pin, Password password,
@@ -73,7 +74,7 @@ Launcher::Launcher(Keyword keyword, Pin pin, Password password,
                        *maid_node_nfs_),
       account_mutex_(),
       app_handler_() {
-  app_handler_.Initialise(GetConfigFilePath(), &account_handler_.account_, &account_mutex_);
+  app_handler_.Initialise(GetConfigFilePath(), account_handler_.account_.get(), &account_mutex_);
 }
 
 std::unique_ptr<Launcher> Launcher::Login(Keyword keyword, Pin pin, Password password) {
@@ -137,8 +138,8 @@ void Launcher::UpdateAppSafeDriveAccess(const std::string& app_name,
   {
     std::lock_guard<std::mutex> lock{ account_mutex_ };
     // TODO(Fraser#5#): 2015-01-20 - Confirm with Lee if these IDs should be used.
-    safe_dir.parent_id = drive::ParentId{account_handler_.account_.unique_user_id};
-    safe_dir.directory_id = account_handler_.account_.root_parent_id;
+    safe_dir.parent_id = drive::ParentId{account_handler_.account_->unique_user_id};
+    safe_dir.directory_id = account_handler_.account_->root_parent_id;
   }
   app_handler_.UpdatePermittedDirs(app_name, safe_dir);
   SaveSession();

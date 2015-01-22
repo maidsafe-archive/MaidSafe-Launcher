@@ -47,8 +47,6 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
                              Account& account);
 
 struct Account {
-  Account();
-
   // Used when creating a new user account, i.e. registering a new user on the network rather than
   // logging back in.  Creates a new default-constructed passport.  Throws on error.
   explicit Account(const passport::MaidAndSigner& maid_and_signer);

@@ -23,6 +23,7 @@
 #include <mutex>
 #include <string>
 #include <set>
+#include <utility>
 
 #include "boost/filesystem/path.hpp"
 
@@ -45,7 +46,7 @@ class AppHandler {
     friend class AppHandler;
    private:
     std::set<AppDetails> local_apps, non_local_apps;
-    boost::filesystem::path config_file;  // TODO(Fraser#5#): 2015-01-21 - handle config file throwing when reapplying snapshot - terminate?
+    boost::filesystem::path config_file;
   };
 
   AppHandler();

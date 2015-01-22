@@ -218,7 +218,7 @@ void AppHandler::Launch(const std::string& /*app_name*/, tcp::Port /*our_port*/)
 
 std::pair<AppHandler::LockGuardPtr, AppHandler::LockGuardPtr> AppHandler::AcquireLocks() const {
   std::lock(*account_mutex_, mutex_);
-  return std::make_pair<LockGuardPtr, LockGuardPtr>(
+  return std::make_pair(
       maidsafe::make_unique<std::lock_guard<std::mutex>>(*account_mutex_, std::adopt_lock),
       maidsafe::make_unique<std::lock_guard<std::mutex>>(mutex_, std::adopt_lock));
 }

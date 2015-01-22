@@ -83,9 +83,9 @@ TEST(AccountHandlerTest, FUNC_Login) {
     std::shared_ptr<AccountGetter> account_getter{account_getter_future.get()};
     account_handler.Login(std::move(user_credentials), *account_getter);
     LOG(kInfo) << "Login successful.";
-    ASSERT_EQ(maid_and_signer.first.name(), account_handler.account_.passport->GetMaid().name());
+    ASSERT_EQ(maid_and_signer.first.name(), account_handler.account_->passport->GetMaid().name());
     auto maid_node_nfs(
-        nfs_client::MaidNodeNfs::MakeShared(account_handler.account_.passport->GetMaid()));
+        nfs_client::MaidNodeNfs::MakeShared(account_handler.account_->passport->GetMaid()));
     LOG(kInfo) << "PrivateClient connection to account successful.";
   } catch (std::exception& e) {
     LOG(kError) << "Error on Login :" << boost::diagnostic_information(e);
@@ -112,18 +112,18 @@ TEST(AccountHandlerTest, FUNC_Save) {
     std::shared_ptr<AccountGetter> account_getter{account_getter_future.get()};
     account_handler.Login(std::move(user_credentials), *account_getter);
     LOG(kInfo) << "Login successful.";
-    ASSERT_EQ(maid_and_signer.first.name(), account_handler.account_.passport->GetMaid().name());
+    ASSERT_EQ(maid_and_signer.first.name(), account_handler.account_->passport->GetMaid().name());
     auto maid_node_nfs(
-        nfs_client::MaidNodeNfs::MakeShared(account_handler.account_.passport->GetMaid()));
+        nfs_client::MaidNodeNfs::MakeShared(account_handler.account_->passport->GetMaid()));
     LOG(kInfo) << "PrivateClient connection to account successful.";
     LOG(kInfo) << "AccountHandlerTest -- Saving account --";
-    boost::posix_time::ptime timestamp{account_handler.account_.timestamp};
+    boost::posix_time::ptime timestamp{account_handler.account_->timestamp};
     for (int i(0); i != 10; ++i) {
       account_handler.Save(*maid_node_nfs);
       // TODO(Team) - check account fields are unchanged except 'timestamp'.
-      EXPECT_NE(timestamp, account_handler.account_.timestamp);
-      account_handler.account_.timestamp -= boost::posix_time::seconds{10};
-      timestamp = account_handler.account_.timestamp;
+      EXPECT_NE(timestamp, account_handler.account_->timestamp);
+      account_handler.account_->timestamp -= boost::posix_time::seconds{10};
+      timestamp = account_handler.account_->timestamp;
       LOG(kInfo) << "Save account successful.";
     }
   } catch (std::exception& e) {

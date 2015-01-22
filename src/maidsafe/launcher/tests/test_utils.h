@@ -19,6 +19,7 @@
 #ifndef MAIDSAFE_LAUNCHER_TESTS_TEST_UTILS_H_
 #define MAIDSAFE_LAUNCHER_TESTS_TEST_UTILS_H_
 
+#include <set>
 #include <string>
 #include <tuple>
 
@@ -71,10 +72,18 @@ DirectoryInfo CreateRandomDirectoryInfo();
 
 AppDetails CreateRandomAppDetails();
 
-testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual);
+enum IgnoreField {
+  kIgnorePath = 1,
+  kIgnoreArgs = 2,
+  kIgnorePermittedDirs = 4,
+  kIgnoreIcon = 8
+};
+
+testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual,
+                                int ignore_field = 0);
 
 testing::AssertionResult Equals(const std::set<AppDetails>& expected,
-                                const std::set<AppDetails>& actual);
+                                const std::set<AppDetails>& actual, int ignore_field = 0);
 
 }  // namespace test
 

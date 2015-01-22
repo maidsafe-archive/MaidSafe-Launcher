@@ -19,18 +19,19 @@
 #ifndef MAIDSAFE_LAUNCHER_ACCOUNT_HANDLER_H_
 #define MAIDSAFE_LAUNCHER_ACCOUNT_HANDLER_H_
 
+#include <memory>
+
 #include "maidsafe/common/config.h"
 #include "maidsafe/common/types.h"
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/data_types/structured_data_versions.h"
 #include "maidsafe/nfs/client/maid_node_nfs.h"
 
-#include "maidsafe/launcher/account.h"
-
 namespace maidsafe {
 
 namespace launcher {
 
+struct Account;
 class AccountGetter;
 
 // This class is not threadsafe.
@@ -63,7 +64,7 @@ class AccountHandler {
   void Save(nfs_client::MaidNodeNfs& maid_node_nfs);
 
   // Give full access to the account
-  Account account_;
+  std::unique_ptr<Account> account_;
 
  private:
   StructuredDataVersions::VersionName current_account_version_;

@@ -76,85 +76,92 @@ AppDetails CreateRandomAppDetails() {
   return app;
 }
 
-testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual) {
+testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual,
+                                int ignore_field) {
   if (expected.name != actual.name) {
-    return testing::AssertionFailure() << "Expected name (" << expected.name
-                                       << ") does not match actual name (" << actual.name << ")";
+    return testing::AssertionFailure() << "\n    Expected name (" << expected.name
+                                       << ") does not match actual name (" << actual.name << ")\n";
   }
-  if (expected.path != actual.path) {
-    return testing::AssertionFailure() << "Expected path (" << expected.path
-                                       << ") does not match actual path (" << actual.path << ")";
+  if (!(ignore_field & kIgnorePath) && expected.path != actual.path) {
+    return testing::AssertionFailure() << "\n    Expected path (" << expected.path
+                                       << ") does not match actual path (" << actual.path << ")\n";
   }
-  if (expected.args != actual.args) {
-    return testing::AssertionFailure() << "Expected args (" << expected.args
-                                       << ") do not match actual args (" << actual.args << ")";
+  if (!(ignore_field & kIgnoreArgs) && expected.args != actual.args) {
+    return testing::AssertionFailure() << "\n    Expected args (" << expected.args
+                                       << ") do not match actual args (" << actual.args << ")\n";
   }
-  bool failed_permitted_dirs{expected.permitted_dirs.size() != actual.permitted_dirs.size()};
-  auto expected_itr(expected.permitted_dirs.begin());
-  auto actual_itr(actual.permitted_dirs.begin());
-  while (!failed_permitted_dirs && expected_itr != expected.permitted_dirs.end()) {
-    if (expected_itr->path != actual_itr->path)
-      failed_permitted_dirs = true;
-    if (expected_itr->parent_id != actual_itr->parent_id)
-      failed_permitted_dirs = true;
-    if (expected_itr->directory_id != actual_itr->directory_id)
-      failed_permitted_dirs = true;
-    if ((expected_itr++)->access_rights != (actual_itr++)->access_rights)
-      failed_permitted_dirs = true;
-  }
-  if (failed_permitted_dirs) {
-    std::string output("Expected permitted dirs do not match actual permitted dirs.");
+  if (!(ignore_field & kIgnorePermittedDirs)) {
+    bool failed_permitted_dirs{expected.permitted_dirs.size() != actual.permitted_dirs.size()};
+    auto expected_itr(expected.permitted_dirs.begin());
+    auto actual_itr(actual.permitted_dirs.begin());
+    while (!failed_permitted_dirs && expected_itr != expected.permitted_dirs.end()) {
+      if (expected_itr->path != actual_itr->path)
+        failed_permitted_dirs = true;
+      if (expected_itr->parent_id != actual_itr->parent_id)
+        failed_permitted_dirs = true;
+      if (expected_itr->directory_id != actual_itr->directory_id)
+        failed_permitted_dirs = true;
+      if ((expected_itr++)->access_rights != (actual_itr++)->access_rights)
+        failed_permitted_dirs = true;
+    }
+    if (failed_permitted_dirs) {
+      std::string output("\n    Expected permitted dirs do not match actual permitted dirs.");
 
-    auto print_dir([&output](const DirectoryInfo& dir) {
-      output += "    path:          " + dir.path.string();
-      output += "    parent_id:     " + HexSubstr(dir.parent_id.data);
-      output += "    directory_id:  " + HexSubstr(dir.directory_id);
-      switch (dir.access_rights) {
-        case DirectoryInfo::AccessRights::kNone:
-          output += "    access_rights: kNone\n";
-        case DirectoryInfo::AccessRights::kReadOnly:
-          output += "    access_rights: kReadOnly\n";
-        case DirectoryInfo::AccessRights::kReadWrite:
-          output += "    access_rights: kReadWrite\n";
-        default:
-          BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
-      }
-    });
+      auto print_dir([&output](const DirectoryInfo& dir) {
+        output += "        path:          " + dir.path.string();
+        output += "        parent_id:     " + HexSubstr(dir.parent_id.data);
+        output += "        directory_id:  " + HexSubstr(dir.directory_id);
+        switch (dir.access_rights) {
+          case DirectoryInfo::AccessRights::kNone:
+            output += "        access_rights: kNone\n";
+          case DirectoryInfo::AccessRights::kReadOnly:
+            output += "        access_rights: kReadOnly\n";
+          case DirectoryInfo::AccessRights::kReadWrite:
+            output += "        access_rights: kReadWrite\n";
+          default:
+            BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
+        }
+      });
 
-    output += "\n\n  Expected dirs:\n";
-    expected_itr = expected.permitted_dirs.begin();
-    while (expected_itr != expected.permitted_dirs.end())
-      print_dir(*expected_itr++);
+      output += "\n\n      Expected dirs:\n";
+      expected_itr = expected.permitted_dirs.begin();
+      while (expected_itr != expected.permitted_dirs.end())
+        print_dir(*expected_itr++);
 
-    output += "\n\n  Actual dirs:\n";
-    actual_itr = actual.permitted_dirs.begin();
-    while (actual_itr != actual.permitted_dirs.end())
-      print_dir(*actual_itr++);
-    return testing::AssertionFailure() << output << '\n';
+      output += "\n\n      Actual dirs:\n";
+      actual_itr = actual.permitted_dirs.begin();
+      while (actual_itr != actual.permitted_dirs.end())
+        print_dir(*actual_itr++);
+      return testing::AssertionFailure() << output << '\n';
+    }
   }
 
-  if (expected.icon != actual.icon) {
+  if (!(ignore_field & kIgnoreIcon) && expected.icon != actual.icon) {
     return testing::AssertionFailure()
-           << "Expected icon ("
+           << "\n    Expected icon ("
            << HexEncode(std::string(expected.icon.begin(), expected.icon.end()))
            << ") does not match actual icon ("
-           << HexEncode(std::string(actual.icon.begin(), actual.icon.end())) << ")";
+           << HexEncode(std::string(actual.icon.begin(), actual.icon.end())) << ")\n";
   }
   return testing::AssertionSuccess();
 }
 
 testing::AssertionResult Equals(const std::set<AppDetails>& expected,
-                                const std::set<AppDetails>& actual) {
+                                const std::set<AppDetails>& actual, int ignore_field) {
   if (expected.size() != actual.size()) {
-    return testing::AssertionFailure() << "Expected size (" << expected.size()
+    return testing::AssertionFailure() << "\n  Expected size (" << expected.size()
                                        << ") does not match actual size (" << actual.size() << ")";
   }
   auto expected_itr(expected.begin());
   auto actual_itr(actual.begin());
   int count{0};
   while (expected_itr != expected.end()) {
-    if (!Equals(*expected_itr++, *actual_itr++))
+    if (!Equals(*expected_itr, *actual_itr, ignore_field)) {
+      EXPECT_TRUE(Equals(*expected_itr, *actual_itr, ignore_field));  // to get console output.
       return testing::AssertionFailure() << "Failed to match apps at index " << count;
+    }
+    ++expected_itr;
+    ++actual_itr;;
     ++count;
   }
   return testing::AssertionSuccess();

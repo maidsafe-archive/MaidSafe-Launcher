@@ -37,28 +37,6 @@ namespace maidsafe {
 
 namespace launcher {
 
-namespace {
-
-std::string SerialiseApps(const std::set<AppDetails>& apps) {
-  // Omit machine-specific 'path' and 'args', since we don't want this to persist in the Account.
-  // They're held in the config file.
-  std::string result;
-  for (const auto& app : apps)
-    result += ConvertToString(app.name, app.permitted_dirs, app.icon);
-  return result;
-}
-
-void ParseApps(std::stringstream& serialised_apps, std::set<AppDetails>& apps) {
-  while (serialised_apps) {
-    AppDetails app_details;
-    ConvertFromStream(serialised_apps, app_details.name, app_details.permitted_dirs,
-                      app_details.icon);
-    apps.emplace(std::move(app_details));
-  }
-}
-
-}  // unnamed namespace
-
 ImmutableData EncryptAccount(const authentication::UserCredentials& user_credentials,
                              Account& account) {
   uint64_t serialised_timestamp{GetTimeStamp()};
@@ -68,10 +46,16 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
   if (account.root_parent_id.IsInitialised())
     root_parent_id = account.root_parent_id;
 
-  NonEmptyString serialised_account{ConvertToString(
-      account.passport->Encrypt(user_credentials), serialised_timestamp, account.ip, account.port,
-      unique_user_id, root_parent_id, account.config_file_aes_key, account.config_file_aes_iv,
-      SerialiseApps(account.apps))};
+  OutputVectorStream binary_output_stream;
+  BinaryOutputArchive output_archive{binary_output_stream};
+  output_archive(account.passport->Encrypt(user_credentials), serialised_timestamp, account.ip,
+                 account.port, unique_user_id, root_parent_id, account.config_file_aes_key,
+                 account.config_file_aes_iv, account.apps.size());
+  for (const auto& app : account.apps)
+    output_archive(app.name, app.permitted_dirs, app.icon);
+
+  NonEmptyString serialised_account{
+      std::string(binary_output_stream.vector().begin(), binary_output_stream.vector().end())};
 
   account.timestamp = TimeStampToPtime(serialised_timestamp);
 
@@ -81,17 +65,6 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
                           authentication::DeriveSymmEncryptKey(secure_password),
                           authentication::DeriveSymmEncryptIv(secure_password)).data};
 }
-
-Account::Account()
-    : passport(),
-      timestamp(),
-      ip(),
-      port(0),
-      unique_user_id(),
-      root_parent_id(),
-      config_file_aes_key(),
-      config_file_aes_iv(),
-      apps() {}
 
 Account::Account(const passport::MaidAndSigner& maid_and_signer)
     : passport(maidsafe::make_unique<passport::Passport>(maid_and_signer)),
@@ -124,17 +97,25 @@ Account::Account(const ImmutableData& encrypted_account,
   crypto::CipherText encrypted_passport;
   uint64_t serialised_timestamp{0};
   boost::optional<Identity> optional_unique_user_id, optional_root_parent_id;
-  std::stringstream str_stream{serialised_account.string()};
-  ConvertFromStream(str_stream, encrypted_passport, serialised_timestamp, ip, port,
-                    optional_unique_user_id, optional_root_parent_id, config_file_aes_key,
-                    config_file_aes_iv);
+  std::size_t app_count{0};
+
+  InputVectorStream binary_input_stream{
+      SerialisedData(serialised_account.string().begin(), serialised_account.string().end())};
+  BinaryInputArchive input_archive{binary_input_stream};
+  input_archive(encrypted_passport, serialised_timestamp, ip, port, optional_unique_user_id,
+                optional_root_parent_id, config_file_aes_key, config_file_aes_iv, app_count);
+  for (std::size_t i{ 0 }; i < app_count; ++i) {
+    AppDetails app_details;
+    input_archive(app_details.name, app_details.permitted_dirs, app_details.icon);
+    apps.insert(apps.end(), std::move(app_details));
+  }
+
   passport = maidsafe::make_unique<passport::Passport>(encrypted_passport, user_credentials);
   timestamp = TimeStampToPtime(serialised_timestamp);
   if (optional_unique_user_id)
     unique_user_id = *optional_unique_user_id;
   if (optional_root_parent_id)
     root_parent_id = *optional_root_parent_id;
-  ParseApps(str_stream, apps);
 }
 
 Account::Account(Account&& other) MAIDSAFE_NOEXCEPT

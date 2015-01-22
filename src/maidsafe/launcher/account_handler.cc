@@ -24,11 +24,13 @@
 #include "maidsafe/common/crypto.h"
 #include "maidsafe/common/error.h"
 #include "maidsafe/common/log.h"
+#include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/on_scope_exit.h"
 #include "maidsafe/common/authentication/user_credential_utils.h"
 #include "maidsafe/common/data_types/immutable_data.h"
 #include "maidsafe/common/data_types/mutable_data.h"
 
+#include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"
 
 namespace maidsafe {
@@ -46,13 +48,13 @@ AccountHandler::AccountHandler() : account_(), current_account_version_(), user_
 AccountHandler::AccountHandler(Account&& account,
                                authentication::UserCredentials&& user_credentials,
                                nfs_client::MaidNodeNfs& maid_node_nfs)
-    : account_(std::move(account)),
+    : account_(maidsafe::make_unique<Account>(std::move(account))),
       current_account_version_(),
       user_credentials_(std::move(user_credentials)) {
   // throw if private_client & account are not coherent
   // TODO(Prakash) Validate credentials
   Identity account_location{GetAccountLocation(*user_credentials_.keyword, *user_credentials_.pin)};
-  ImmutableData encrypted_account{EncryptAccount(user_credentials_, account_)};
+  ImmutableData encrypted_account{EncryptAccount(user_credentials_, *account_)};
   try {
     LOG(kVerbose) << "Put encrypted_account";
     auto put_future = maid_node_nfs.Put(encrypted_account);
@@ -85,7 +87,7 @@ AccountHandler& AccountHandler::operator=(AccountHandler&& other) {
 
 void AccountHandler::Login(authentication::UserCredentials&& user_credentials,
                            AccountGetter& account_getter) {
-  if (account_.passport)  // already logged in
+  if (account_->passport)  // already logged in
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
 
   Identity account_location{GetAccountLocation(*user_credentials.keyword, *user_credentials.pin)};
@@ -102,7 +104,7 @@ void AccountHandler::Login(authentication::UserCredentials&& user_credentials,
     auto encrypted_account_future(account_getter.data_getter().Get(versions.at(0).id));
     auto encrypted_account(encrypted_account_future.get());
     LOG(kVerbose) << "Get encrypted_account succeeded";
-    account_ = Account{encrypted_account, user_credentials};
+    account_ = maidsafe::make_unique<Account>(encrypted_account, user_credentials);
     current_account_version_ = versions.at(0);
     user_credentials_ = std::move(user_credentials);
   } catch (const std::exception& e) {
@@ -113,9 +115,9 @@ void AccountHandler::Login(authentication::UserCredentials&& user_credentials,
 
 void AccountHandler::Save(nfs_client::MaidNodeNfs& maid_node_nfs) {
   // The only member which is modified in this process is the account timestamp.
-  on_scope_exit strong_guarantee{on_scope_exit::RevertValue(account_.timestamp)};
+  on_scope_exit strong_guarantee{on_scope_exit::RevertValue(account_->timestamp)};
 
-  ImmutableData encrypted_account(EncryptAccount(user_credentials_, account_));
+  ImmutableData encrypted_account(EncryptAccount(user_credentials_, *account_));
   try {
     auto put_future = maid_node_nfs.Put(encrypted_account);
     put_future.get();

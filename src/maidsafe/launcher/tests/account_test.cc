@@ -58,13 +58,13 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   authentication::UserCredentials user_credentials{GetRandomUserCredentials()};
 
   // Check we can handle serialising a default-contructed account.
-  EXPECT_NO_THROW(encrypted_account0 = maidsafe::make_unique<ImmutableData>(
+  ASSERT_NO_THROW(encrypted_account0 = maidsafe::make_unique<ImmutableData>(
                       EncryptAccount(user_credentials, account0)));
   EXPECT_NE(boost::posix_time::ptime(boost::date_time::not_a_date_time), account0.timestamp);
 
   // Parse default-constructed account and update it.
   std::unique_ptr<Account> account1;
-  EXPECT_NO_THROW(account1 = maidsafe::make_unique<Account>(*encrypted_account0, user_credentials));
+  ASSERT_NO_THROW(account1 = maidsafe::make_unique<Account>(*encrypted_account0, user_credentials));
   EXPECT_EQ(account0.passport->Encrypt(user_credentials),
             account1->passport->Encrypt(user_credentials));
   EXPECT_EQ(account0.timestamp, account1->timestamp);
@@ -98,7 +98,7 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
 
   // Encrypt updated account, then parse and check.
   std::unique_ptr<ImmutableData> encrypted_account1;
-  EXPECT_NO_THROW(encrypted_account1 = maidsafe::make_unique<ImmutableData>(
+  ASSERT_NO_THROW(encrypted_account1 = maidsafe::make_unique<ImmutableData>(
                       EncryptAccount(user_credentials, *account1)));
   EXPECT_LT(account0.timestamp, account1->timestamp);
   EXPECT_EQ(account1->ip, ip);
@@ -110,7 +110,7 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   EXPECT_TRUE(Equals(account1->apps, apps));
 
   std::unique_ptr<Account> account2;
-  EXPECT_NO_THROW(account2 = maidsafe::make_unique<Account>(*encrypted_account1, user_credentials));
+  ASSERT_NO_THROW(account2 = maidsafe::make_unique<Account>(*encrypted_account1, user_credentials));
   EXPECT_EQ(account1->passport->Encrypt(user_credentials),
             account2->passport->Encrypt(user_credentials));
   EXPECT_EQ(account1->timestamp, account2->timestamp);
@@ -120,7 +120,7 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   EXPECT_EQ(account1->root_parent_id, account2->root_parent_id);
   EXPECT_EQ(account1->config_file_aes_key, account2->config_file_aes_key);
   EXPECT_EQ(account1->config_file_aes_iv, account2->config_file_aes_iv);
-  EXPECT_TRUE(Equals(account1->apps, account2->apps));
+  EXPECT_TRUE(Equals(account1->apps, account2->apps, (kIgnorePath | kIgnoreArgs)));
 }
 
 TEST(AccountTest, FUNC_MoveConstructAndAssign) {
