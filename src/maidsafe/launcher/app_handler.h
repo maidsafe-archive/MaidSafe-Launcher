@@ -71,7 +71,7 @@ class AppHandler {
   void UpdateIcon(const std::string& app_name, const SerialisedData& new_icon);
   void RemoveLocally(const std::string& app_name);
   void RemoveFromNetwork(const std::string& app_name);
-  void Launch(const std::string& app_name, tcp::Port our_port);
+  std::pair<boost::filesystem::path, std::string> GetPathAndArgs(std::string app_name) const;
 
  private:
   using LockGuardPtr = std::unique_ptr<std::lock_guard<std::mutex>>;

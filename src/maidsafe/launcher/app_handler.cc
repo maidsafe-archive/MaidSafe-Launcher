@@ -212,7 +212,17 @@ void AppHandler::RemoveFromNetwork(const std::string& app_name) {
   WriteConfigFile();
 }
 
-void AppHandler::Launch(const std::string& /*app_name*/, tcp::Port /*our_port*/) {}
+std::pair<fs::path, std::string> AppHandler::GetPathAndArgs(std::string app_name) const {
+  AppDetails app;
+  app.name = app_name;
+  std::lock_guard<std::mutex> lock{mutex_};
+  auto itr = local_apps_.find(app);
+  if (itr == local_apps_.end()) {
+    LOG(kError) << "App \"" << app_name << "\" doesn't exist in AppHandler's local apps set.";
+    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::no_such_element));
+  }
+  return std::make_pair(itr->path, itr->args);
+}
 
 std::pair<AppHandler::LockGuardPtr, AppHandler::LockGuardPtr> AppHandler::AcquireLocks() const {
   std::lock(*account_mutex_, mutex_);

@@ -26,6 +26,7 @@
 #include <string>
 
 #include "boost/filesystem/path.hpp"
+#include "boost/optional.hpp"
 
 #include "maidsafe/directory_info.h"
 #include "maidsafe/common/on_scope_exit.h"
@@ -93,8 +94,16 @@ class Launcher {
   // file).  Throws with strong exception guarantee if 'app_name' isn't in the set.
   void RemoveAppFromNetwork(const std::string& app_name);
 
-  // Save the account to the network.                        If this throws, the application should not continue running.  timeout / conn dropped?
-  void SaveSession();
+  // Save the account to the network.  If 'force' is false, the account is only saved if there are
+  // unsaved changes in the account (e.g. if AddApp has been called).  If 'force' is true, the
+  // account is saved unconditionally.  Throws on error, with strong exception guarantee.  If the
+  // error indicates a temporary problem, it is safe to retry SaveSession, otherwise the user
+  // probably needs to take action.
+  void SaveSession(bool force = false);
+
+  // Reverts the internal state back to the last successful 'SaveSession' call, or the initial state
+  // if there have been no 'SaveSession' calls.
+  void RevertToLastSavedSession();
 
   // Launches a new instance of the app indicated by 'app_name' as a detached child.  Throws on
   // error, with strong exception guarantee.
@@ -107,7 +116,7 @@ class Launcher {
   // For new accounts.  Throws on failure to create account.
   Launcher(Keyword keyword, Pin pin, Password password, passport::MaidAndSigner&& maid_and_signer);
 
-  void RevertOperation(AppHandler::Snapshot snapshot);
+  void RevertAppHandler(AppHandler::Snapshot snapshot);
 
   tcp::Port StartListening();
 
@@ -115,6 +124,7 @@ class Launcher {
   AccountHandler account_handler_;
   mutable std::mutex account_mutex_;
   AppHandler app_handler_;
+  boost::optional<AppHandler::Snapshot> rollback_snapshot_;
 };
 
 }  // namespace launcher

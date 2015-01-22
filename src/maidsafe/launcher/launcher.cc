@@ -60,7 +60,7 @@ authentication::UserCredentials ConvertToCredentials(Launcher::Keyword keyword, 
 }  // unamed namespace
 
 Launcher::Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& account_getter)
-    : maid_node_nfs_(), account_handler_(), account_mutex_(), app_handler_() {
+    : maid_node_nfs_(), account_handler_(), account_mutex_(), app_handler_(), rollback_snapshot_() {
   account_handler_.Login(ConvertToCredentials(keyword, pin, password), account_getter);
   maid_node_nfs_ =
       nfs_client::MaidNodeNfs::MakeShared(account_handler_.account_->passport->GetMaid());
@@ -73,7 +73,7 @@ Launcher::Launcher(Keyword keyword, Pin pin, Password password,
       account_handler_(Account{maid_and_signer}, ConvertToCredentials(keyword, pin, password),
                        *maid_node_nfs_),
       account_mutex_(),
-      app_handler_() {
+      app_handler_(), rollback_snapshot_() {
   app_handler_.Initialise(GetConfigFilePath(), account_handler_.account_.get(), &account_mutex_);
 }
 
@@ -92,47 +92,49 @@ std::unique_ptr<Launcher> Launcher::CreateAccount(Keyword keyword, Pin pin, Pass
 }
 
 void Launcher::LogoutAndStop() {
-  SaveSession();
+  SaveSession(true);
   maid_node_nfs_->Stop();
 }
 
 void Launcher::AddApp(std::string app_name, boost::filesystem::path app_path,
                       std::string app_args) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{[&] { RevertOperation(std::move(snapshot)); }};
+  on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.Add(std::move(app_name), std::move(app_path), std::move(app_args));
-  SaveSession();
+  if (!rollback_snapshot_)
+    rollback_snapshot_ = snapshot;
   strong_guarantee.Release();
 }
 
 void Launcher::UpdateAppName(const std::string& app_name, const std::string& new_name) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{ [&] { RevertOperation(std::move(snapshot)); } };
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   app_handler_.UpdateName(app_name, new_name);
-  SaveSession();
+  if (!rollback_snapshot_)
+    rollback_snapshot_ = snapshot;
   strong_guarantee.Release();
 }
 
 void Launcher::UpdateAppPath(const std::string& app_name, const boost::filesystem::path& new_path) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{ [&] { RevertOperation(std::move(snapshot)); } };
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   app_handler_.UpdatePath(app_name, new_path);
-  // No need to save account since app path isn't held in the account.
+  // No need to keep snapshot since app path isn't held in the account, so no need to rollback.
   strong_guarantee.Release();
 }
 
 void Launcher::UpdateAppArgs(const std::string& app_name, const std::string& new_args) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{ [&] { RevertOperation(std::move(snapshot)); } };
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   app_handler_.UpdateArgs(app_name, new_args);
-  // No need to save account since app args aren't held in the account.
+  // No need to keep snapshot since app args aren't held in the account, so no need to rollback.
   strong_guarantee.Release();
 }
 
 void Launcher::UpdateAppSafeDriveAccess(const std::string& app_name,
                                         DirectoryInfo::AccessRights new_rights) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{ [&] { RevertOperation(std::move(snapshot)); } };
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   // TODO(Fraser#5#): 2015-01-20 - Replace "SafeDrive" string with constant defined... where?
   DirectoryInfo safe_dir("SafeDrive", drive::ParentId(), drive::DirectoryId(), new_rights);
   {
@@ -142,41 +144,60 @@ void Launcher::UpdateAppSafeDriveAccess(const std::string& app_name,
     safe_dir.directory_id = account_handler_.account_->root_parent_id;
   }
   app_handler_.UpdatePermittedDirs(app_name, safe_dir);
-  SaveSession();
+  if (!rollback_snapshot_)
+    rollback_snapshot_ = snapshot;
   strong_guarantee.Release();
 }
 
 void Launcher::UpdateAppIcon(const std::string& app_name, const SerialisedData& new_icon) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{ [&] { RevertOperation(std::move(snapshot)); } };
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   app_handler_.UpdateIcon(app_name, new_icon);
-  SaveSession();
+  if (!rollback_snapshot_)
+    rollback_snapshot_ = snapshot;
   strong_guarantee.Release();
 }
 
 void Launcher::RemoveAppLocally(const std::string& app_name) {
+  auto snapshot(app_handler_.GetSnapshot());
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   app_handler_.RemoveLocally(app_name);
-  // No need to save account since this only applies to apps in the local config file.
+  // No need to keep snapshot since this only applies to apps in the local config file, so no need
+  // to rollback.
+  strong_guarantee.Release();
 }
 
 void Launcher::RemoveAppFromNetwork(const std::string& app_name) {
   auto snapshot(app_handler_.GetSnapshot());
-  on_scope_exit strong_guarantee{ [&] { RevertOperation(std::move(snapshot)); } };
+  on_scope_exit strong_guarantee{ [&] { RevertAppHandler(std::move(snapshot)); } };
   app_handler_.RemoveFromNetwork(app_name);
-  SaveSession();
+  if (!rollback_snapshot_)
+    rollback_snapshot_ = snapshot;
   strong_guarantee.Release();
 }
 
 void Launcher::LaunchApp(const std::string& app_name) {
-  app_handler_.Launch(app_name, StartListening());
+  auto path_and_args(app_handler_.GetPathAndArgs(app_name));
+//  tcp::Port listening_port{StartListening()};
 }
 
-void Launcher::SaveSession() {
+void Launcher::SaveSession(bool force) {
   std::lock_guard<std::mutex> lock{ account_mutex_ };
+  if (!force && !rollback_snapshot_)
+    return;
   account_handler_.Save(*maid_node_nfs_);
+  rollback_snapshot_ = boost::none;
 }
 
-void Launcher::RevertOperation(AppHandler::Snapshot snapshot) {
+void Launcher::RevertToLastSavedSession() {
+  std::lock_guard<std::mutex> lock{ account_mutex_ };
+  if (!rollback_snapshot_)
+    return;
+  RevertAppHandler(*rollback_snapshot_);
+  rollback_snapshot_ = boost::none;
+}
+
+void Launcher::RevertAppHandler(AppHandler::Snapshot snapshot) {
   try {
     app_handler_.ApplySnapshot(std::move(snapshot));
   }
