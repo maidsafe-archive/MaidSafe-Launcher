@@ -177,8 +177,68 @@ std::set<AppDetails> AppHandler::GetApps(bool locally_available) const {
   return locally_available ? local_apps_ : non_local_apps_;
 }
 
-void AppHandler::Add(std::string app_name, fs::path app_path, std::string app_args) {
-  //  need to add to account to be serialised too
+AppDetails AppHandler::AddOrLinkApp(std::string app_name, fs::path app_path, std::string app_args,
+                                    const SerialisedData* const app_icon) {
+  AppDetails app;
+  app.name = app_name;
+  app.path = app_path;
+  app.args = app_args;
+
+  auto locks(AcquireLocks());
+
+  auto account_itr(account_->apps.find(app));
+  auto local_itr(local_apps_.find(app));
+  auto non_local_itr(non_local_apps_.find(app));
+
+  // We're linking the app if 'app_icon' is null, otherwise we're adding the app.
+  if (app_icon) {
+    app.icon = *app_icon;
+    Add(app, account_itr, local_itr, non_local_itr);
+  } else {
+    Link(app, account_itr, local_itr, non_local_itr);
+  }
+
+  WriteConfigFile();
+  return app;
+}
+
+void AppHandler::Add(AppDetails& app, std::set<AppDetails>::iterator account_itr,
+  std::set<AppDetails>::iterator local_itr, std::set<AppDetails>::iterator non_local_itr) {
+  // Adding requires app to not exist in the account
+  if (account_itr != account_->apps.end()) {
+    LOG(kError) << "App \"" << app.name << "\" already exists in Account - can't add.";
+    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::unable_to_handle_request));
+  }
+
+  app.permitted_dirs.emplace(std::string("/") + app.name, drive::ParentId(account_->root_parent_id),
+                             drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
+                             DirectoryInfo::AccessRights::kReadWrite);
+
+  // Add to account and local set
+  account_->apps.insert(app);
+  local_apps_.insert(app);
+}
+
+void AppHandler::Link(AppDetails& app, std::set<AppDetails>::iterator account_itr,
+                      std::set<AppDetails>::iterator local_itr,
+                      std::set<AppDetails>::iterator non_local_itr) {
+  // Linking requires app to exist in non-local set and not exist in local set
+  if (local_itr != local_apps_.end() || non_local_itr == non_local_apps_.end()) {
+    LOG(kError)
+      << "App \"" << app.name
+      << "\" already exists in local set, or doesn't exist in non-local set - can't link.";
+    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::unable_to_handle_request));
+  }
+
+  // If app is in non-local set, it must also be in Account.
+  assert(account_itr != account_->apps.end());
+
+  app.permitted_dirs = account_itr->permitted_dirs;
+  app.icon = account_itr->icon;
+
+  // Add to local and remove from non-local
+  local_apps_.insert(app);
+  non_local_apps_.erase(non_local_itr);
 }
 
 void AppHandler::UpdateName(const std::string& app_name, const std::string& new_name) {

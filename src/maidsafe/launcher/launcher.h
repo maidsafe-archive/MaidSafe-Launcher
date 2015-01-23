@@ -29,6 +29,7 @@
 #include "boost/optional.hpp"
 
 #include "maidsafe/directory_info.h"
+#include "maidsafe/common/asio_service.h"
 #include "maidsafe/common/on_scope_exit.h"
 #include "maidsafe/passport/passport.h"
 #include "maidsafe/nfs/client/maid_node_nfs.h"
@@ -43,6 +44,15 @@ namespace launcher {
 
 class AccountGetter;
 
+// Unless otherwise indicated, this class' public functions all throw on error and provide the
+// strong exception-safety guarantee.
+//
+// An app which has been added to the Launcher on this machine for this user is known as a local or
+// locally-available app.  An app which has been added for this user via a Launcher on a different
+// machine is known as a non-local or non-locally-available app.  The set of local and non-local
+// apps are mutually-exclusive.
+//
+// A non-local app can be added locally by calling 'LinkApp', not 'AddApp'.
 class Launcher {
  public:
   using Keyword = std::string;
@@ -54,29 +64,34 @@ class Launcher {
   Launcher& operator=(const Launcher&) = delete;
   Launcher& operator=(Launcher&&) = delete;
 
-  // Retrieves and decrypts account info and logs in to an existing account.  Throws on error.
+  // Retrieves and decrypts account info and starts a new session by logging into the network.
   static std::unique_ptr<Launcher> Login(Keyword keyword, Pin pin, Password password);
 
-  // This function should be used when creating a new account, i.e. where a account has never
-  // been put to the network.  Internally saves the first encrypted account after creating the new
-  // account.  Throws on error.
+  // This function should be used when creating a new account, i.e. where an account has never
+  // been put to the network.  Creates a new account, encrypts it and puts it to the network.
   static std::unique_ptr<Launcher> CreateAccount(Keyword keyword, Pin pin, Password password);
 
   // Saves session, and logs out of the network.  After calling, the class should be destructed as
-  // it is no longer connected to the network.  Throws on error, with strong exception guarantee.
+  // it is no longer connected to the network.
   void LogoutAndStop();
 
-  // Returns the set of apps which have been added.  If 'locally_available' is false, only apps
-  // which have been added on other machines are returned (i.e. there is no local config file entry
-  // for these apps).  If 'locally_available' is true, only apps which have been added on this
-  // machine are returned.  These sets are mutually exclusive.  Doesn't throw.
+  // Returns the set of apps which have been added; either the locally-available ones or the
+  // non-locally-available ones depending on the value of 'locally_available'.
   std::set<AppDetails> GetApps(bool locally_available) const;
 
-  // Adds an instance of 'app_name' to the set of recognised apps.
-  void AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args);
+  // Adds an instance of 'app_name' to the set of local apps.  Throws if the app has already been
+  // added locally or non-locally.  (To add an app which has previously been added non-locally, use
+  // the 'LinkApp' function.)
+  void AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
+              SerialisedData app_icon);
 
-  // Update functions all throw on error (e.g. if the indicated app doesn't exist in the set) with
-  // strong exception guarantee.
+  // Adds an instance of 'app_name' to the set of local apps where this app must have been
+  // previously added non-locally.  Throws if the app has already been added locally, linked, or has
+  // *not* been added non-locally.
+  void LinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args);
+
+  // The 'Update...' functions all replace the existing field with the new one for the app indicated
+  // by 'app_name'.
   void UpdateAppName(const std::string& app_name, const std::string& new_name);
   void UpdateAppPath(const std::string& app_name, const boost::filesystem::path& new_path);
   void UpdateAppArgs(const std::string& app_name, const std::string& new_args);
@@ -84,29 +99,25 @@ class Launcher {
                                 DirectoryInfo::AccessRights new_rights);
   void UpdateAppIcon(const std::string& app_name, const SerialisedData& new_icon);
 
-  // Removes an instance of 'app_name' from the set of locally available apps (i.e. apps which have
-  // been added on this machine and which have an entry in the local config file).  Throws with
-  // strong exception guarantee if 'app_name' isn't in the set.
+  // Removes an instance of the app indicated by 'app_name' from the set of locally-available apps.
+  // Throws if the app isn't in the set.
   void RemoveAppLocally(const std::string& app_name);
 
-  // Removes an instance of 'app_name' from the set of non-locally available apps (i.e. apps which
-  // have only been added on a different machine and which don't have an entry in the local config
-  // file).  Throws with strong exception guarantee if 'app_name' isn't in the set.
+  // Removes an instance of the app indicated by 'app_name' from the set of non-locally available
+  // apps.  Throws if the app isn't in the set.
   void RemoveAppFromNetwork(const std::string& app_name);
 
   // Save the account to the network.  If 'force' is false, the account is only saved if there are
   // unsaved changes in the account (e.g. if AddApp has been called).  If 'force' is true, the
-  // account is saved unconditionally.  Throws on error, with strong exception guarantee.  If the
-  // error indicates a temporary problem, it is safe to retry SaveSession, otherwise the user
-  // probably needs to take action.
+  // account is saved unconditionally.  If the functions throws an exception indicating a temporary
+  // problem, it is safe to retry SaveSession, otherwise the user probably needs to take action.
   void SaveSession(bool force = false);
 
   // Reverts the internal state back to the last successful 'SaveSession' call, or the initial state
   // if there have been no 'SaveSession' calls.
   void RevertToLastSavedSession();
 
-  // Launches a new instance of the app indicated by 'app_name' as a detached child.  Throws on
-  // error, with strong exception guarantee.
+  // Launches a new instance of the app indicated by 'app_name' as a detached child.
   void LaunchApp(const std::string& app_name);
 
  private:
@@ -116,10 +127,14 @@ class Launcher {
   // For new accounts.  Throws on failure to create account.
   Launcher(Keyword keyword, Pin pin, Password password, passport::MaidAndSigner&& maid_and_signer);
 
+  void AddOrLinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
+                    const SerialisedData* const app_icon);
+
   void RevertAppHandler(AppHandler::Snapshot snapshot);
 
   tcp::Port StartListening();
 
+  AsioService asio_service_;
   std::shared_ptr<nfs_client::MaidNodeNfs> maid_node_nfs_;
   AccountHandler account_handler_;
   mutable std::mutex account_mutex_;

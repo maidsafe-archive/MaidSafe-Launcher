@@ -40,7 +40,11 @@ struct Account;
 struct AppDetails;
 
 // This class only offers the basic exception safety guarantee, but it allows a snapshot to be taken
-// so that the owning Launcher class can revert this to the snapshot state if required.
+// so that the owning Launcher class can revert this to the snapshot state if required.  The
+// Snapshot struct provides a RAII copy of the config file.  When an instance of a Snaphot is
+// created, a copy of the config file is created and the path to this copy held in a shared_ptr
+// member of the Snapshot instance.  When the final copy of this Snapshot instance is destroyed, the
+// copied file is also removed from disk.
 class AppHandler {
  public:
   struct Snapshot {
@@ -64,7 +68,9 @@ class AppHandler {
   void ApplySnapshot(Snapshot snapshot);
 
   std::set<AppDetails> GetApps(bool locally_available) const;
-  void Add(std::string app_name, boost::filesystem::path app_path, std::string app_args);
+  // Link if 'app_icon' is null, else Add.
+  AppDetails AddOrLinkApp(std::string app_name, boost::filesystem::path app_path,
+                          std::string app_args, const SerialisedData* const app_icon);
   void UpdateName(const std::string& app_name, const std::string& new_name);
   void UpdatePath(const std::string& app_name, const boost::filesystem::path& new_path);
   void UpdateArgs(const std::string& app_name, const std::string& new_args);
@@ -79,6 +85,10 @@ class AppHandler {
   std::pair<LockGuardPtr, LockGuardPtr> AcquireLocks() const;
   void ReadConfigFile();
   void WriteConfigFile() const;
+  void Add(AppDetails& app, std::set<AppDetails>::iterator account_itr,
+           std::set<AppDetails>::iterator local_itr, std::set<AppDetails>::iterator non_local_itr);
+  void Link(AppDetails& app, std::set<AppDetails>::iterator account_itr,
+            std::set<AppDetails>::iterator local_itr, std::set<AppDetails>::iterator non_local_itr);
   void Update(const std::string& app_name, const std::string* const new_name,
               const boost::filesystem::path* const new_path, const std::string* const new_args,
               const DirectoryInfo* const new_dir, const SerialisedData* const new_icon);
