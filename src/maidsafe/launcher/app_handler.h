@@ -39,6 +39,10 @@ namespace launcher {
 struct Account;
 struct AppDetails;
 
+namespace test {
+class AppHandlerTest;
+}  // namespace test
+
 // This class only offers the basic exception safety guarantee, but it allows a snapshot to be taken
 // so that the owning Launcher class can revert this to the snapshot state if required.  The
 // Snapshot struct provides a RAII copy of the config file.  When an instance of a Snaphot is
@@ -49,6 +53,7 @@ class AppHandler {
  public:
   struct Snapshot {
     friend class AppHandler;
+    friend class test::AppHandlerTest;
    private:
     std::set<AppDetails> local_apps, non_local_apps;
     std::shared_ptr<boost::filesystem::path> config_file;

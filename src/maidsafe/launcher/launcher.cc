@@ -38,7 +38,8 @@ namespace {
 
 boost::filesystem::path GetConfigFilePath() {
 #ifdef TESTING
-  static test::TestPath test_path(test::CreateTestPath("MaidSafe_TestLauncher"));
+  static maidsafe::test::TestPath test_path(
+      maidsafe::test::CreateTestPath("MaidSafe_TestLauncher"));
   return *test_path / "config.txt";
 #else
   return GetUserAppDir() / "config";
