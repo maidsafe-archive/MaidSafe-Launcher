@@ -78,20 +78,23 @@ AppHandler::AppHandler()
 void AppHandler::Initialise(fs::path config_file_path, Account* account,
                             std::mutex* account_mutex) {
   // Check 'Initialise' hasn't already been called.
-  assert(!account_ && !account_mutex_ && fs::is_regular_file(config_file_path));
+  assert(!account_ && !account_mutex_);
 
   assert(account && account_mutex);
-  fs::create_directories(config_file_path.parent_path());
 
   std::lock(*account_mutex, mutex_);
   std::lock_guard<std::mutex> account_lock(*account_mutex, std::adopt_lock);
   std::lock_guard<std::mutex> lock(mutex_, std::adopt_lock);
   account_ = account;
   account_mutex_ = account_mutex;
+  config_file_path_ = std::move(config_file_path);
 
   // Initialise the non-local apps from the account and the local ones from the config file
   non_local_apps_ = account_->apps;
-  ReadConfigFile();
+  if (!fs::exists(config_file_path_.parent_path()))
+    fs::create_directories(config_file_path_.parent_path());
+  else
+    ReadConfigFile();
 
   // Iterate through each set of apps.  For any app which appears as local *and* non-local, its info
   // is merged to the copy in the local set and it is removed from the non-local set.  Any app which
@@ -119,11 +122,25 @@ AppHandler::Snapshot AppHandler::GetSnapshot() const {
   snapshot.local_apps = local_apps_;
   snapshot.non_local_apps = non_local_apps_;
   try {
-    snapshot.config_file = config_file_path_.parent_path() / RandomAlphaNumericString(10);
-    fs::copy_file(config_file_path_, snapshot.config_file);
+    // Set up copy of config file.  Path is held in a shared_ptr with a custom deleter which also
+    // tries to remove the copied file as well as deleting the path pointer.
+    snapshot.config_file.reset(
+        new fs::path(config_file_path_.parent_path() / RandomAlphaNumericString(10)),
+        [](fs::path* delete_path) {
+          if (!delete_path->empty() && fs::exists(*delete_path)) {
+            boost::system::error_code ec;
+            if (!fs::remove(*delete_path, ec))
+              LOG(kWarning) << "Failed to remove " << *delete_path;
+            if (ec)
+              LOG(kWarning) << "Error removing " << *delete_path << "  " << ec.message();
+          }
+          delete delete_path;
+        });
+    if (fs::exists(config_file_path_))
+      fs::copy_file(config_file_path_, *snapshot.config_file);
   } catch (const std::exception& e) {
     LOG(kError) << "Failed to copy config file from " << config_file_path_ << " to "
-                << snapshot.config_file << ": " << e.what();
+                << *snapshot.config_file << ": " << e.what();
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::filesystem_io_error));
   }
   return snapshot;
@@ -144,9 +161,12 @@ void AppHandler::ApplySnapshot(Snapshot snapshot) {
 
   // Replace config file
   try {
-    fs::rename(snapshot.config_file, config_file_path_);
+    if (fs::exists(*snapshot.config_file))
+      fs::rename(*snapshot.config_file, config_file_path_);
+    else
+      fs::remove(config_file_path_);
   } catch (const std::exception& e) {
-    LOG(kError) << "Failed to move config file from " << snapshot.config_file << " to "
+    LOG(kError) << "Failed to move config file from " << *snapshot.config_file << " to "
                 << config_file_path_ << ": " << e.what();
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::filesystem_io_error));
   }
@@ -232,6 +252,10 @@ std::pair<AppHandler::LockGuardPtr, AppHandler::LockGuardPtr> AppHandler::Acquir
 }
 
 void AppHandler::ReadConfigFile() {
+  if (!fs::exists(config_file_path_))
+    return;
+  assert(fs::is_regular_file(config_file_path_));
+
   // Read from file.
   crypto::CipherText encrypted_contents{ReadFile(config_file_path_)};
 

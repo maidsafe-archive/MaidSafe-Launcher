@@ -20,6 +20,7 @@
 #define MAIDSAFE_LAUNCHER_APP_HANDLER_H_
 
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <set>
@@ -46,7 +47,7 @@ class AppHandler {
     friend class AppHandler;
    private:
     std::set<AppDetails> local_apps, non_local_apps;
-    boost::filesystem::path config_file;
+    std::shared_ptr<boost::filesystem::path> config_file;
   };
 
   AppHandler();

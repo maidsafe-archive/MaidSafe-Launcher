@@ -22,6 +22,7 @@
 
 #include "maidsafe/directory_info.h"
 #include "maidsafe/common/authentication/user_credentials.h"
+#include "maidsafe/common/crypto.h"
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/utils.h"
 
@@ -57,10 +58,11 @@ authentication::UserCredentials MakeUserCredentials(
 }
 
 DirectoryInfo CreateRandomDirectoryInfo() {
-  return DirectoryInfo(RandomAlphaNumericString((RandomUint32() % 10) + 10),
-                       drive::ParentId(drive::DirectoryId(RandomString(64))),
-                       drive::DirectoryId(RandomString(64)),
-                       static_cast<DirectoryInfo::AccessRights>(RandomUint32() % 3));
+  return DirectoryInfo(
+      RandomAlphaNumericString((RandomUint32() % 10) + 10),
+      drive::ParentId(drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE))),
+      drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
+      static_cast<DirectoryInfo::AccessRights>(RandomUint32() % 3));
 }
 
 AppDetails CreateRandomAppDetails() {
@@ -161,7 +163,7 @@ testing::AssertionResult Equals(const std::set<AppDetails>& expected,
       return testing::AssertionFailure() << "Failed to match apps at index " << count;
     }
     ++expected_itr;
-    ++actual_itr;;
+    ++actual_itr;
     ++count;
   }
   return testing::AssertionSuccess();

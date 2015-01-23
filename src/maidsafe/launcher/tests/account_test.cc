@@ -79,8 +79,8 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
 
   const auto ip(asio::ip::make_address_v6(maidsafe::test::GetRandomIPv6AddressAsString()));
   const uint16_t port(static_cast<uint16_t>(RandomUint32()));
-  const Identity unique_user_id(RandomString(64));
-  const Identity root_parent_id(RandomString(64));
+  const Identity unique_user_id(RandomString(crypto::SHA512::DIGESTSIZE));
+  const Identity root_parent_id(RandomString(crypto::SHA512::DIGESTSIZE));
   const crypto::AES256Key aes_key(RandomString(crypto::AES256_KeySize));
   const crypto::AES256InitialisationVector aes_iv(RandomString(crypto::AES256_IVSize));
   std::set<AppDetails> apps;
@@ -131,8 +131,8 @@ TEST(AccountTest, FUNC_MoveConstructAndAssign) {
   const boost::posix_time::ptime timestamp{initial_account.timestamp};
   const auto ip(asio::ip::make_address_v6(maidsafe::test::GetRandomIPv6AddressAsString()));
   const uint16_t port{static_cast<uint16_t>(RandomUint32())};
-  const Identity unique_user_id{RandomString(64)};
-  const Identity root_parent_id{RandomString(64)};
+  const Identity unique_user_id{RandomString(crypto::SHA512::DIGESTSIZE)};
+  const Identity root_parent_id{RandomString(crypto::SHA512::DIGESTSIZE)};
   const crypto::AES256Key aes_key{RandomString(crypto::AES256_KeySize)};
   const crypto::AES256InitialisationVector aes_iv{RandomString(crypto::AES256_IVSize)};
   std::set<AppDetails> apps;
