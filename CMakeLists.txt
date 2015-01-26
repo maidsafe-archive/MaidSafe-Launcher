@@ -52,21 +52,25 @@ list(REMOVE_ITEM LauncherTestsAllFiles "${LauncherSourcesDir}/tests/dummy_app.cc
 #==================================================================================================#
 ms_add_static_library(maidsafe_launcher ${LauncherAllFiles})
 target_include_directories(maidsafe_launcher PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE ${PROJECT_SOURCE_DIR}/src)
-target_compile_definitions(maidsafe_launcher PUBLIC COMPANY_NAME=MaidSafe APPLICATION_NAME=SafeLauncher)
+set(ApplicationName SafeLauncher)
+target_compile_definitions(maidsafe_launcher PUBLIC COMPANY_NAME=MaidSafe APPLICATION_NAME=${ApplicationName})
 # TODO - Once NFS has taken over Drive's duties, swap maidsafe_drive for maidsafe_nfs
 target_link_libraries(maidsafe_launcher maidsafe_api maidsafe_drive)
 
 if(INCLUDE_TESTS)
   target_link_libraries(maidsafe_launcher maidsafe_test)
 
+  set(dummy_launcherName ${ApplicationName})
   ms_add_executable(dummy_launcher "Tests/Launcher" "${LauncherSourcesDir}/launcher_main.cc")
   target_include_directories(dummy_launcher PRIVATE ${PROJECT_SOURCE_DIR}/src)
   target_link_libraries(dummy_launcher maidsafe_launcher)
 
+  set(test_launcherName ${ApplicationName})
   ms_add_executable(test_launcher "Tests/Launcher" ${LauncherTestsAllFiles})
   target_include_directories(test_launcher PRIVATE ${PROJECT_SOURCE_DIR}/src)
   target_link_libraries(test_launcher maidsafe_launcher)
 
+  set(dummy_appName ${ApplicationName})
   ms_add_executable(dummy_app "Tests/Launcher" "${LauncherSourcesDir}/tests/dummy_app.cc")
   target_link_libraries(dummy_app maidsafe_launcher)
 

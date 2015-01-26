@@ -33,7 +33,7 @@ AppDetails::AppDetails(AppDetails&& other) MAIDSAFE_NOEXCEPT
       permitted_dirs(std::move(other.permitted_dirs)),
       icon(std::move(other.icon)) {}
 
-AppDetails& AppDetails::operator=(AppDetails&& other) {
+AppDetails& AppDetails::operator=(AppDetails&& other) MAIDSAFE_NOEXCEPT {
   name = std::move(other.name);
   path = std::move(other.path);
   args = std::move(other.args);

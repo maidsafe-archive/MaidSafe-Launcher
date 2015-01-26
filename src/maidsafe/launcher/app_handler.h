@@ -54,6 +54,7 @@ class AppHandler {
   struct Snapshot {
     friend class AppHandler;
     friend class test::AppHandlerTest;
+
    private:
     std::set<AppDetails> local_apps, non_local_apps;
     std::shared_ptr<boost::filesystem::path> config_file;
@@ -90,10 +91,8 @@ class AppHandler {
   std::pair<LockGuardPtr, LockGuardPtr> AcquireLocks() const;
   void ReadConfigFile();
   void WriteConfigFile() const;
-  void Add(AppDetails& app, std::set<AppDetails>::iterator account_itr,
-           std::set<AppDetails>::iterator local_itr, std::set<AppDetails>::iterator non_local_itr);
-  void Link(AppDetails& app, std::set<AppDetails>::iterator account_itr,
-            std::set<AppDetails>::iterator local_itr, std::set<AppDetails>::iterator non_local_itr);
+  void Add(AppDetails& app, std::set<AppDetails>::iterator account_itr);
+  void Link(AppDetails& app, std::set<AppDetails>::iterator account_itr);
   void Update(const std::string& app_name, const std::string* const new_name,
               const boost::filesystem::path* const new_path, const std::string* const new_args,
               const DirectoryInfo* const new_dir, const SerialisedData* const new_icon);

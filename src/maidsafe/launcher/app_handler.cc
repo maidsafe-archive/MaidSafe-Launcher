@@ -185,30 +185,27 @@ AppDetails AppHandler::AddOrLinkApp(std::string app_name, fs::path app_path, std
   app.args = app_args;
 
   auto locks(AcquireLocks());
-
   auto account_itr(account_->apps.find(app));
-  auto local_itr(local_apps_.find(app));
-  auto non_local_itr(non_local_apps_.find(app));
 
   // We're linking the app if 'app_icon' is null, otherwise we're adding the app.
   if (app_icon) {
     app.icon = *app_icon;
-    Add(app, account_itr, local_itr, non_local_itr);
+    Add(app, account_itr);
   } else {
-    Link(app, account_itr, local_itr, non_local_itr);
+    Link(app, account_itr);
   }
 
   WriteConfigFile();
   return app;
 }
 
-void AppHandler::Add(AppDetails& app, std::set<AppDetails>::iterator account_itr,
-  std::set<AppDetails>::iterator local_itr, std::set<AppDetails>::iterator non_local_itr) {
+void AppHandler::Add(AppDetails& app, std::set<AppDetails>::iterator account_itr) {
   // Adding requires app to not exist in the account
   if (account_itr != account_->apps.end()) {
     LOG(kError) << "App \"" << app.name << "\" already exists in Account - can't add.";
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::unable_to_handle_request));
   }
+  assert(local_apps_.count(app) == 0 && non_local_apps_.count(app) == 0);
 
   app.permitted_dirs.emplace(std::string("/") + app.name, drive::ParentId(account_->root_parent_id),
                              drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
@@ -219,14 +216,13 @@ void AppHandler::Add(AppDetails& app, std::set<AppDetails>::iterator account_itr
   local_apps_.insert(app);
 }
 
-void AppHandler::Link(AppDetails& app, std::set<AppDetails>::iterator account_itr,
-                      std::set<AppDetails>::iterator local_itr,
-                      std::set<AppDetails>::iterator non_local_itr) {
+void AppHandler::Link(AppDetails& app, std::set<AppDetails>::iterator account_itr) {
   // Linking requires app to exist in non-local set and not exist in local set
-  if (local_itr != local_apps_.end() || non_local_itr == non_local_apps_.end()) {
+  auto non_local_itr(non_local_apps_.find(app));
+  if (local_apps_.count(app) != 0 || non_local_itr != non_local_apps_.end()) {
     LOG(kError)
-      << "App \"" << app.name
-      << "\" already exists in local set, or doesn't exist in non-local set - can't link.";
+        << "App \"" << app.name
+        << "\" already exists in local set, or doesn't exist in non-local set - can't link.";
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::unable_to_handle_request));
   }
 

@@ -129,7 +129,7 @@ Account::Account(Account&& other) MAIDSAFE_NOEXCEPT
       config_file_aes_iv(std::move(other.config_file_aes_iv)),
       apps(std::move(other.apps)) {}
 
-Account& Account::operator=(Account&& other) {
+Account& Account::operator=(Account&& other) MAIDSAFE_NOEXCEPT {
   passport = std::move(other.passport);
   timestamp = std::move(other.timestamp);
   ip = std::move(other.ip);
