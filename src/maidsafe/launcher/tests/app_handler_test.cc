@@ -80,12 +80,16 @@ TEST_F(AppHandlerTest, BEH_Snapshot) {
   // Cause config file to be created by adding apps.
   const std::uint32_t app_count{(RandomUint32() % 100) + 1};
   std::set<AppDetails> apps;
-  for (std::uint32_t i{ 0 }; i < app_count; ++i) {
+  for (std::uint32_t i{0}; i < app_count; ++i) {
     AppDetails app{CreateRandomAppDetails()};
-    app_handler.AddOrLinkApp(app.name, app.path, app.args, &app.icon);
+    AppDetails added_app(app_handler.AddOrLinkApp(app.name, app.path, app.args, &app.icon));
+    app.permitted_dirs.insert(*added_app.permitted_dirs.begin());
+    for (const auto& dir : app.permitted_dirs)
+      app_handler.UpdatePermittedDirs(app.name, dir);
     ASSERT_TRUE(apps.insert(std::move(app)).second);
   }
   ASSERT_TRUE(fs::exists(config_file));
+  ASSERT_TRUE(Equals(apps, app_handler.GetApps(true)));
 
   // Check that creating a snapshot copies the config file and that copying and moving a snapshot
   // doesn't affect the file copy being destroyed when the final snapshot copy is destroyed.
@@ -128,10 +132,6 @@ TEST_F(AppHandlerTest, BEH_Snapshot) {
   EXPECT_TRUE(Equals(apps, app_handler.GetApps(true)));
   EXPECT_TRUE(fs::exists(config_file));
   EXPECT_EQ(config_file_contents, ReadFile(config_file));
-
-  // Destroy the snapshot and check its copy of the config file is removed.
-  EXPECT_TRUE(fs::exists(snapshot_config_file));
-  snapshot.reset();
   EXPECT_FALSE(fs::exists(snapshot_config_file));
 }
 

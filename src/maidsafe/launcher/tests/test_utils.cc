@@ -62,7 +62,7 @@ DirectoryInfo CreateRandomDirectoryInfo() {
       RandomAlphaNumericString((RandomUint32() % 10) + 10),
       drive::ParentId(drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE))),
       drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
-      static_cast<DirectoryInfo::AccessRights>(RandomUint32() % 3));
+      static_cast<DirectoryInfo::AccessRights>((RandomUint32() % 2) + 1));
 }
 
 AppDetails CreateRandomAppDetails() {
