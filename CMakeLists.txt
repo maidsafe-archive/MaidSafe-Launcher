@@ -56,9 +56,11 @@ if(INCLUDE_TESTS)
   ms_add_executable(test_launcher "Tests/Launcher" ${LauncherTestsAllFiles})
   target_include_directories(test_launcher PRIVATE ${PROJECT_SOURCE_DIR}/src)
   ms_add_executable(dummy_app "Tests/Launcher" "${LauncherSourcesDir}/tests/dummy_app.cc")
+  ms_add_executable(dummy_launcher "Tests/Launcher" "${LauncherSourcesDir}/tests/dummy_app.cc")
 
   target_link_libraries(test_launcher maidsafe_launcher maidsafe_test)
   target_link_libraries(dummy_app maidsafe_launcher)
+  target_link_libraries(dummy_launcher maidsafe_launcher)
   add_dependencies(test_launcher dummy_app)
 endif()
 
