@@ -75,6 +75,8 @@ if(INCLUDE_TESTS)
   target_link_libraries(dummy_app maidsafe_launcher)
 
   add_dependencies(test_launcher dummy_app)
+
+  set(test_launcher_multiple_definitionsName ${ApplicationName})
 endif()
 
 ms_rename_outdated_built_exes()

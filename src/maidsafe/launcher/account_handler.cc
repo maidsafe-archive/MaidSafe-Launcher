@@ -30,7 +30,6 @@
 #include "maidsafe/common/data_types/immutable_data.h"
 #include "maidsafe/common/data_types/mutable_data.h"
 
-#include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"
 
 namespace maidsafe {

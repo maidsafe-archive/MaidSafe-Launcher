@@ -59,23 +59,24 @@ BOOL CtrlHandler(DWORD control_type) {
 }  // unnamed namespace
 
 int main(int argc, char** argv) {
+  using Launcher = maidsafe::launcher::Launcher;
   maidsafe::log::Logging::Instance().Initialise(argc, argv);
   try {
 #ifdef _MSC_VER
     if (SetConsoleCtrlHandler(reinterpret_cast<PHANDLER_ROUTINE>(CtrlHandler), TRUE)) {
-      maidsafe::launcher::Launcher launcher;
+      std::unique_ptr<Launcher> launcher(Launcher::CreateAccount("aaaaa", 1111, "bbbbb"));
       g_shutdown_promise.get_future().get();
-      launcher.Stop();
+      launcher->LogoutAndStop();
     } else {
       LOG(kError) << "Failed to set control handler.";
       return maidsafe::ErrorToInt(MakeError(maidsafe::CommonErrors::unable_to_handle_request));
     }
 #else
-    maidsafe::launcher::Launcher launcher;
+    std::unique_ptr<Launcher> launcher(Launcher::CreateAccount("aaaaa", 1111, "bbbbb"));
     signal(SIGINT, ShutDownLauncher);
     signal(SIGTERM, ShutDownLauncher);
     g_shutdown_promise.get_future().get();
-    launcher.Stop();
+    launcher->LogoutAndStop();
 #endif
   }
   catch (const maidsafe::maidsafe_error& error) {

@@ -27,11 +27,12 @@
 #include "maidsafe/common/data_types/structured_data_versions.h"
 #include "maidsafe/nfs/client/maid_node_nfs.h"
 
+#include "maidsafe/launcher/account.h"
+
 namespace maidsafe {
 
 namespace launcher {
 
-struct Account;
 class AccountGetter;
 
 // This class is not threadsafe.
