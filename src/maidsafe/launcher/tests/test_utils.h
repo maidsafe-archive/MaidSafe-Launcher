@@ -72,12 +72,7 @@ DirectoryInfo CreateRandomDirectoryInfo();
 
 AppDetails CreateRandomAppDetails();
 
-enum IgnoreField {
-  kIgnorePath = 1,
-  kIgnoreArgs = 2,
-  kIgnorePermittedDirs = 4,
-  kIgnoreIcon = 8
-};
+enum IgnoreField { kIgnorePath = 1, kIgnoreArgs = 2, kIgnorePermittedDirs = 4, kIgnoreIcon = 8 };
 
 testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual,
                                 int ignore_field = 0);

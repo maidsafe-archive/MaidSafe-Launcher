@@ -34,19 +34,17 @@ AppHandshake::AppHandshake(asio::io_service& io_service, std::set<DirectoryInfo>
       connection_(),
       permitted_dirs_(std::move(permitted_dirs)) {}
 
-AppHandshake::~AppHandshake() {
-
-}
+AppHandshake::~AppHandshake() {}
 
 tcp::Port AppHandshake::ListeningPort() const { return listener_->ListeningPort(); }
 
-//asymm::PublicKey AppHandshake::AppSessionPublicKey() {
+// asymm::PublicKey AppHandshake::AppSessionPublicKey() {
 
 //}
 
 void AppHandshake::OnConnection(tcp::ConnectionPtr connection) {
   connection_ = connection;
-  //try {
+  // try {
   //  connection_->Start([&](std::string message) { OnMessage(std::move(message)); },
   //                     [&] { OnConnectionClosed(); });
   //  tcp_connection->Send(Serialise(std::move(public_key)));
@@ -57,18 +55,16 @@ void AppHandshake::OnConnection(tcp::ConnectionPtr connection) {
   //  if (reply_handler.directories.empty())
   //    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::uninitialised));
   //}
-  //catch (const std::exception& e) {
+  // catch (const std::exception& e) {
   //  LOG(kError) << boost::diagnostic_information(e);
   //  throw;
   //}
-  //return reply_handler.directories;
+  // return reply_handler.directories;
 }
 
 void AppHandshake::OnConnectionClosed() {}
 
-void AppHandshake::OnMessage(tcp::Message /*message*/) {
-
-}
+void AppHandshake::OnMessage(tcp::Message /*message*/) {}
 
 }  //  namespace launcher
 

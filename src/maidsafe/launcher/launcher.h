@@ -32,7 +32,7 @@
 #include "maidsafe/common/asio_service.h"
 #include "maidsafe/common/on_scope_exit.h"
 #include "maidsafe/passport/passport.h"
-#include "maidsafe/nfs/client/maid_node_nfs.h"
+#include "maidsafe/nfs/client/maid_client.h"
 
 #include "maidsafe/launcher/account_handler.h"
 #include "maidsafe/launcher/app_handler.h"
@@ -135,7 +135,7 @@ class Launcher {
   tcp::Port StartListening();
 
   AsioService asio_service_;
-  std::shared_ptr<nfs_client::MaidNodeNfs> maid_node_nfs_;
+  std::shared_ptr<nfs_client::MaidClient> maid_client_;
   AccountHandler account_handler_;
   mutable std::mutex account_mutex_;
   AppHandler app_handler_;

@@ -43,13 +43,13 @@ void ShutDownLauncher(int /*signal*/) {
 
 BOOL CtrlHandler(DWORD control_type) {
   switch (control_type) {
-  case CTRL_C_EVENT:
-  case CTRL_CLOSE_EVENT:
-  case CTRL_SHUTDOWN_EVENT:
-    ShutDownLauncher(0);
-    return TRUE;
-  default:
-    return FALSE;
+    case CTRL_C_EVENT:
+    case CTRL_CLOSE_EVENT:
+    case CTRL_SHUTDOWN_EVENT:
+      ShutDownLauncher(0);
+      return TRUE;
+    default:
+      return FALSE;
   }
 }
 
@@ -78,12 +78,10 @@ int main(int argc, char** argv) {
     g_shutdown_promise.get_future().get();
     launcher->LogoutAndStop();
 #endif
-  }
-  catch (const maidsafe::maidsafe_error& error) {
+  } catch (const maidsafe::maidsafe_error& error) {
     LOG(kError) << "Error: " << boost::diagnostic_information(error);
     return maidsafe::ErrorToInt(error);
-  }
-  catch (const std::exception& e) {
+  } catch (const std::exception& e) {
     LOG(kError) << "Error: " << e.what();
     return maidsafe::ErrorToInt(MakeError(maidsafe::CommonErrors::unknown));
   }

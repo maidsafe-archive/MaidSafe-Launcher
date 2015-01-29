@@ -104,7 +104,7 @@ Account::Account(const ImmutableData& encrypted_account,
   BinaryInputArchive input_archive{binary_input_stream};
   input_archive(encrypted_passport, serialised_timestamp, ip, port, optional_unique_user_id,
                 optional_root_parent_id, config_file_aes_key, config_file_aes_iv, app_count);
-  for (std::size_t i{ 0 }; i < app_count; ++i) {
+  for (std::size_t i{0}; i < app_count; ++i) {
     AppDetails app_details;
     input_archive(app_details.name, app_details.permitted_dirs, app_details.icon);
     apps.insert(apps.end(), std::move(app_details));

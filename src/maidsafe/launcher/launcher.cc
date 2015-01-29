@@ -62,23 +62,22 @@ authentication::UserCredentials ConvertToCredentials(Launcher::Keyword keyword, 
 
 Launcher::Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& account_getter)
     : asio_service_(1),
-      maid_node_nfs_(),
+      maid_client_(),
       account_handler_(),
       account_mutex_(),
       app_handler_(),
       rollback_snapshot_() {
   account_handler_.Login(ConvertToCredentials(keyword, pin, password), account_getter);
-  maid_node_nfs_ =
-      nfs_client::MaidNodeNfs::MakeShared(account_handler_.account_->passport->GetMaid());
+  maid_client_ = nfs_client::MaidClient::MakeShared(account_handler_.account_->passport->GetMaid());
   app_handler_.Initialise(GetConfigFilePath(), account_handler_.account_.get(), &account_mutex_);
 }
 
 Launcher::Launcher(Keyword keyword, Pin pin, Password password,
                    passport::MaidAndSigner&& maid_and_signer)
     : asio_service_(1),
-      maid_node_nfs_(nfs_client::MaidNodeNfs::MakeShared(maid_and_signer)),
+      maid_client_(nfs_client::MaidClient::MakeShared(maid_and_signer)),
       account_handler_(Account{maid_and_signer}, ConvertToCredentials(keyword, pin, password),
-                       *maid_node_nfs_),
+                       *maid_client_),
       account_mutex_(),
       app_handler_(),
       rollback_snapshot_() {
@@ -101,7 +100,7 @@ std::unique_ptr<Launcher> Launcher::CreateAccount(Keyword keyword, Pin pin, Pass
 
 void Launcher::LogoutAndStop() {
   SaveSession(true);
-  maid_node_nfs_->Stop();
+  maid_client_->Stop();
 }
 
 void Launcher::AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
@@ -115,13 +114,13 @@ void Launcher::LinkApp(std::string app_name, boost::filesystem::path app_path,
 }
 
 void Launcher::AddOrLinkApp(std::string app_name, boost::filesystem::path app_path,
-                                  std::string app_args, const SerialisedData* const app_icon) {
+                            std::string app_args, const SerialisedData* const app_icon) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   AppDetails app{app_handler_.AddOrLinkApp(std::move(app_name), std::move(app_path),
                                            std::move(app_args), app_icon)};
   if (app_icon) {  // we're adding the app
-    // TODO(Fraser#5#): 2015-01-23 - Add the app.dir to maid_node_nfs_
+                   // TODO(Fraser#5#): 2015-01-23 - Add the app.dir to maid_client_
   }
   if (!rollback_snapshot_)
     rollback_snapshot_ = snapshot;
@@ -207,7 +206,7 @@ void Launcher::SaveSession(bool force) {
   std::lock_guard<std::mutex> lock{account_mutex_};
   if (!force && !rollback_snapshot_)
     return;
-  account_handler_.Save(*maid_node_nfs_);
+  account_handler_.Save(*maid_client_);
   rollback_snapshot_ = boost::none;
 }
 
