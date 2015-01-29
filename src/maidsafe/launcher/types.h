@@ -16,46 +16,24 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_APP_DETAILS_H_
-#define MAIDSAFE_LAUNCHER_APP_DETAILS_H_
+#ifndef MAIDSAFE_LAUNCHER_TYPES_H_
+#define MAIDSAFE_LAUNCHER_TYPES_H_
 
 #include <cstdint>
-#include <set>
-
-#include "boost/filesystem/path.hpp"
-
-#include "maidsafe/common/config.h"
-#include "maidsafe/common/serialisation/serialisation.h"
-#include "maidsafe/directory_info.h"
-
-#include "maidsafe/launcher/types.h"
+#include <string>
 
 namespace maidsafe {
 
 namespace launcher {
 
-struct AppDetails {
-  AppDetails();
-
-  AppDetails(const AppDetails&) = default;
-  AppDetails(AppDetails&& other) MAIDSAFE_NOEXCEPT;
-  AppDetails& operator=(const AppDetails&) = default;
-  AppDetails& operator=(AppDetails&& other) MAIDSAFE_NOEXCEPT;
-
-  AppName name;
-  boost::filesystem::path path;
-  AppArgs args;
-  std::set<DirectoryInfo> permitted_dirs;
-  SerialisedData icon;
-  bool auto_start;
-};
-
-void swap(AppDetails& lhs, AppDetails& rhs) MAIDSAFE_NOEXCEPT;
-
-bool operator<(const AppDetails& lhs, const AppDetails& rhs);
+using AppName = std::string;
+using AppArgs = std::string;
+using Keyword = std::string;
+using Pin = std::uint32_t;
+using Password = std::string;
 
 }  // namespace launcher
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_APP_DETAILS_H_
+#endif  // MAIDSAFE_LAUNCHER_TYPES_H_

@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <string>
 
 #include "boost/filesystem/operations.hpp"
 #include "cereal/types/string.hpp"
@@ -42,10 +43,9 @@ namespace launcher {
 
 namespace {
 
-void UpdateAppDetails(AppDetails& app, const std::string* const new_name,
-                      const boost::filesystem::path* const new_path,
-                      const std::string* const new_args, const DirectoryInfo* const new_dir,
-                      const SerialisedData* const new_icon,
+void UpdateAppDetails(AppDetails& app, const AppName* const new_name,
+                      const boost::filesystem::path* const new_path, const AppArgs* const new_args,
+                      const DirectoryInfo* const new_dir, const SerialisedData* const new_icon,
                       const bool* const new_auto_start_value) {
   // Check exactly one of the six pointers is non-null.
   assert(int(!!new_name) + int(!!new_path) + int(!!new_args) + int(!!new_dir) + int(!!new_icon) +
@@ -181,7 +181,7 @@ std::set<AppDetails> AppHandler::GetApps(bool locally_available) const {
   return locally_available ? local_apps_ : non_local_apps_;
 }
 
-AppDetails AppHandler::AddOrLinkApp(std::string app_name, fs::path app_path, std::string app_args,
+AppDetails AppHandler::AddOrLinkApp(AppName app_name, fs::path app_path, AppArgs app_args,
                                     const SerialisedData* const app_icon, bool auto_start) {
   AppDetails app;
   app.name = app_name;
@@ -242,31 +242,31 @@ void AppHandler::Link(AppDetails& app, std::set<AppDetails>::iterator account_it
   non_local_apps_.erase(non_local_itr);
 }
 
-void AppHandler::UpdateName(const std::string& app_name, const std::string& new_name) {
+void AppHandler::UpdateName(const AppName& app_name, const AppName& new_name) {
   Update(app_name, &new_name, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
-void AppHandler::UpdatePath(const std::string& app_name, const fs::path& new_path) {
+void AppHandler::UpdatePath(const AppName& app_name, const fs::path& new_path) {
   Update(app_name, nullptr, &new_path, nullptr, nullptr, nullptr, nullptr);
 }
 
-void AppHandler::UpdateArgs(const std::string& app_name, const std::string& new_args) {
+void AppHandler::UpdateArgs(const AppName& app_name, const AppArgs& new_args) {
   Update(app_name, nullptr, nullptr, &new_args, nullptr, nullptr, nullptr);
 }
 
-void AppHandler::UpdatePermittedDirs(const std::string& app_name, const DirectoryInfo& new_dir) {
+void AppHandler::UpdatePermittedDirs(const AppName& app_name, const DirectoryInfo& new_dir) {
   Update(app_name, nullptr, nullptr, nullptr, &new_dir, nullptr, nullptr);
 }
 
-void AppHandler::UpdateIcon(const std::string& app_name, const SerialisedData& new_icon) {
+void AppHandler::UpdateIcon(const AppName& app_name, const SerialisedData& new_icon) {
   Update(app_name, nullptr, nullptr, nullptr, nullptr, &new_icon, nullptr);
 }
 
-void AppHandler::UpdateAutoStart(const std::string& app_name, bool new_auto_start_value) {
+void AppHandler::UpdateAutoStart(const AppName& app_name, bool new_auto_start_value) {
   Update(app_name, nullptr, nullptr, nullptr, nullptr, nullptr, &new_auto_start_value);
 }
 
-void AppHandler::RemoveLocally(const std::string& app_name) {
+void AppHandler::RemoveLocally(const AppName& app_name) {
   AppDetails app;
   app.name = app_name;
   std::lock_guard<std::mutex> lock{mutex_};
@@ -277,7 +277,7 @@ void AppHandler::RemoveLocally(const std::string& app_name) {
   WriteConfigFile();
 }
 
-void AppHandler::RemoveFromNetwork(const std::string& app_name) {
+void AppHandler::RemoveFromNetwork(const AppName& app_name) {
   AppDetails app;
   app.name = app_name;
   auto locks(AcquireLocks());
@@ -297,7 +297,7 @@ void AppHandler::RemoveFromNetwork(const std::string& app_name) {
   WriteConfigFile();
 }
 
-std::pair<fs::path, std::string> AppHandler::GetPathAndArgs(std::string app_name) const {
+std::pair<fs::path, AppArgs> AppHandler::GetPathAndArgs(AppName app_name) const {
   AppDetails app;
   app.name = app_name;
   std::lock_guard<std::mutex> lock{mutex_};
@@ -358,9 +358,9 @@ void AppHandler::WriteConfigFile() const {
   }
 }
 
-void AppHandler::Update(const std::string& app_name, const std::string* const new_name,
+void AppHandler::Update(const AppName& app_name, const AppName* const new_name,
                         const boost::filesystem::path* const new_path,
-                        const std::string* const new_args, const DirectoryInfo* const new_dir,
+                        const AppArgs* const new_args, const DirectoryInfo* const new_dir,
                         const SerialisedData* const new_icon,
                         const bool* const new_auto_start_value) {
   AppDetails current_app;

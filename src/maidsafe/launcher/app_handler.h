@@ -22,7 +22,6 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <set>
 #include <utility>
 
@@ -31,6 +30,8 @@
 #include "maidsafe/common/types.h"
 #include "maidsafe/common/serialisation/serialisation.h"
 #include "maidsafe/directory_info.h"
+
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
@@ -75,18 +76,17 @@ class AppHandler {
 
   std::set<AppDetails> GetApps(bool locally_available) const;
   // Link if 'app_icon' is null, else Add.
-  AppDetails AddOrLinkApp(std::string app_name, boost::filesystem::path app_path,
-                          std::string app_args, const SerialisedData* const app_icon,
-                          bool auto_start);
-  void UpdateName(const std::string& app_name, const std::string& new_name);
-  void UpdatePath(const std::string& app_name, const boost::filesystem::path& new_path);
-  void UpdateArgs(const std::string& app_name, const std::string& new_args);
-  void UpdatePermittedDirs(const std::string& app_name, const DirectoryInfo& new_dir);
-  void UpdateIcon(const std::string& app_name, const SerialisedData& new_icon);
-  void UpdateAutoStart(const std::string& app_name, bool new_auto_start_value);
-  void RemoveLocally(const std::string& app_name);
-  void RemoveFromNetwork(const std::string& app_name);
-  std::pair<boost::filesystem::path, std::string> GetPathAndArgs(std::string app_name) const;
+  AppDetails AddOrLinkApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+                          const SerialisedData* const app_icon, bool auto_start);
+  void UpdateName(const AppName& app_name, const AppName& new_name);
+  void UpdatePath(const AppName& app_name, const boost::filesystem::path& new_path);
+  void UpdateArgs(const AppName& app_name, const AppArgs& new_args);
+  void UpdatePermittedDirs(const AppName& app_name, const DirectoryInfo& new_dir);
+  void UpdateIcon(const AppName& app_name, const SerialisedData& new_icon);
+  void UpdateAutoStart(const AppName& app_name, bool new_auto_start_value);
+  void RemoveLocally(const AppName& app_name);
+  void RemoveFromNetwork(const AppName& app_name);
+  std::pair<boost::filesystem::path, AppArgs> GetPathAndArgs(AppName app_name) const;
 
  private:
   using LockGuardPtr = std::unique_ptr<std::lock_guard<std::mutex>>;
@@ -95,8 +95,8 @@ class AppHandler {
   void WriteConfigFile() const;
   void Add(AppDetails& app, std::set<AppDetails>::iterator account_itr);
   void Link(AppDetails& app, std::set<AppDetails>::iterator account_itr);
-  void Update(const std::string& app_name, const std::string* const new_name,
-              const boost::filesystem::path* const new_path, const std::string* const new_args,
+  void Update(const AppName& app_name, const AppName* const new_name,
+              const boost::filesystem::path* const new_path, const AppArgs* const new_args,
               const DirectoryInfo* const new_dir, const SerialisedData* const new_icon,
               const bool* const new_auto_start_value);
 
