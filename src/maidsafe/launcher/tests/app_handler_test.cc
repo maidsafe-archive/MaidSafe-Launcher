@@ -82,7 +82,8 @@ TEST_F(AppHandlerTest, BEH_Snapshot) {
   std::set<AppDetails> apps;
   for (std::uint32_t i{0}; i < app_count; ++i) {
     AppDetails app{CreateRandomAppDetails()};
-    AppDetails added_app(app_handler.AddOrLinkApp(app.name, app.path, app.args, &app.icon));
+    AppDetails added_app(
+        app_handler.AddOrLinkApp(app.name, app.path, app.args, &app.icon, app.auto_start));
     app.permitted_dirs.insert(*added_app.permitted_dirs.begin());
     for (const auto& dir : app.permitted_dirs)
       app_handler.UpdatePermittedDirs(app.name, dir);

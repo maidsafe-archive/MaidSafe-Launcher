@@ -46,6 +46,7 @@ struct AppDetails {
   std::string args;
   std::set<DirectoryInfo> permitted_dirs;
   SerialisedData icon;
+  bool auto_start;
 };
 
 void swap(AppDetails& lhs, AppDetails& rhs) MAIDSAFE_NOEXCEPT;

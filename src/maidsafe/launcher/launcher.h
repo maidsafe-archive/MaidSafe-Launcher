@@ -83,12 +83,13 @@ class Launcher {
   // added locally or non-locally.  (To add an app which has previously been added non-locally, use
   // the 'LinkApp' function.)
   void AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
-              SerialisedData app_icon);
+              SerialisedData app_icon, bool auto_start);
 
   // Adds an instance of 'app_name' to the set of local apps where this app must have been
   // previously added non-locally.  Throws if the app has already been added locally, linked, or has
   // *not* been added non-locally.
-  void LinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args);
+  void LinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
+               bool auto_start);
 
   // The 'Update...' functions all replace the existing field with the new one for the app indicated
   // by 'app_name'.
@@ -98,6 +99,7 @@ class Launcher {
   void UpdateAppSafeDriveAccess(const std::string& app_name,
                                 DirectoryInfo::AccessRights new_rights);
   void UpdateAppIcon(const std::string& app_name, const SerialisedData& new_icon);
+  void UpdateAppAutoStart(const std::string& app_name, bool new_auto_start_value);
 
   // Removes an instance of the app indicated by 'app_name' from the set of locally-available apps.
   // Throws if the app isn't in the set.
@@ -128,9 +130,12 @@ class Launcher {
   Launcher(Keyword keyword, Pin pin, Password password, passport::MaidAndSigner&& maid_and_signer);
 
   void AddOrLinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
-                    const SerialisedData* const app_icon);
+                    const SerialisedData* const app_icon, bool auto_start);
 
   void RevertAppHandler(AppHandler::Snapshot snapshot);
+
+  void LaunchApp(const std::string& app_name, const boost::filesystem::path& path,
+                 const std::string& args);
 
   tcp::Port StartListening();
 

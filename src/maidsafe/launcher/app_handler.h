@@ -76,12 +76,14 @@ class AppHandler {
   std::set<AppDetails> GetApps(bool locally_available) const;
   // Link if 'app_icon' is null, else Add.
   AppDetails AddOrLinkApp(std::string app_name, boost::filesystem::path app_path,
-                          std::string app_args, const SerialisedData* const app_icon);
+                          std::string app_args, const SerialisedData* const app_icon,
+                          bool auto_start);
   void UpdateName(const std::string& app_name, const std::string& new_name);
   void UpdatePath(const std::string& app_name, const boost::filesystem::path& new_path);
   void UpdateArgs(const std::string& app_name, const std::string& new_args);
   void UpdatePermittedDirs(const std::string& app_name, const DirectoryInfo& new_dir);
   void UpdateIcon(const std::string& app_name, const SerialisedData& new_icon);
+  void UpdateAutoStart(const std::string& app_name, bool new_auto_start_value);
   void RemoveLocally(const std::string& app_name);
   void RemoveFromNetwork(const std::string& app_name);
   std::pair<boost::filesystem::path, std::string> GetPathAndArgs(std::string app_name) const;
@@ -95,7 +97,8 @@ class AppHandler {
   void Link(AppDetails& app, std::set<AppDetails>::iterator account_itr);
   void Update(const std::string& app_name, const std::string* const new_name,
               const boost::filesystem::path* const new_path, const std::string* const new_args,
-              const DirectoryInfo* const new_dir, const SerialisedData* const new_icon);
+              const DirectoryInfo* const new_dir, const SerialisedData* const new_icon,
+              const bool* const new_auto_start_value);
 
   Account* account_;
   mutable std::mutex* account_mutex_;

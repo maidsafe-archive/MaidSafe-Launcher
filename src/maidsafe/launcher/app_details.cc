@@ -24,14 +24,15 @@ namespace maidsafe {
 
 namespace launcher {
 
-AppDetails::AppDetails() : name(), path(), args(), permitted_dirs(), icon() {}
+AppDetails::AppDetails() : name(), path(), args(), permitted_dirs(), icon(), auto_start(false) {}
 
 AppDetails::AppDetails(AppDetails&& other) MAIDSAFE_NOEXCEPT
     : name(std::move(other.name)),
       path(std::move(other.path)),
       args(std::move(other.args)),
       permitted_dirs(std::move(other.permitted_dirs)),
-      icon(std::move(other.icon)) {}
+      icon(std::move(other.icon)),
+      auto_start(std::move(other.auto_start)) {}
 
 AppDetails& AppDetails::operator=(AppDetails&& other) MAIDSAFE_NOEXCEPT {
   name = std::move(other.name);
@@ -39,6 +40,7 @@ AppDetails& AppDetails::operator=(AppDetails&& other) MAIDSAFE_NOEXCEPT {
   args = std::move(other.args);
   permitted_dirs = std::move(other.permitted_dirs);
   icon = std::move(other.icon);
+  auto_start = std::move(other.auto_start);
   return *this;
 }
 
@@ -49,6 +51,7 @@ void swap(AppDetails& lhs, AppDetails& rhs) MAIDSAFE_NOEXCEPT {
   swap(lhs.args, rhs.args);
   swap(lhs.permitted_dirs, rhs.permitted_dirs);
   swap(lhs.icon, rhs.icon);
+  swap(lhs.auto_start, rhs.auto_start);
 }
 
 bool operator<(const AppDetails& lhs, const AppDetails& rhs) { return lhs.name < rhs.name; }
