@@ -40,7 +40,7 @@ tcp::Port AppHandshake::ListeningPort() const { return listener_->ListeningPort(
 
 // asymm::PublicKey AppHandshake::AppSessionPublicKey() {
 
-//}
+// }
 
 void AppHandshake::OnConnection(tcp::ConnectionPtr connection) {
   connection_ = connection;
@@ -54,11 +54,11 @@ void AppHandshake::OnConnection(tcp::ConnectionPtr connection) {
   //  }
   //  if (reply_handler.directories.empty())
   //    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::uninitialised));
-  //}
+  // }
   // catch (const std::exception& e) {
   //  LOG(kError) << boost::diagnostic_information(e);
   //  throw;
-  //}
+  // }
   // return reply_handler.directories;
 }
 
