@@ -1,4 +1,4 @@
-/*  Copyright 2014 MaidSafe.net limited
+/*  Copyright 2015 MaidSafe.net limited
 
     This MaidSafe Software is licensed to you under (1) the MaidSafe.net Commercial License,
     version 1.0 or later, or (2) The General Public License (GPL), version 3, depending on which
@@ -16,13 +16,34 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/launcher/client_interface.h"
+#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+
+#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
+#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
+namespace ui {
+
+namespace models {
+
+class APIModel : public QObject {
+  Q_OBJECT
+
+ public:
+  explicit APIModel(QObject* parent = nullptr);
+};
+
+}  // namespace models
+
+}  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+

@@ -16,17 +16,27 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_CLIENT_INTERFACE_H_
-#define MAIDSAFE_LAUNCHER_CLIENT_INTERFACE_H_
+#include "maidsafe/launcher/account_getter.h"
+
+#include "maidsafe/common/test.h"
+
+#include "maidsafe/routing/parameters.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
-class ClientInterface {};
+namespace test {
+
+TEST(AccountGetterTest, FUNC_Constructor) {
+  auto account_getter_future = AccountGetter::CreateAccountGetter();
+  LOG(kVerbose) << "Started CreateAccountGetter thread";
+  std::unique_ptr<AccountGetter> account_getter;
+  ASSERT_NO_THROW(account_getter = account_getter_future.get());
+}
+
+}  // namespace test
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_CLIENT_INTERFACE_H_

@@ -16,6 +16,44 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+#ifndef MAIDSAFE_LAUNCHER_APP_DETAILS_H_
+#define MAIDSAFE_LAUNCHER_APP_DETAILS_H_
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+#include <cstdint>
+#include <string>
+#include <set>
+
+#include "boost/filesystem/path.hpp"
+
+#include "maidsafe/common/config.h"
+#include "maidsafe/common/serialisation/serialisation.h"
+#include "maidsafe/directory_info.h"
+
+namespace maidsafe {
+
+namespace launcher {
+
+struct AppDetails {
+  AppDetails();
+
+  AppDetails(const AppDetails&) = default;
+  AppDetails(AppDetails&& other) MAIDSAFE_NOEXCEPT;
+  AppDetails& operator=(const AppDetails&) = default;
+  AppDetails& operator=(AppDetails&& other) MAIDSAFE_NOEXCEPT;
+
+  std::string name;
+  boost::filesystem::path path;
+  std::string args;
+  std::set<DirectoryInfo> permitted_dirs;
+  SerialisedData icon;
+};
+
+void swap(AppDetails& lhs, AppDetails& rhs) MAIDSAFE_NOEXCEPT;
+
+bool operator<(const AppDetails& lhs, const AppDetails& rhs);
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_APP_DETAILS_H_

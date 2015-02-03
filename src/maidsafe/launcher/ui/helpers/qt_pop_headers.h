@@ -16,6 +16,16 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+// No header guard
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+#ifdef MAIDSAFE_WIN32
+#  pragma warning(pop)
+#endif
+
+#ifdef MAIDSAFE_APPLE
+#  pragma GCC diagnostic pop
+#endif
+
+#ifdef MAIDSAFE_LINUX
+#  pragma GCC diagnostic pop
+#endif

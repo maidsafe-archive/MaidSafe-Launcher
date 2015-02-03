@@ -16,6 +16,31 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
+#define MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
+#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+
+namespace maidsafe {
+
+namespace launcher {
+
+namespace ui {
+
+namespace models {
+
+class AccountHandlerModel : public QObject {
+ public:
+  explicit AccountHandlerModel(QObject* parent = nullptr);
+};
+
+}  // namespace models
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_

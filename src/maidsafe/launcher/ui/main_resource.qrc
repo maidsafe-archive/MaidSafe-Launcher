@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/fonts/OpenSans-Light.ttf</file>
+        <file>resources/fonts/OpenSans-Regular.ttf</file>
+        <file>resources/fonts/OpenSans-Semibold.ttf</file>
+        <file>resources/js/brushes.js</file>
+        <file>views/account_handling/AccountHandlerView.qml</file>
+        <file>views/account_handling/CreateAccount.qml</file>
+        <file>views/account_handling/Login.qml</file>
+        <file>views/MainWindow.qml</file>
+        <file>resources/images/create_error.png</file>
+        <file>resources/images/create_tick.png</file>
+        <file>resources/images/login_bg.png</file>
+        <file>custom_components/CustomTextField.qml</file>
+    </qresource>
+</RCC>

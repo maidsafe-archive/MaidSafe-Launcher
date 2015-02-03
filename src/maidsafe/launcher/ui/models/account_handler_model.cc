@@ -16,6 +16,25 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+#include "maidsafe/launcher/ui/models/account_handler_model.h"
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+namespace maidsafe {
+
+namespace launcher {
+
+namespace ui {
+
+namespace models {
+
+AccountHandlerModel::AccountHandlerModel(QObject* parent)
+    : QObject{parent} {}
+
+}  // namespace models
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+

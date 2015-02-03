@@ -16,6 +16,5 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+#include "helpers/qt_push_headers.h"
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }

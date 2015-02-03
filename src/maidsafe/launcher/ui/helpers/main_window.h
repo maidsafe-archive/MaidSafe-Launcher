@@ -16,6 +16,38 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_
+#define MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+#include <QQuickView>
+
+namespace maidsafe {
+
+namespace launcher {
+
+namespace ui {
+
+namespace helpers {
+
+class MainWindow : public QQuickView {
+  Q_OBJECT
+
+ public:
+  explicit MainWindow(QWindow* parent = nullptr);
+  ~MainWindow() override;
+
+  void CenterToScreen();
+
+ private slots:  // NOLINT - Viv
+  void StatusChanged(const QQuickView::Status status);
+};
+
+}  // namespace helpers
+
+}  // namespace ui
+
+}  // namespace launcher
+
+}  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_MAIN_WINDOW_H_

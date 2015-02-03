@@ -16,6 +16,38 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
+import "../resources/js/brushes.js" as DefaultBrushes
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+TextField {
+  FontLoader { id: arialFont; name: "Arial" }
+
+  property bool isMarkerTextVisible : true
+
+  font.pixelSize: 12
+  horizontalAlignment: Qt.AlignHCenter
+  style: TextFieldStyle {
+    background: Rectangle {
+      border {
+        color: {
+          if (!control.enabled) {
+            DefaultBrushes.disabledGray
+          } else if (control.activeFocus) {
+            DefaultBrushes.focusBlack
+          } else {
+            DefaultBrushes.borderGray
+          }
+        }
+        width: 1
+      }
+      implicitHeight: 30
+      implicitWidth: 225
+    }
+    font: arialFont.name
+    selectionColor: DefaultBrushes.selectionBlue
+    selectedTextColor: DefaultBrushes.focusBlack
+    textColor: !control.enabled ? DefaultBrushes.disabledGray : DefaultBrushes.focusBlack
+  }
+}

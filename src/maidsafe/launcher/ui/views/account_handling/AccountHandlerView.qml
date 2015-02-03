@@ -16,6 +16,16 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+import QtQuick 2.4
+import AccountHandler 1.0
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+import "../../custom_components"
+
+Image {
+  source: "/resources/images/login_bg.png"
+
+  CustomTextField {
+    height: 30
+    width: 100
+  }
+}

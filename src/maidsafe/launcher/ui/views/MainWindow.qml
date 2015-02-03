@@ -16,6 +16,21 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/common/test.h"
+import QtQuick 2.4
+import MainController 1.0
 
-int main(int argc, char** argv) { return maidsafe::test::ExecuteMain(argc, argv); }
+Item {
+  id: rootMainWindowItem
+  objectName: "rootMainWindowItem"
+
+  Loader {
+    id: rootLoader
+    objectName: "rootLoader"
+
+    anchors.fill: parent
+    source: mainController.currentView === MainController.HandleAccount ?
+              "account_handling/AccountHandlerView.qml"
+            :
+              ""
+  }
+}
