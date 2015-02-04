@@ -16,16 +16,10 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
-#define MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
+#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_RAII_DISPATCHER_H_
+#define MAIDSAFE_LAUNCHER_UI_HELPERS_RAII_DISPATCHER_H_
 
-#include <memory>
-#include <string>
-
-#include "boost/optional.hpp"
-
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include <functional>
 
 namespace maidsafe {
 
@@ -33,37 +27,11 @@ namespace launcher {
 
 namespace ui {
 
-class MainController;
-
-class ExceptionEvent : public QEvent {
- public:
-  ExceptionEvent(const QString& exception_message, Type type = QEvent::User);
-  ~ExceptionEvent() {}
-  QString ExceptionMessage();
-
- private:
-  ExceptionEvent(const ExceptionEvent&);
-  ExceptionEvent& operator=(const ExceptionEvent&);
-
-  QString exception_message_;
-};
-
-class Application : public QApplication {
- public:
-  Application(int argc, char** argv);
-  QStringList AvailableTranslations();
-  void SwitchLanguage(QString language);
-  virtual bool notify(QObject* receiver, QEvent* event);
-  void SetErrorHandler(boost::optional<MainController&> handler_object);
-  bool IsUniqueInstance();
-
- private:
-  void CreateTranslators();
-
-  boost::optional<MainController&> handler_object_;
-  QMap<QString, QTranslator*> translators_;
-  QTranslator* current_translator_;
-  QSharedMemory shared_memory_;
+struct RAIIDispatcher {
+  using Callable = std::function<void()>;
+  explicit RAIIDispatcher(const Callable& c) : c_{c} {}
+  ~RAIIDispatcher() { c_(); }
+  Callable c_;
 };
 
 }  // namespace ui
@@ -72,4 +40,4 @@ class Application : public QApplication {
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
+#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_RAII_DISPATCHER_H_

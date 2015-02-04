@@ -17,6 +17,8 @@
     use of the MaidSafe Software.                                                                 */
 
 #include "maidsafe/launcher/ui/helpers/application.h"
+
+#include "maidsafe/common/log.h"
 #include "maidsafe/launcher/ui/controllers/main_controller.h"
 
 namespace maidsafe {
@@ -25,15 +27,10 @@ namespace launcher {
 
 namespace ui {
 
-namespace helpers {
-
 ExceptionEvent::ExceptionEvent(const QString& exception_message, Type type)
-    : QEvent(type),
-      exception_message_(exception_message) {}
+    : QEvent(type), exception_message_(exception_message) {}
 
-QString ExceptionEvent::ExceptionMessage() {
-  return exception_message_;
-}
+QString ExceptionEvent::ExceptionMessage() { return exception_message_; }
 
 Application::Application(int argc, char** argv)
     : QApplication(argc, argv),
@@ -41,13 +38,12 @@ Application::Application(int argc, char** argv)
       translators_(),
       current_translator_(),
       shared_memory_() {
+  maidsafe::log::Logging::Instance().Initialise(argc, argv);
   CreateTranslators();
   SwitchLanguage("en");
 }
 
-QStringList Application::AvailableTranslations() {
-  return QStringList(translators_.keys());
-}
+QStringList Application::AvailableTranslations() { return QStringList(translators_.keys()); }
 
 void Application::SwitchLanguage(QString language) {
   if (current_translator_)
@@ -61,7 +57,8 @@ void Application::SwitchLanguage(QString language) {
 bool Application::notify(QObject* receiver, QEvent* event) {
   try {
     return QApplication::notify(receiver, event);
-  } catch(...) {
+  }
+  catch (...) {
     if (handler_object_) {
       QApplication::instance()->postEvent(&(*handler_object_),
                                           new ExceptionEvent(tr("Unknown Exception")));
@@ -72,7 +69,7 @@ bool Application::notify(QObject* receiver, QEvent* event) {
   return false;
 }
 
-void Application::SetErrorHandler(boost::optional<controllers::MainController&> handler_object) {
+void Application::SetErrorHandler(boost::optional<MainController&> handler_object) {
   if (handler_object)
     handler_object_ = handler_object;
 }
@@ -86,7 +83,9 @@ void Application::CreateTranslators() {
   if (!translators_.isEmpty())
     return;
   QStringList languages;
-  languages << "en" << "fr" << "es";
+  languages << "en"
+            << "fr"
+            << "es";
   foreach(QString language, languages) {
     QTranslator* translator = new QTranslator(instance());
     translator->load(language);
@@ -94,11 +93,8 @@ void Application::CreateTranslators() {
   }
 }
 
-}  // namespace helpers
-
 }  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-

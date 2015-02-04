@@ -17,9 +17,9 @@
     use of the MaidSafe Software.                                                                 */
 
 #include "maidsafe/launcher/ui/controllers/account_handler_controller.h"
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+
 #include "maidsafe/launcher/ui/helpers/main_window.h"
+#include "maidsafe/launcher/ui/models/account_handler_model.h"
 
 namespace maidsafe {
 
@@ -27,20 +27,33 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
-
-AccountHandlerController::AccountHandlerController(
-    helpers::MainWindow& main_window, QObject* parent)
+AccountHandlerController::AccountHandlerController(MainWindow& main_window,
+                                                   QObject* parent)
     : QObject{parent},
-      main_window_{main_window} {
-  connect(this, SIGNAL(LoginCompleted()), parent, SLOT(LoginCompleted()), Qt::UniqueConnection);
+      main_window_{main_window},
+      account_handler_model_{new AccountHandlerModel{this}} {
+  Q_ASSERT_X(connect(account_handler_model_, SIGNAL(LoginResultAvailable()), this,
+                     SLOT(LoginResultAvailable()), Qt::QueuedConnection),
+             "Connection Failure",
+             "Account Handler Model must implement signal void LoginResultAvailable()");
+
+  Q_ASSERT_X(connect(account_handler_model_, SIGNAL(CreateAccountResultAvailable()), this,
+                     SLOT(CreateAccountResultAvailable()), Qt::QueuedConnection),
+             "Connection Failure",
+             "Account Handler Model must implement signal void CreateAccountResultAvailable()");
+}
+
+AccountHandlerController::~AccountHandlerController() {
+  if (future_.valid()) {
+    future_.wait();
+  }
 }
 
 AccountHandlerController::AccountHandlingViews AccountHandlerController::currentView() const {
   return current_view_;
 }
 
-void AccountHandlerController::setCurrentView(const AccountHandlingViews new_current_view) {
+void AccountHandlerController::SetCurrentView(const AccountHandlingViews new_current_view) {
   if (new_current_view != current_view_) {
     current_view_ = new_current_view;
     emit currentViewChanged(current_view_);
@@ -49,26 +62,51 @@ void AccountHandlerController::setCurrentView(const AccountHandlingViews new_cur
 
 void AccountHandlerController::login(const QString& pin, const QString& keyword,
                                      const QString& password) {
-  (void)pin; (void)keyword; (void)password;
+  if (!future_.valid()) {
+    future_ = std::async(std::launch::async,
+                         [=] { return account_handler_model_->Login(pin, keyword, password); });
+  }
 }
 
-void AccountHandlerController::showLoginView() { setCurrentView(LoginView); }
+void AccountHandlerController::showLoginView() {
+  SetCurrentView(LoginView);
+}
 
 void AccountHandlerController::createAccount(const QString& pin, const QString& keyword,
                                              const QString& password) {
-  (void)pin; (void)keyword; (void)password;
+  if (!future_.valid()) {
+    future_ =
+        std::async(std::launch::async,
+                   [=] { return account_handler_model_->CreateAccount(pin, keyword, password); });
+  }
 }
 
-void AccountHandlerController::showCreateAccountView() { setCurrentView(CreateAccountView); }
+void AccountHandlerController::showCreateAccountView() {
+  SetCurrentView(CreateAccountView);
+}
 
 void AccountHandlerController::Invoke() {
-  main_window_.setWidth(300);
-  main_window_.setHeight(400);
-  main_window_.CenterToScreen();
+  main_window_.centerToScreen();
   main_window_.show();
 }
 
-}  // namespace controllers
+void AccountHandlerController::LoginResultAvailable() {
+  try {
+    auto launcher(future_.get());
+    emit LoginCompleted(launcher.release());
+  }
+  catch (...) {
+  }
+}
+
+void AccountHandlerController::CreateAccountResultAvailable() {
+  try {
+    auto launcher(future_.get());
+    emit LoginCompleted(launcher.release());
+  }
+  catch (...) {
+  }
+}
 
 }  // namespace ui
 

@@ -16,29 +16,44 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+Button {
+  id: buttonControl
+  objectName: "buttonControl"
 
-namespace maidsafe {
+  property Component backgroundComponent: null
 
-namespace launcher {
+  property bool underlineLabelOnFocus: true
+  property bool italiciseLabelOnFocus: false
 
-namespace ui {
+  Keys.onEnterPressed: clicked();
+  Keys.onSpacePressed: clicked();
+  Keys.onReturnPressed: clicked();
 
-class APIModel : public QObject {
-  Q_OBJECT
+  style: ButtonStyle {
+    id: buttonStyle
+    objectName: "buttonStyle"
 
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
+    Component.onCompleted: {
+      if (buttonControl.backgroundComponent) { background = buttonControl.backgroundComponent }
+    }
 
-}  // namespace ui
+    label: CustomLabel {
+      id: buttonLabel
+      objectName: "buttonLabel"
 
-}  // namespace launcher
+      text: control.text
+      verticalAlignment: Qt.AlignVCenter
+      horizontalAlignment: Qt.AlignHCenter
 
-}  // namespace maidsafe
+      font {
+        italic: control.italiciseLabelOnFocus && control.activeFocus ? true : false
+        underline: control.underlineLabelOnFocus && control.activeFocus ? true : false
+      }
+    }
+  }
+}
 
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_

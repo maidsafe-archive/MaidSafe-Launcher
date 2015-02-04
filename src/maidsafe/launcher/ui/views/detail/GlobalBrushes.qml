@@ -16,29 +16,31 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+QtObject {
+  id: globalBrushes
+  objectName: "globalBrushes"
 
-namespace maidsafe {
+  readonly property color textGrey: "#b3b3b3"
+  readonly property color textBlack: "#000000"
+  readonly property color textDefault: "#ffffff"
+  readonly property color textWeakPassword: "#c1272d"
+  readonly property color textMediumPassword: "#f15a24"
+  readonly property color textStrongPassword: "#39b54a"
 
-namespace launcher {
+  readonly property color placeHolderFocusGrey: "#70b3b3b3"
+  readonly property color placeHolderDefaultGrey: textGrey
 
-namespace ui {
+  readonly property color labelDefault: textDefault
+  readonly property color labelSelected: "#1d6499"
+  readonly property color labelNotSelected: "#ceebf4"
 
-class APIModel : public QObject {
-  Q_OBJECT
+  readonly property color buttonDefaultBlue: "#1d6499"
+  readonly property color buttonHoveredBlue: "#2a81b7"
+  readonly property color buttonPressedBlue: "#124360"
 
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+  readonly property color buttonDefaultGrey: "#808080"
+  readonly property color buttonHoveredGrey: "#aaaaaa"
+  readonly property color buttonPressedGrey: "#404040"
+}

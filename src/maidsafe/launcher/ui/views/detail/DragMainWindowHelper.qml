@@ -16,29 +16,28 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+MouseArea {
+  id: dragMainWindow
+  objectName: "dragMainWindow"
 
-namespace maidsafe {
+  property real prevMouseX
+  property real prevMouseY
 
-namespace launcher {
+  acceptedButtons: Qt.LeftButton
+  cursorShape: containsPress ? Qt.ClosedHandCursor : Qt.ArrowCursor
 
-namespace ui {
+  onPressed:  {
+    prevMouseX = mouseX
+    prevMouseY = mouseY
+  }
 
-class APIModel : public QObject {
-  Q_OBJECT
+  onPositionChanged: {
+    var deltaX = mouseX - prevMouseX
+    var deltaY = mouseY - prevMouseY
 
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+    mainWindow_.x += deltaX
+    mainWindow_.y += deltaY
+  }
+}

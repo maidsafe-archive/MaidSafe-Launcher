@@ -17,20 +17,72 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import MainController 1.0
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
+
+import SAFEAppLauncher.MainController 1.0
+
+import "./detail"
+import "../custom_components"
 
 Item {
-  id: rootMainWindowItem
-  objectName: "rootMainWindowItem"
+  id: mainWindowItem
+  objectName: "mainWindowItem"
+
+  FontLoader       { id: globalFontFamily; name      : "OpenSans"         }
+  GlobalBrushes    { id: globalBrushes;    objectName: "globalBrushes"    }
+  GlobalProperties { id: globalProperties; objectName: "globalProperties" }
+
+  DragMainWindowHelper {
+    id: dragMainWindowHelper
+    objectName: "dragMainWindowHelper"
+
+    anchors {
+      top: parent.top
+      right: parent.right
+      left: parent.left
+      bottom: mainWindowTitleBar.bottom
+      leftMargin: Qt.platform.os === "linux" || Qt.platform.os === "osx" ?
+                    mainWindowTitleBar.buttonLoaderwidth + 10 : 0
+      rightMargin: Qt.platform.os === "windows" ? mainWindowTitleBar.buttonLoaderwidth + 10 : 0
+    }
+    enabled: mainWindowTitleBar.visible
+  }
 
   Loader {
-    id: rootLoader
-    objectName: "rootLoader"
+    id: mainWindowLoader
+    objectName: "mainWindowLoader"
 
     anchors.fill: parent
-    source: mainController.currentView === MainController.HandleAccount ?
+    source: mainController_.currentView === MainController.HandleAccount ?
               "account_handling/AccountHandlerView.qml"
             :
               ""
+
+    focus: true
+    onLoaded: item.focus = true
+  }
+
+  ResizeMainWindowHelper {
+    id: globalWindowResizeHelper
+    objectName: "globalWindowResizeHelper"
+
+    anchors.fill: parent
+    enabled: Qt.platform.os !== "linux"
+  }
+
+  CustomTitleBar {
+    id: mainWindowTitleBar
+    objectName: "mainWindowTitleBar"
+
+    anchors {
+      top: parent.top
+      left: parent.left
+      right: parent.right
+      margins: 5
+    }
+
+    visible: Qt.platform.os !== "linux"
+    enabled: visible
   }
 }

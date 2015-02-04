@@ -16,29 +16,25 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+QtObject {
+  id: globalProperties
+  objectName: "globalProperties"
 
-namespace maidsafe {
+  readonly property int windowResizerThickness: 5
 
-namespace launcher {
+  readonly property int fontPixelSize: 18
+  readonly property int loginTextFieldWidth: 320
+  readonly property int loginTextFieldHeight: 35
+  readonly property int loginRextFieldRadius: 5
+  readonly property int loginTextFieldVerticalSpacing: 15
 
-namespace ui {
+  readonly property int loginButtonBottomMargin: 130
+  readonly property int createAccountNextButtonBottomMargin: 130
+  readonly property int accountHandlerClickableTextBottomMargin: 45
 
-class APIModel : public QObject {
-  Q_OBJECT
-
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+  readonly property int loginPageNextButtonWidth: loginTextFieldWidth
+  readonly property int loginPageNextButtonHeight: loginTextFieldHeight
+  readonly property int loginPageNextButtonRadius: loginRextFieldRadius
+}

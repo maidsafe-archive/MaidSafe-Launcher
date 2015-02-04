@@ -16,47 +16,45 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
+import QtQuick 2.4
 
-#include <memory>
+FocusScope {
+  id: focusScope
+  objectName: "focusScope"
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+  signal clicked()
+  property alias label: customLabel
+  property alias mouseArea: mouseArea
 
-#include "maidsafe/common/config.h"
+  width: childrenRect.width
+  height: childrenRect.height
 
-namespace maidsafe {
+  clip: true
 
-namespace launcher {
+  MouseArea {
+    id: mouseArea
+    objectName: "mouseArea"
 
-struct Launcher {
-  int a_{999};
-};
+    height: customLabel.implicitHeight
+    width: customLabel.implicitWidth
 
-namespace ui {
+    hoverEnabled: true
+    acceptedButtons: Qt.LeftButton
+    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
 
-class AccountHandlerModel : public QObject {
-  Q_OBJECT
+    onClicked: focusScope.clicked()
 
- public:
-  explicit AccountHandlerModel(QObject* parent = nullptr);
-  ~AccountHandlerModel() override;
+    CustomLabel {
+      id: customLabel
+      objectName: "customLabel"
 
-  std::unique_ptr<Launcher> Login(const QString& pin, const QString& keyword,
-                                  const QString& password);
-  std::unique_ptr<Launcher> CreateAccount(const QString& pin, const QString& keyword,
-                                          const QString& password);
+      focus: true
+      anchors.centerIn: parent
+      font.underline: mouseArea.containsMouse || activeFocus
 
- signals: // NOLINT - Spandan
-  void LoginResultAvailable();
-  void CreateAccountResultAvailable();
-};
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_ACCOUNT_HANDLER_MODEL_H_
+      Keys.onEnterPressed: focusScope.clicked()
+      Keys.onSpacePressed: focusScope.clicked()
+      Keys.onReturnPressed: focusScope.clicked()
+    }
+  }
+}

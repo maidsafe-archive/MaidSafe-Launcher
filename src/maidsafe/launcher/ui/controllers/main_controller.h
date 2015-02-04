@@ -22,18 +22,20 @@
 #include <memory>
 
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/main_window.h"
 #include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+
+#include "maidsafe/common/config.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
+struct Launcher;
+
 namespace ui {
 
-namespace models { class APIModel; }  // namespace models
-
-namespace controllers {
+class APIModel;
+class MainWindow;
 
 class MainController : public QObject {
   Q_OBJECT
@@ -43,40 +45,44 @@ class MainController : public QObject {
 
  public:
   enum MainViews {
-    HandleAccount,
+    HandleAccount
   };
 
-  explicit MainController(QObject* parent = 0);
+  explicit MainController(QObject* parent = nullptr);
+  ~MainController() override;
 
   MainViews currentView() const;
   void SetCurrentView(const MainViews new_current_view);
-  Q_SIGNAL void currentViewChanged(MainViews arg);
+
+  MainController(MainController&&) = delete;
+  MainController(const MainController&) = delete;
+  MainController& operator=(MainController&&) = delete;
+  MainController& operator=(const MainController&) = delete;
 
  protected:
   bool eventFilter(QObject* object, QEvent* event);
 
+ signals: // NOLINT - Viv
+  void InvokeAccountHandlerController();
+  void currentViewChanged(MainViews arg);
+
  private slots:  // NOLINT - Viv
   void UnhandledException();
   void EventLoopStarted();
+  void LoginCompleted(Launcher* launcherPtr);
 
  private:
   void RegisterQmlTypes() const;
   void RegisterQtMetaTypes() const;
+  void SetupConnections() const;
   void SetContexProperties();
 
-  // AccountHandling
-  Q_SLOT void LoginCompleted();
-  Q_SIGNAL void InvokeAccountHandlerController();
-
- private:
-  std::unique_ptr<helpers::MainWindow> main_window_{new helpers::MainWindow};
-  models::APIModel* api_model_{nullptr};
+  std::unique_ptr<MainWindow> main_window_;
+  APIModel* api_model_{nullptr};
   QObject* account_handler_controller_{nullptr};
 
   MainViews current_view_{HandleAccount};
 };
-
-}  // namespace controllers
 
 }  // namespace ui
 
@@ -85,4 +91,3 @@ class MainController : public QObject {
 }  // namespace maidsafe
 
 #endif  // MAIDSAFE_LAUNCHER_UI_CONTROLLERS_MAIN_CONTROLLER_H_
-

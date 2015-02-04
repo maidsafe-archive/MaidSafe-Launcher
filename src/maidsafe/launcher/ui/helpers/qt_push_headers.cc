@@ -17,4 +17,3 @@
     use of the MaidSafe Software.                                                                 */
 
 #include "helpers/qt_push_headers.h"
-
