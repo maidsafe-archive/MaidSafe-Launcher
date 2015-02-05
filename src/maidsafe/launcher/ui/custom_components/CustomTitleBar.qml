@@ -93,7 +93,7 @@ FocusScope {
           id: minimiseImage
           objectName: "minimiseImage"
 
-          source: "/resources/icons/window_details/minimise.png"
+          source: "/resources/images/window_details/minimise.png"
         }
       }
 
@@ -133,9 +133,9 @@ FocusScope {
           objectName: "maximiseImage"
 
           source: maximiseMouseArea.maximise ?
-                    "/resources/icons/window_details/maximise.png"
+                    "/resources/images/window_details/maximise.png"
                   :
-                    "/resources/icons/window_details/restore.png"
+                    "/resources/images/window_details/restore.png"
         }
       }
 
@@ -165,7 +165,7 @@ FocusScope {
           id: closeImage
           objectName: "closeImage"
 
-          source: "/resources/icons/window_details/close.png"
+          source: "/resources/images/window_details/close.png"
         }
       }
     }
@@ -206,7 +206,7 @@ FocusScope {
           id: closeImage
           objectName: "closeImage"
 
-          source: "/resources/icons/window_details/close.png"
+          source: "/resources/images/window_details/close.png"
         }
       }
 
@@ -236,7 +236,7 @@ FocusScope {
           id: minimiseImage
           objectName: "minimiseImage"
 
-          source: "/resources/icons/window_details/minimise.png"
+          source: "/resources/images/window_details/minimise.png"
         }
       }
 
@@ -276,9 +276,9 @@ FocusScope {
           objectName: "maximiseImage"
 
           source: maximiseMouseArea.maximise ?
-                    "/resources/icons/window_details/maximise.png"
+                    "/resources/images/window_details/maximise.png"
                   :
-                    "/resources/icons/window_details/restore.png"
+                    "/resources/images/window_details/restore.png"
         }
       }
     }
@@ -306,14 +306,14 @@ FocusScope {
         source: {
           if (enabled) {
             if (macButtonsRow.containsMouse) {
-              "/resources/icons/window_details/mac_close_hover.png"
+              "/resources/images/window_details/mac_close_hover.png"
             }
             else {
-              "/resources/icons/window_details/mac_close.png"
+              "/resources/images/window_details/mac_close.png"
             }
           }
           else {
-            "/resources/icons/window_details/mac_all_disabled.png"
+            "/resources/images/window_details/mac_all_disabled.png"
           }
         }
 
@@ -338,12 +338,12 @@ FocusScope {
         source: {
           if (enabled) {
             if (macButtonsRow.containsMouse) {
-              "/resources/icons/window_details/mac_minimise_hover.png"
+              "/resources/images/window_details/mac_minimise_hover.png"
             } else {
-              "/resources/icons/window_details/mac_minimise.png"
+              "/resources/images/window_details/mac_minimise.png"
             }
           } else {
-            "/resources/icons/window_details/mac_all_disabled.png"
+            "/resources/images/window_details/mac_all_disabled.png"
           }
         }
 
@@ -368,12 +368,12 @@ FocusScope {
         source: {
           if (enabled) {
             if (macButtonsRow.containsMouse) {
-              "/resources/icons/window_details/mac_maximise_hover.png"
+              "/resources/images/window_details/mac_maximise_hover.png"
             } else {
-              "/resources/icons/window_details/mac_maximise.png"
+              "/resources/images/window_details/mac_maximise.png"
             }
           } else {
-            "/resources/icons/window_details/mac_all_disabled.png"
+            "/resources/images/window_details/mac_all_disabled.png"
           }
         }
 

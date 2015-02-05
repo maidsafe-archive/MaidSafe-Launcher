@@ -23,17 +23,17 @@
         <file>custom_components/FloatingStatusBox.qml</file>
         <file>resources/js/password_strength.js</file>
         <file>custom_components/CustomTitleBar.qml</file>
-        <file>resources/icons/window_details/close.png</file>
-        <file>resources/icons/window_details/maximise.png</file>
-        <file>resources/icons/window_details/minimise.png</file>
-        <file>resources/icons/window_details/restore.png</file>
-        <file>resources/icons/window_details/mac_all_disabled.png</file>
-        <file>resources/icons/window_details/mac_close.png</file>
-        <file>resources/icons/window_details/mac_close_hover.png</file>
-        <file>resources/icons/window_details/mac_maximise.png</file>
-        <file>resources/icons/window_details/mac_maximise_hover.png</file>
-        <file>resources/icons/window_details/mac_minimise.png</file>
-        <file>resources/icons/window_details/mac_minimise_hover.png</file>
+        <file>resources/images/window_details/close.png</file>
+        <file>resources/images/window_details/maximise.png</file>
+        <file>resources/images/window_details/minimise.png</file>
+        <file>resources/images/window_details/restore.png</file>
+        <file>resources/images/window_details/mac_all_disabled.png</file>
+        <file>resources/images/window_details/mac_close.png</file>
+        <file>resources/images/window_details/mac_close_hover.png</file>
+        <file>resources/images/window_details/mac_maximise.png</file>
+        <file>resources/images/window_details/mac_maximise_hover.png</file>
+        <file>resources/images/window_details/mac_minimise.png</file>
+        <file>resources/images/window_details/mac_minimise_hover.png</file>
         <file>custom_components/ButtonBase.qml</file>
         <file>custom_components/GreyButton.qml</file>
         <file>views/account_handling/detail/AccountHandlerBrushes.qml</file>
