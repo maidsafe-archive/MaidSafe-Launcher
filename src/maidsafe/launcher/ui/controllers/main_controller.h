@@ -45,7 +45,7 @@ class MainController : public QObject {
 
  public:
   enum MainViews {
-    HandleAccount
+    HandleAccount,
   };
 
   explicit MainController(QObject* parent = nullptr);

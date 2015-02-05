@@ -44,7 +44,10 @@ class AccountHandlerController : public QObject {
   Q_PROPERTY(AccountHandlingViews currentView READ currentView NOTIFY currentViewChanged FINAL)
 
  public:
-  enum AccountHandlingViews { LoginView, CreateAccountView, };
+  enum AccountHandlingViews {
+    LoginView,
+    CreateAccountView,
+  };
 
   AccountHandlerController(MainWindow& main_window, QObject* parent);
   ~AccountHandlerController() override;
@@ -76,7 +79,7 @@ class AccountHandlerController : public QObject {
   AccountHandlerModel* account_handler_model_{nullptr};
   std::future<std::unique_ptr<Launcher>> future_;
 
-  AccountHandlingViews current_view_{CreateAccountView};
+  AccountHandlingViews current_view_{LoginView};
 };
 
 }  // namespace ui
