@@ -46,7 +46,7 @@ FocusScope {
     if (!primaryTextField.text.match(/^\d{4}$/)) {
       primaryTextField.showErrorImage = true
       floatingStatus.infoText.text = qsTr("PIN must be only and exactly 4 digits")
-      floatingStatus.infoText.color = globalBrushes.textWeakPassword
+      floatingStatus.infoText.color = customBrushes.textWeakPassword
       floatingStatus.pointToItem = primaryTextField
       floatingStatus.visible = true
       return false
@@ -64,15 +64,15 @@ FocusScope {
     case 0:
     case 1:
       floatingStatus.infoText.text = qsTr("Weak")
-      floatingStatus.infoText.color = globalBrushes.textWeakPassword
+      floatingStatus.infoText.color = customBrushes.textWeakPassword
       break
     case 2:
       floatingStatus.infoText.text = qsTr("Medium")
-      floatingStatus.infoText.color = globalBrushes.textMediumPassword
+      floatingStatus.infoText.color = customBrushes.textMediumPassword
       break
     default:
       floatingStatus.infoText.text = qsTr("Strong")
-      floatingStatus.infoText.color = globalBrushes.textStrongPassword
+      floatingStatus.infoText.color = customBrushes.textStrongPassword
       break
     }
 
@@ -82,7 +82,7 @@ FocusScope {
   function showBlankFieldError() {
     primaryTextField.showErrorImage = true
     floatingStatus.infoText.text = qsTr(fieldName + " cannot be left blank")
-    floatingStatus.infoText.color = globalBrushes.textWeakPassword
+    floatingStatus.infoText.color = customBrushes.textWeakPassword
     floatingStatus.pointToItem = primaryTextField
     floatingStatus.visible = true
   }
@@ -91,7 +91,7 @@ FocusScope {
     if (primaryTextField.text !== confirmationTextField.text) {
       confirmationTextField.showErrorImage = true
       floatingStatus.infoText.text = qsTr("Entries don't match")
-      floatingStatus.infoText.color = globalBrushes.textWeakPassword
+      floatingStatus.infoText.color = customBrushes.textWeakPassword
       floatingStatus.pointToItem = confirmationTextField
       floatingStatus.visible = true
       return false
@@ -118,7 +118,7 @@ FocusScope {
     id: textFieldsAndButtonColumn
     objectName: "textFieldsAndButtonColumn"
 
-    spacing: globalProperties.loginTextFieldVerticalSpacing
+    spacing: customProperties.textFieldVerticalSpacing
 
     CustomTextField {
       id: primaryTextField
@@ -198,7 +198,9 @@ FocusScope {
                 validateConfirmationMatch()
         }
 
-        if (ok) { focusScopeRoot.proceed() }
+        if (ok) {
+          focusScopeRoot.proceed()
+        }
       }
     }
   }

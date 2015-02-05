@@ -42,9 +42,9 @@ Rectangle {
                    metaInformationText.implicitHeight + metaInformationText.implicitHeight *
                    metaInformationText.implicitWidth / (metaInformationText.width ?
                                                           metaInformationText.width : 1),
-                   globalProperties.loginTextFieldHeight)
+                   customProperties.textFieldHeight)
 
-  radius: globalProperties.loginRextFieldRadius
+  radius: customProperties.textFieldRadius
   visible: false
 
   onVisibleChanged: {

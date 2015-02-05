@@ -30,6 +30,8 @@ namespace ui {
 ExceptionEvent::ExceptionEvent(const QString& exception_message, Type type)
     : QEvent(type), exception_message_(exception_message) {}
 
+ExceptionEvent::~ExceptionEvent() = default;
+
 QString ExceptionEvent::ExceptionMessage() { return exception_message_; }
 
 Application::Application(int argc, char** argv)

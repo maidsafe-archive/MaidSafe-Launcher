@@ -30,6 +30,7 @@ namespace maidsafe {
 
 namespace launcher {
 
+// TODO(Spandan) Remove this once backend is in place
 struct Launcher {
   int a_{999};
 };

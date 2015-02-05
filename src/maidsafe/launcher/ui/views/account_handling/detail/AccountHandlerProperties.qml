@@ -16,28 +16,24 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_HELPERS_RAII_DISPATCHER_H_
-#define MAIDSAFE_LAUNCHER_UI_HELPERS_RAII_DISPATCHER_H_
+import QtQuick 2.4
 
-#include <functional>
+QtObject {
+  id: properties
+  objectName: "properties"
 
-namespace maidsafe {
+  readonly property int defaultFontPixelSize: 18
 
-namespace launcher {
+  readonly property int textFieldWidth: 320
+  readonly property int textFieldHeight: 35
+  readonly property int textFieldRadius: 5
+  readonly property int textFieldVerticalSpacing: 15
 
-namespace ui {
+  readonly property int nextButtonBottomMargin: 130
+  readonly property int loginButtonBottomMargin: 130
+  readonly property int clickableTextBottomMargin: 45
 
-struct RAIIDispatcher {
-  using Callable = std::function<void()>;
-  explicit RAIIDispatcher(const Callable& c) : c_{c} {}
-  ~RAIIDispatcher() { c_(); }
-  Callable c_;
-};
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_RAII_DISPATCHER_H_
+  readonly property int blueButtonWidth: textFieldWidth
+  readonly property int blueButtonHeight: textFieldHeight
+  readonly property int blueButtonRadius: textFieldRadius
+}

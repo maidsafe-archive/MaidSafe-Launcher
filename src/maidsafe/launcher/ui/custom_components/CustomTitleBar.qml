@@ -46,10 +46,15 @@ FocusScope {
     }
 
     sourceComponent: {
-      if (Qt.platform.os === "linux") linuxButtonsComponent
-      else if (Qt.platform.os === "windows") windowsButtonsComponent
-      else if (Qt.platform.os === "osx") macButtonsComponent
-      else undefined
+      if (Qt.platform.os === "linux") {
+        linuxButtonsComponent
+      } else if (Qt.platform.os === "windows") {
+        windowsButtonsComponent
+      } else if (Qt.platform.os === "osx") {
+        macButtonsComponent
+      } else {
+        undefined
+      }
     }
   }
 
@@ -114,8 +119,11 @@ FocusScope {
           hoverEnabled: true
 
           onClicked: {
-            if (maximise) { mainWindow_.showMaximized() }
-            else { mainWindow_.showNormal() }
+            if (maximise) {
+              mainWindow_.showMaximized()
+            } else {
+              mainWindow_.showNormal()
+            }
             maximise = !maximise
           }
         }
@@ -254,8 +262,11 @@ FocusScope {
           hoverEnabled: true
 
           onClicked: {
-            if (maximise) { mainWindow_.showMaximized() }
-            else { mainWindow_.showNormal() }
+            if (maximise) {
+              mainWindow_.showMaximized()
+            } else {
+              mainWindow_.showNormal()
+            }
             maximise = !maximise
           }
         }
@@ -328,12 +339,10 @@ FocusScope {
           if (enabled) {
             if (macButtonsRow.containsMouse) {
               "/resources/icons/window_details/mac_minimise_hover.png"
-            }
-            else {
+            } else {
               "/resources/icons/window_details/mac_minimise.png"
             }
-          }
-          else {
+          } else {
             "/resources/icons/window_details/mac_all_disabled.png"
           }
         }
@@ -360,12 +369,10 @@ FocusScope {
           if (enabled) {
             if (macButtonsRow.containsMouse) {
               "/resources/icons/window_details/mac_maximise_hover.png"
-            }
-            else {
+            } else {
               "/resources/icons/window_details/mac_maximise.png"
             }
-          }
-          else {
+          } else {
             "/resources/icons/window_details/mac_all_disabled.png"
           }
         }

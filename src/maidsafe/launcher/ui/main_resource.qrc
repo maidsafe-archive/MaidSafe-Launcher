@@ -36,5 +36,7 @@
         <file>resources/icons/window_details/mac_minimise_hover.png</file>
         <file>custom_components/ButtonBase.qml</file>
         <file>custom_components/GreyButton.qml</file>
+        <file>views/account_handling/detail/AccountHandlerBrushes.qml</file>
+        <file>views/account_handling/detail/AccountHandlerProperties.qml</file>
     </qresource>
 </RCC>

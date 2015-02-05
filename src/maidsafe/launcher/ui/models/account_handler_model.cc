@@ -17,8 +17,7 @@
     use of the MaidSafe Software.                                                                 */
 
 #include "maidsafe/launcher/ui/models/account_handler_model.h"
-
-#include "maidsafe/launcher/ui/helpers/raii_dispatcher.h"
+#include "maidsafe/common/on_scope_exit.h"
 
 namespace maidsafe {
 
@@ -33,7 +32,7 @@ AccountHandlerModel::~AccountHandlerModel() = default;
 std::unique_ptr<Launcher> AccountHandlerModel::Login(const QString& /*pin*/,
                                                      const QString& /*keyword*/,
                                                      const QString& /*password*/) {
-  RAIIDispatcher sig{[this] { emit LoginResultAvailable(); }};
+  on_scope_exit sig{[this] { emit LoginResultAvailable(); }};
   static_cast<void>(sig);
   //  return Launcher::Login(pin.toStdString(), keyword.toStdString(), password.toStdString());
   std::unique_ptr<Launcher> launcher{new Launcher};
@@ -43,7 +42,7 @@ std::unique_ptr<Launcher> AccountHandlerModel::Login(const QString& /*pin*/,
 std::unique_ptr<Launcher> AccountHandlerModel::CreateAccount(const QString& /*pin*/,
                                                              const QString& /*keyword*/,
                                                              const QString& /*password*/) {
-  RAIIDispatcher sig{[this] { emit CreateAccountResultAvailable(); }};
+  on_scope_exit sig{[this] { emit CreateAccountResultAvailable(); }};
   static_cast<void>(sig);
   //  return Launcher::CreateAccount(pin.toStdString(), keyword.toStdString(),
   // password.toStdString());

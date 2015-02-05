@@ -36,7 +36,7 @@ FocusScope {
       leftMargin: 15
     }
     pointToItem: textFieldRepeater.itemAt(0)
-    infoText.color: "#ff0000"
+    infoText.color: globalBrushes.textError
     yOffset: textFieldsAndButtonColumn.y
   }
 
@@ -47,10 +47,10 @@ FocusScope {
     anchors {
       horizontalCenter: parent.horizontalCenter
       bottom: parent.bottom
-      bottomMargin: globalProperties.loginButtonBottomMargin
+      bottomMargin: customProperties.loginButtonBottomMargin
     }
 
-    spacing: globalProperties.loginTextFieldVerticalSpacing
+    spacing: customProperties.textFieldVerticalSpacing
 
     Repeater {
       id: textFieldRepeater
@@ -93,20 +93,17 @@ FocusScope {
           floatingStatus.pointToItem = textFieldRepeater.itemAt(0)
           floatingStatus.infoText.text = qsTr("PIN cannot be left blank")
           floatingStatus.visible = true
-        }
-        else if (textFieldRepeater.itemAt(1).text === "") {
+        } else if (textFieldRepeater.itemAt(1).text === "") {
           textFieldRepeater.itemAt(1).showErrorImage = true
           floatingStatus.pointToItem = textFieldRepeater.itemAt(1)
           floatingStatus.infoText.text = qsTr("Keyword cannot be left blank")
           floatingStatus.visible = true
-        }
-        else if (textFieldRepeater.itemAt(2).text === "") {
+        } else if (textFieldRepeater.itemAt(2).text === "") {
           textFieldRepeater.itemAt(2).showErrorImage = true
           floatingStatus.pointToItem = textFieldRepeater.itemAt(2)
           floatingStatus.infoText.text = qsTr("Password cannot be left blank")
           floatingStatus.visible = true
-        }
-        else {
+        } else {
           accountHandlerController_.login(textFieldRepeater.itemAt(0).text,
                                           textFieldRepeater.itemAt(1).text,
                                           textFieldRepeater.itemAt(2).text)
@@ -122,7 +119,7 @@ FocusScope {
     anchors {
       horizontalCenter: parent.horizontalCenter
       bottom: parent.bottom
-      bottomMargin: globalProperties.accountHandlerClickableTextBottomMargin
+      bottomMargin: customProperties.clickableTextBottomMargin
     }
 
     label.text: qsTr("Create Account")

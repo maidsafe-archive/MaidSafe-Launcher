@@ -19,11 +19,22 @@
 import QtQuick 2.4
 import SAFEAppLauncher.AccountHandler 1.0
 
+import "./detail"
 import "../../custom_components"
 
 FocusScope {
   id: accountHandlerviewRoot
   objectName: "accountHandlerviewRoot"
+
+  AccountHandlerBrushes {
+    id: customBrushes
+    objectName: "customBrushes"
+  }
+
+  AccountHandlerProperties {
+    id: customProperties
+    objectName: "customProperties"
+  }
 
   Image {
     id: accountHandlerView
@@ -94,12 +105,13 @@ FocusScope {
       anchors.fill: parent
 
       source: {
-        if (accountHandlerController_.currentView === AccountHandlerController.CreateAccountView)
+        if (accountHandlerController_.currentView === AccountHandlerController.CreateAccountView) {
           "CreateAccount.qml"
-        else if (accountHandlerController_.currentView === AccountHandlerController.LoginView)
+        } else if (accountHandlerController_.currentView === AccountHandlerController.LoginView) {
           "Login.qml"
-        else
+        } else {
           ""
+        }
       }
 
       focus: true

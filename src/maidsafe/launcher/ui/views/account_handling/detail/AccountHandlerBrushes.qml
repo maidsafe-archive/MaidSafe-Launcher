@@ -19,8 +19,17 @@
 import QtQuick 2.4
 
 QtObject {
-  id: globalProperties
-  objectName: "globalProperties"
+  id: brushes
+  objectName: "brushes"
 
-  readonly property int windowResizerThickness: 5
+  readonly property color textWeakPassword: "#c1272d"
+  readonly property color textMediumPassword: "#f15a24"
+  readonly property color textStrongPassword: "#39b54a"
+
+  readonly property color labelSelected: "#1d6499"
+  readonly property color labelNotSelected: "#ceebf4"
+
+  readonly property color buttonDefaultBlue: "#1d6499"
+  readonly property color buttonHoveredBlue: "#2a81b7"
+  readonly property color buttonPressedBlue: "#124360"
 }

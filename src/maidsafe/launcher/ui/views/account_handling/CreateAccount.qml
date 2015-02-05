@@ -45,7 +45,7 @@ FocusScope {
     anchors {
       horizontalCenter: parent.horizontalCenter
       bottom: userInputLoader.top
-      bottomMargin: globalProperties.loginTextFieldHeight
+      bottomMargin: customProperties.textFieldHeight
     }
 
     spacing: 15
@@ -62,9 +62,9 @@ FocusScope {
 
         text: modelData
         color: model.index === dPtr.currentTabIndex ?
-                 globalBrushes.labelSelected
+                 customBrushes.labelSelected
                :
-                 globalBrushes.labelNotSelected
+                 customBrushes.labelNotSelected
       }
     }
   }
@@ -76,14 +76,18 @@ FocusScope {
     anchors {
       horizontalCenter: parent.horizontalCenter
       bottom: parent.bottom
-      bottomMargin: globalProperties.createAccountNextButtonBottomMargin
+      bottomMargin: customProperties.nextButtonBottomMargin
     }
 
     focus: true
     sourceComponent: {
-      if (!dPtr.currentTabIndex) acceptPINComponent
-      else if (dPtr.currentTabIndex === 1) acceptKeywordComponent
-      else acceptPasswordComponent
+      if (!dPtr.currentTabIndex) {
+        acceptPINComponent
+      } else if (dPtr.currentTabIndex === 1) {
+        acceptKeywordComponent
+      } else {
+        acceptPasswordComponent
+      }
     }
 
     onLoaded: {
@@ -153,7 +157,7 @@ FocusScope {
     anchors {
       horizontalCenter: parent.horizontalCenter
       bottom: parent.bottom
-      bottomMargin: globalProperties.accountHandlerClickableTextBottomMargin
+      bottomMargin: customProperties.clickableTextBottomMargin
     }
 
     sourceComponent: dPtr.currentTabIndex ?

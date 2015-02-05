@@ -23,24 +23,11 @@ QtObject {
   objectName: "globalBrushes"
 
   readonly property color textGrey: "#b3b3b3"
+  readonly property color textError: "#ff0000"
   readonly property color textBlack: "#000000"
   readonly property color textDefault: "#ffffff"
-  readonly property color textWeakPassword: "#c1272d"
-  readonly property color textMediumPassword: "#f15a24"
-  readonly property color textStrongPassword: "#39b54a"
+  readonly property color labelDefault: textDefault
 
   readonly property color placeHolderFocusGrey: "#70b3b3b3"
   readonly property color placeHolderDefaultGrey: textGrey
-
-  readonly property color labelDefault: textDefault
-  readonly property color labelSelected: "#1d6499"
-  readonly property color labelNotSelected: "#ceebf4"
-
-  readonly property color buttonDefaultBlue: "#1d6499"
-  readonly property color buttonHoveredBlue: "#2a81b7"
-  readonly property color buttonPressedBlue: "#124360"
-
-  readonly property color buttonDefaultGrey: "#808080"
-  readonly property color buttonHoveredGrey: "#aaaaaa"
-  readonly property color buttonPressedGrey: "#404040"
 }

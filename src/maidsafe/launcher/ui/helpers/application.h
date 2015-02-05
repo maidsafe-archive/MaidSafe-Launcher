@@ -38,7 +38,7 @@ class MainController;
 class ExceptionEvent : public QEvent {
  public:
   ExceptionEvent(const QString& exception_message, Type type = QEvent::User);
-  ~ExceptionEvent() {}
+  ~ExceptionEvent() override;
   QString ExceptionMessage();
 
  private:

@@ -26,15 +26,19 @@ ButtonBase {
     id: backgroundRect
     objectName: "backgroundRect"
 
-    implicitHeight: globalProperties.loginPageNextButtonHeight
-    implicitWidth: globalProperties.loginPageNextButtonWidth
-    radius: globalProperties.loginPageNextButtonRadius
+    implicitHeight: customProperties.blueButtonHeight
+    implicitWidth: customProperties.blueButtonWidth
+    radius: customProperties.blueButtonRadius
     antialiasing: true
 
     color: {
-      if (buttonBaseRoot.pressed) globalBrushes.buttonPressedBlue
-      else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) globalBrushes.buttonHoveredBlue
-      else globalBrushes.buttonDefaultBlue
+      if (buttonBaseRoot.pressed) {
+        customBrushes.buttonPressedBlue
+      } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
+        customBrushes.buttonHoveredBlue
+      } else {
+        customBrushes.buttonDefaultBlue
+      }
     }
   }
 }

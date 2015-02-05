@@ -50,7 +50,7 @@ TextField {
   }
 
   font {
-    pixelSize: globalProperties.fontPixelSize
+    pixelSize: customProperties.defaultFontPixelSize
     family: globalFontFamily.name
   }
   horizontalAlignment: TextInput.AlignHCenter
@@ -71,9 +71,9 @@ TextField {
       id: backgroundRect
       objectName: "backgroundRect"
 
-      implicitHeight: globalProperties.loginTextFieldHeight
-      implicitWidth: globalProperties.loginTextFieldWidth
-      radius: globalProperties.loginRextFieldRadius
+      implicitHeight: customProperties.textFieldHeight
+      implicitWidth: customProperties.textFieldWidth
+      radius: customProperties.textFieldRadius
 
       Image {
         id: tickImage

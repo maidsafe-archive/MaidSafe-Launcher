@@ -24,7 +24,7 @@ Text {
 
   color: globalBrushes.textDefault
   font {
-    pixelSize: globalProperties.fontPixelSize
+    pixelSize: customProperties.defaultFontPixelSize
     family: globalFontFamily.name
   }
 }
