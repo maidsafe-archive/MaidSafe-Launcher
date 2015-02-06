@@ -19,6 +19,7 @@
 #ifndef MAIDSAFE_LAUNCHER_UI_CONTROLLERS_ACCOUNT_HANDLER_CONTROLLER_H_
 #define MAIDSAFE_LAUNCHER_UI_CONTROLLERS_ACCOUNT_HANDLER_CONTROLLER_H_
 
+#include <memory>
 #include <future>
 
 #include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
