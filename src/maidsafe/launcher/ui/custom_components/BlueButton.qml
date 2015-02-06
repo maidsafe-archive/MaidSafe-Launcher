@@ -16,29 +16,29 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+ButtonBase {
+  id: buttonBaseRoot
+  objectName: "buttonBaseRoot"
 
-namespace maidsafe {
+  backgroundComponent: Rectangle {
+    id: backgroundRect
+    objectName: "backgroundRect"
 
-namespace launcher {
+    implicitHeight: customProperties.blueButtonHeight
+    implicitWidth: customProperties.blueButtonWidth
+    radius: customProperties.blueButtonRadius
+    antialiasing: true
 
-namespace ui {
-
-class APIModel : public QObject {
-  Q_OBJECT
-
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
-
-}  // namespace ui
-
-}  // namespace launcher
-
-}  // namespace maidsafe
-
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+    color: {
+      if (buttonBaseRoot.pressed) {
+        customBrushes.buttonPressedBlue
+      } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
+        customBrushes.buttonHoveredBlue
+      } else {
+        customBrushes.buttonDefaultBlue
+      }
+    }
+  }
+}

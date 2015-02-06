@@ -19,35 +19,87 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
-import "../resources/js/brushes.js" as DefaultBrushes
 
 TextField {
-  FontLoader { id: arialFont; name: "Arial" }
+  id: textField
+  objectName: "textField"
 
-  property bool isMarkerTextVisible : true
+  property bool showTickImage: false
+  property bool showErrorImage: false
+  property bool clearAllImagesOnTextChange: true
 
-  font.pixelSize: 12
-  horizontalAlignment: Qt.AlignHCenter
-  style: TextFieldStyle {
-    background: Rectangle {
-      border {
-        color: {
-          if (!control.enabled) {
-            DefaultBrushes.disabledGray
-          } else if (control.activeFocus) {
-            DefaultBrushes.focusBlack
-          } else {
-            DefaultBrushes.borderGray
-          }
-        }
-        width: 1
-      }
-      implicitHeight: 30
-      implicitWidth: 225
+  function clearAllImages() { showTickImage = showErrorImage = false }
+
+  onShowTickImageChanged: {
+    if (showTickImage && showErrorImage) {
+      showErrorImage = false
     }
-    font: arialFont.name
-    selectionColor: DefaultBrushes.selectionBlue
-    selectedTextColor: DefaultBrushes.focusBlack
-    textColor: !control.enabled ? DefaultBrushes.disabledGray : DefaultBrushes.focusBlack
+  }
+  onShowErrorImageChanged: {
+    if (showErrorImage && showTickImage) {
+      showTickImage = false
+    }
+  }
+  onActiveFocusChanged: {
+    if (activeFocus) {
+      selectAll()
+    }
+  }
+  onTextChanged: {
+    if (clearAllImagesOnTextChange) { clearAllImages() }
+  }
+
+  font {
+    pixelSize: customProperties.defaultFontPixelSize
+    family: globalFontFamily.name
+  }
+  horizontalAlignment: TextInput.AlignHCenter
+  verticalAlignment: TextInput.AlignVCenter
+
+  style: TextFieldStyle {
+    id: textFieldStyle
+    objectName: "textFieldStyle"
+
+    textColor: globalBrushes.textGrey
+
+    placeholderTextColor: control.activeFocus ?
+                            globalBrushes.placeHolderFocusGrey
+                          :
+                            globalBrushes.placeHolderDefaultGrey
+
+    background: Rectangle {
+      id: backgroundRect
+      objectName: "backgroundRect"
+
+      implicitHeight: customProperties.textFieldHeight
+      implicitWidth: customProperties.textFieldWidth
+      radius: customProperties.textFieldRadius
+
+      Image {
+        id: tickImage
+        objectName: "tickImage"
+
+        anchors {
+          right: parent.right
+          rightMargin: 3
+          verticalCenter: parent.verticalCenter
+        }
+        source: "/resources/images/create_tick.png"
+        visible: textField.showTickImage
+      }
+
+      Image {
+        id: errorImage
+        objectName: "errorImage"
+
+        anchors {
+          right: parent.right
+          rightMargin: 3
+          verticalCenter: parent.verticalCenter
+        }
+        source: "/resources/images/create_error.png"
+        visible: textField.showErrorImage
+      }
+    }
   }
 }

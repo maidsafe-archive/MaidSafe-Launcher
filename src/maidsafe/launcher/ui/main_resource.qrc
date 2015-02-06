@@ -3,7 +3,6 @@
         <file>resources/fonts/OpenSans-Light.ttf</file>
         <file>resources/fonts/OpenSans-Regular.ttf</file>
         <file>resources/fonts/OpenSans-Semibold.ttf</file>
-        <file>resources/js/brushes.js</file>
         <file>views/account_handling/AccountHandlerView.qml</file>
         <file>views/account_handling/CreateAccount.qml</file>
         <file>views/account_handling/Login.qml</file>
@@ -12,5 +11,32 @@
         <file>resources/images/create_tick.png</file>
         <file>resources/images/login_bg.png</file>
         <file>custom_components/CustomTextField.qml</file>
+        <file>views/detail/ResizeMainWindowHelper.qml</file>
+        <file>views/detail/DragMainWindowHelper.qml</file>
+        <file>views/detail/GlobalProperties.qml</file>
+        <file>views/detail/GlobalBrushes.qml</file>
+        <file>custom_components/BlueButton.qml</file>
+        <file>custom_components/CustomLabel.qml</file>
+        <file>custom_components/CustomText.qml</file>
+        <file>custom_components/ClickableText.qml</file>
+        <file>views/account_handling/detail/CreateAccountUserInputColumn.qml</file>
+        <file>custom_components/FloatingStatusBox.qml</file>
+        <file>resources/js/password_strength.js</file>
+        <file>custom_components/CustomTitleBar.qml</file>
+        <file>resources/images/window_details/close.png</file>
+        <file>resources/images/window_details/maximise.png</file>
+        <file>resources/images/window_details/minimise.png</file>
+        <file>resources/images/window_details/restore.png</file>
+        <file>resources/images/window_details/mac_all_disabled.png</file>
+        <file>resources/images/window_details/mac_close.png</file>
+        <file>resources/images/window_details/mac_close_hover.png</file>
+        <file>resources/images/window_details/mac_maximise.png</file>
+        <file>resources/images/window_details/mac_maximise_hover.png</file>
+        <file>resources/images/window_details/mac_minimise.png</file>
+        <file>resources/images/window_details/mac_minimise_hover.png</file>
+        <file>custom_components/ButtonBase.qml</file>
+        <file>custom_components/GreyButton.qml</file>
+        <file>views/account_handling/detail/AccountHandlerBrushes.qml</file>
+        <file>views/account_handling/detail/AccountHandlerProperties.qml</file>
     </qresource>
 </RCC>

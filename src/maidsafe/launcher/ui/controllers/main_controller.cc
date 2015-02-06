@@ -19,9 +19,11 @@
 #include "maidsafe/launcher/ui/controllers/main_controller.h"
 
 #include "maidsafe/launcher/ui/controllers/account_handler_controller.h"
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+#include "maidsafe/launcher/ui/helpers/main_window.h"
 #include "maidsafe/launcher/ui/models/api_model.h"
+
+// TODO(Spandan) remove when fake Launcher is removed
+#include "maidsafe/launcher/ui/models/account_handler_model.h"
 
 namespace maidsafe {
 
@@ -29,38 +31,31 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers {
-
-MainController::MainController(QObject* parent)
-    : QObject{parent},
-      api_model_{new models::APIModel{this}},
-      account_handler_controller_{new AccountHandlerController{*main_window_, this}} {
-  RegisterQtMetaTypes();
-  RegisterQmlTypes();
-  SetContexProperties();
-
-  // TODO(Spandan) There is crash right now on my system (Ubunut).
-  // connections
-  connect(this, SIGNAL(InvokeAccountHandlerController()),
-          account_handler_controller_, SLOT(Invoke()),
-          Qt::UniqueConnection);
-
-  installEventFilter(this);
-
+MainController::MainController(QObject* parent) : QObject{parent} {
   QTimer::singleShot(0, this, SLOT(EventLoopStarted()));
 }
 
+MainController::~MainController() = default;
+
 void MainController::EventLoopStarted() {
-  // TODO(Spandan) move this to the constructor. There is crash right now on my system (Ubunut).
-//  connect(this, SIGNAL(InvokeAccountHandlerController()),
-//          account_handler_controller_, SLOT(Invoke()),
-//          Qt::UniqueConnection);
+  main_window_.reset(new MainWindow);
+  api_model_ = new APIModel{this};
+  account_handler_controller_ = new AccountHandlerController{*main_window_, this};
+
+  RegisterQtMetaTypes();
+  RegisterQmlTypes();
+  SetContexProperties();
+  SetupConnections();
+
+  installEventFilter(this);
 
   main_window_->setSource(QUrl{"qrc:/views/MainWindow.qml"});
   emit InvokeAccountHandlerController();
 }
 
-MainController::MainViews MainController::currentView() const { return current_view_; }
+MainController::MainViews MainController::currentView() const {
+  return current_view_;
+}
 
 void MainController::SetCurrentView(const MainViews new_current_view) {
   if (new_current_view != current_view_) {
@@ -69,7 +64,11 @@ void MainController::SetCurrentView(const MainViews new_current_view) {
   }
 }
 
-void MainController::LoginCompleted() {}
+void MainController::LoginCompleted(Launcher* launcherPtr) {
+  std::unique_ptr<Launcher> launcher{launcherPtr};
+  static_cast<void>(launcher);
+  qDebug() << "main controller:" << launcher->a_;
+}
 
 bool MainController::eventFilter(QObject* object, QEvent* event) {
   if (object == this && event->type() >= QEvent::User && event->type() <= QEvent::MaxUser) {
@@ -86,31 +85,37 @@ void MainController::UnhandledException() {
 
 void MainController::RegisterQmlTypes() const {
   qmlRegisterUncreatableType<MainController>(
-        "MainController",
-        1, 0,
-        "MainController",
-        "Error!! Attempting to access uncreatable type - MainController");
+      "SAFEAppLauncher.MainController", 1, 0, "MainController",
+      "Error!! Attempting to access uncreatable type - MainController");
   qmlRegisterUncreatableType<AccountHandlerController>(
-        "AccountHandler",
-        1, 0,
-        "AccountHandlerController",
-        "Error!! Attempting to access uncreatable type - AccountHandlerController");
+      "SAFEAppLauncher.AccountHandler", 1, 0, "AccountHandlerController",
+      "Error!! Attempting to access uncreatable type - AccountHandlerController");
 }
 
-void MainController::RegisterQtMetaTypes() const { }
+void MainController::RegisterQtMetaTypes() const {}
+
+void MainController::SetupConnections() const {
+  Q_ASSERT_X(connect(this, SIGNAL(InvokeAccountHandlerController()), account_handler_controller_,
+                     SLOT(Invoke()), Qt::UniqueConnection),
+             "Connection Failure", "Account Handler Controller must implement slot void Invoke()");
+  Q_ASSERT_X(connect(account_handler_controller_, SIGNAL(LoginCompleted(Launcher*)), this, // NOLINT - Spandan
+                     SLOT(LoginCompleted(Launcher*)), Qt::UniqueConnection), // NOLINT - Spandan
+             "Connection Failure",
+             "Account Handler Controller must implement signal void LoginCompleted(Launcher*)");
+  Q_ASSERT_X(
+      connect(main_window_->engine(), SIGNAL(quit()), qApp, SLOT(quit()), Qt::UniqueConnection),
+      "Connection Failure", "QQmlEngine::quit() -> qApp::quit()");
+}
 
 void MainController::SetContexProperties() {
   auto root_context(main_window_->rootContext());
-  root_context->setContextProperty("mainController", this);
-  root_context->setContextProperty("accountHandlerController", account_handler_controller_);
+  root_context->setContextProperty("mainController_", this);
+  root_context->setContextProperty("mainWindow_", main_window_.get());
+  root_context->setContextProperty("accountHandlerController_", account_handler_controller_);
 }
-
-
-}  // namespace controllers
 
 }  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-

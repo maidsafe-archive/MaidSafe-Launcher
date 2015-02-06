@@ -16,29 +16,45 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
-#define MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+import QtQuick 2.4
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
+FocusScope {
+  id: focusScope
+  objectName: "focusScope"
 
-namespace maidsafe {
+  signal clicked()
+  property alias label: customLabel
+  property alias mouseArea: mouseArea
 
-namespace launcher {
+  width: childrenRect.width
+  height: childrenRect.height
 
-namespace ui {
+  clip: true
 
-class APIModel : public QObject {
-  Q_OBJECT
+  MouseArea {
+    id: mouseArea
+    objectName: "mouseArea"
 
- public:
-  explicit APIModel(QObject* parent = nullptr);
-};
+    height: customLabel.implicitHeight
+    width: customLabel.implicitWidth
 
-}  // namespace ui
+    hoverEnabled: true
+    acceptedButtons: Qt.LeftButton
+    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
 
-}  // namespace launcher
+    onClicked: focusScope.clicked()
 
-}  // namespace maidsafe
+    CustomLabel {
+      id: customLabel
+      objectName: "customLabel"
 
-#endif  // MAIDSAFE_LAUNCHER_UI_MODELS_API_MODEL_H_
+      focus: true
+      anchors.centerIn: parent
+      font.underline: mouseArea.containsMouse || activeFocus
+
+      Keys.onEnterPressed: focusScope.clicked()
+      Keys.onSpacePressed: focusScope.clicked()
+      Keys.onReturnPressed: focusScope.clicked()
+    }
+  }
+}

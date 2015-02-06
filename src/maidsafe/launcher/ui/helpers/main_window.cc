@@ -18,8 +18,7 @@
 
 #include "maidsafe/launcher/ui/helpers/main_window.h"
 
-#include <QDebug>
-#include <QDesktopWidget>
+#include "maidsafe/common/log.h"
 
 namespace maidsafe {
 
@@ -27,53 +26,51 @@ namespace launcher {
 
 namespace ui {
 
-namespace helpers {
-
-MainWindow::MainWindow(QWindow* parent)
-    : QQuickView{parent} {
-  connect(this,
-          SIGNAL(statusChanged(QQuickView::Status)),
-          this,
-          SLOT(StatusChanged(const QQuickView::Status)),
-          Qt::UniqueConnection);
+MainWindow::MainWindow(QWindow* parent) : QQuickView{parent} {
+  connect(this, SIGNAL(statusChanged(QQuickView::Status)), this,
+          SLOT(StatusChanged(const QQuickView::Status)), Qt::UniqueConnection);
 
   setResizeMode(QQuickView::SizeRootObjectToView);
+
+#if !defined(__linux__)
+  setFlags(flags() | Qt::FramelessWindowHint);
+#endif
 }
 
 MainWindow::~MainWindow() = default;
 
-void MainWindow::CenterToScreen() {
+void MainWindow::centerToScreen() {
   auto screen_width(QDesktopWidget{}.screen()->width());
   auto screen_height(QDesktopWidget{}.screen()->height());
   setGeometry(screen_width / 2 - width() / 2, screen_height / 2 - height() / 2, width(), height());
 }
 
 void MainWindow::StatusChanged(const QQuickView::Status status) {
+  qDebug() << "QML Loading Status:";
+  LOG(kAlways) << "QML Loading Status:";
   switch (status) {
     case QQuickView::Null:
       qDebug() << "Status: Null.";
-//      LOG() << "Status: Null.";
+      LOG(kAlways) << "Status: Null.";
       break;
     case QQuickView::Ready:
       qDebug() << "Status: Ready.";
-//      LOG() << "Status: Ready.";
+      LOG(kAlways) << "Status: Ready.";
       break;
     case QQuickView::Loading:
       qDebug() << "Status: Loading.";
-//      LOG() << "Status: Loading.";
+      LOG(kAlways) << "Status: Loading.";
       break;
     case QQuickView::Error:
       qDebug() << "Status: ERROR.";
-//      LOG() << "Status: ERROR.";
+      LOG(kAlways) << "Status: ERROR.";
       break;
     default:
       qDebug() << "Status: Unknown.";
-//      LOG() << "Status: Unknown.";
+      LOG(kAlways) << "Status: Unknown.";
       break;
   }
 }
-
-}  // namespace helpers
 
 }  // namespace ui
 

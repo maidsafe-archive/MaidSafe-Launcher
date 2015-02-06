@@ -16,25 +16,24 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-.pragma library
+import QtQuick 2.4
 
-var focusBlack = "#1C1C1B"
-var white = "#FFFFFF"
+QtObject {
+  id: properties
+  objectName: "properties"
 
-var selectionBlue = "#D4E4F4"
-var lightBlue = "#88B8E4"
-var normalBlue = "#5791CD"
-var darkBlue = "#457BAF"
-var darkerBlue = "#1D5086"
+  readonly property int defaultFontPixelSize: 18
 
-var disabledGray = "#DADAD9"
-var lightGray = "#ECECEC"
-var darkerGray = "#B2B2B1"
-var labelGray = "#6F6F6E"
-var borderGray = "#9D9C9C"
-var playerTimeLineGray = "#4D4D4D"
+  readonly property int textFieldWidth: 320
+  readonly property int textFieldHeight: 35
+  readonly property int textFieldRadius: 5
+  readonly property int textFieldVerticalSpacing: 15
 
-var darkRed = "#981919"
-var normalRed = "#E6332A"
+  readonly property int nextButtonBottomMargin: 130
+  readonly property int loginButtonBottomMargin: 130
+  readonly property int clickableTextBottomMargin: 45
 
-var transparent = "#00000000"
+  readonly property int blueButtonWidth: textFieldWidth
+  readonly property int blueButtonHeight: textFieldHeight
+  readonly property int blueButtonRadius: textFieldRadius
+}

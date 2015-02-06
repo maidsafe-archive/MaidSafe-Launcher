@@ -33,14 +33,12 @@ namespace launcher {
 
 namespace ui {
 
-namespace controllers { class MainController; }  // namespace controllers
-
-namespace helpers {
+class MainController;
 
 class ExceptionEvent : public QEvent {
  public:
   ExceptionEvent(const QString& exception_message, Type type = QEvent::User);
-  ~ExceptionEvent() {}
+  ~ExceptionEvent() override;
   QString ExceptionMessage();
 
  private:
@@ -56,19 +54,17 @@ class Application : public QApplication {
   QStringList AvailableTranslations();
   void SwitchLanguage(QString language);
   virtual bool notify(QObject* receiver, QEvent* event);
-  void SetErrorHandler(boost::optional<controllers::MainController&> handler_object);
+  void SetErrorHandler(boost::optional<MainController&> handler_object);
   bool IsUniqueInstance();
 
  private:
   void CreateTranslators();
 
-  boost::optional<controllers::MainController&> handler_object_;
+  boost::optional<MainController&> handler_object_;
   QMap<QString, QTranslator*> translators_;
   QTranslator* current_translator_;
   QSharedMemory shared_memory_;
 };
-
-}  // namespace helpers
 
 }  // namespace ui
 
@@ -77,4 +73,3 @@ class Application : public QApplication {
 }  // namespace maidsafe
 
 #endif  // MAIDSAFE_LAUNCHER_UI_HELPERS_APPLICATION_H_
-

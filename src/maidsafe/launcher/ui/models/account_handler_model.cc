@@ -17,6 +17,7 @@
     use of the MaidSafe Software.                                                                 */
 
 #include "maidsafe/launcher/ui/models/account_handler_model.h"
+#include "maidsafe/common/on_scope_exit.h"
 
 namespace maidsafe {
 
@@ -24,17 +25,31 @@ namespace launcher {
 
 namespace ui {
 
-namespace models {
+AccountHandlerModel::AccountHandlerModel(QObject* parent) : QObject{parent} {}
 
-AccountHandlerModel::AccountHandlerModel(QObject* parent)
-    : QObject{parent} {}
+AccountHandlerModel::~AccountHandlerModel() = default;
 
-}  // namespace models
+std::unique_ptr<Launcher> AccountHandlerModel::Login(const QString& /*pin*/,
+                                                     const QString& /*keyword*/,
+                                                     const QString& /*password*/) {
+  on_scope_exit sig{[this] { emit LoginResultAvailable(); }};
+  //  return Launcher::Login(pin.toStdString(), keyword.toStdString(), password.toStdString());
+  std::unique_ptr<Launcher> launcher{new Launcher};
+  return std::move(launcher);
+}
+
+std::unique_ptr<Launcher> AccountHandlerModel::CreateAccount(const QString& /*pin*/,
+                                                             const QString& /*keyword*/,
+                                                             const QString& /*password*/) {
+  on_scope_exit sig{[this] { emit CreateAccountResultAvailable(); }};
+  //  return Launcher::CreateAccount(pin.toStdString(), keyword.toStdString(),
+  // password.toStdString());
+  std::unique_ptr<Launcher> launcher{new Launcher};
+  return std::move(launcher);
+}
 
 }  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-
-

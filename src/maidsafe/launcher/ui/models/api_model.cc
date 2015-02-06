@@ -18,26 +18,16 @@
 
 #include "maidsafe/launcher/ui/models/api_model.h"
 
-#include "maidsafe/launcher/ui/helpers/qt_push_headers.h"
-#include "maidsafe/launcher/ui/helpers/qt_pop_headers.h"
-
 namespace maidsafe {
 
 namespace launcher {
 
 namespace ui {
 
-namespace models {
-
-APIModel::APIModel(QObject* parent)
-    : QObject(parent) {}
-
-}  // namespace models
+APIModel::APIModel(QObject* parent) : QObject(parent) {}
 
 }  // namespace ui
 
 }  // namespace launcher
 
 }  // namespace maidsafe
-
-
