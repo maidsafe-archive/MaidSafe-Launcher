@@ -34,7 +34,7 @@ ExceptionEvent::~ExceptionEvent() = default;
 
 QString ExceptionEvent::ExceptionMessage() { return exception_message_; }
 
-Application::Application(int argc, char** argv)
+Application::Application(int& argc, char** argv)
     : QApplication(argc, argv),
       handler_object_(),
       translators_(),
@@ -62,8 +62,10 @@ bool Application::notify(QObject* receiver, QEvent* event) {
   }
   catch (...) {
     if (handler_object_) {
+      /*
       QApplication::instance()->postEvent(&(*handler_object_),
                                           new ExceptionEvent(tr("Unknown Exception")));
+                                          */
     } else {
       QApplication::quit();
     }
