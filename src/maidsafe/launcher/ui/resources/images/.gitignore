@@ -1,8 +1,0 @@
-*.0
-*~
-*.backup
-*.temp
-desktop.ini
-.kdev4/
-*.kdev4
-.DS_Store
