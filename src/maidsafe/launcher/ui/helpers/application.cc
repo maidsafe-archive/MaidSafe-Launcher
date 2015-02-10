@@ -62,10 +62,8 @@ bool Application::notify(QObject* receiver, QEvent* event) {
   }
   catch (...) {
     if (handler_object_) {
-      /*
       QApplication::instance()->postEvent(&(*handler_object_),
                                           new ExceptionEvent(tr("Unknown Exception")));
-                                          */
     } else {
       QApplication::quit();
     }
