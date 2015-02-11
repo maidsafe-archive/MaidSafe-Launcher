@@ -50,7 +50,7 @@ class ExceptionEvent : public QEvent {
 
 class Application : public QApplication {
  public:
-  Application(int argc, char** argv);
+  Application(int& argc, char** argv);
   QStringList AvailableTranslations();
   void SwitchLanguage(QString language);
   virtual bool notify(QObject* receiver, QEvent* event);

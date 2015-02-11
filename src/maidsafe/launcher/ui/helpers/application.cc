@@ -34,7 +34,7 @@ ExceptionEvent::~ExceptionEvent() = default;
 
 QString ExceptionEvent::ExceptionMessage() { return exception_message_; }
 
-Application::Application(int argc, char** argv)
+Application::Application(int& argc, char** argv)
     : QApplication(argc, argv),
       handler_object_(),
       translators_(),
