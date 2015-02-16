@@ -44,8 +44,8 @@ TEST(AccountTest, BEH_Create) {
   EXPECT_EQ(boost::posix_time::ptime(boost::date_time::not_a_date_time), account->timestamp);
   EXPECT_TRUE(account->ip.is_unspecified());
   EXPECT_EQ(0, account->port);
-  EXPECT_FALSE(account->unique_user_id.IsInitialised());
-  EXPECT_FALSE(account->root_parent_id.IsInitialised());
+  EXPECT_TRUE(account->unique_user_id.IsInitialised());
+  EXPECT_TRUE(account->root_parent_id.IsInitialised());
   EXPECT_TRUE(account->config_file_aes_key.IsInitialised());
   EXPECT_TRUE(account->config_file_aes_iv.IsInitialised());
   EXPECT_TRUE(account->apps.empty());
@@ -120,7 +120,8 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   EXPECT_EQ(account1->root_parent_id, account2->root_parent_id);
   EXPECT_EQ(account1->config_file_aes_key, account2->config_file_aes_key);
   EXPECT_EQ(account1->config_file_aes_iv, account2->config_file_aes_iv);
-  EXPECT_TRUE(Equals(account1->apps, account2->apps, (kIgnorePath | kIgnoreArgs)));
+  EXPECT_TRUE(
+      Equals(account1->apps, account2->apps, (kIgnorePath | kIgnoreArgs | kIgnoreAutoStart)));
 }
 
 TEST(AccountTest, FUNC_MoveConstructAndAssign) {

@@ -86,7 +86,7 @@ AccountHandler& AccountHandler::operator=(AccountHandler&& other) MAIDSAFE_NOEXC
 
 void AccountHandler::Login(authentication::UserCredentials&& user_credentials,
                            AccountGetter& account_getter) {
-  if (account_->passport)  // already logged in
+  if (account_ && account_->passport)  // already logged in
     BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
 
   Identity account_location{GetAccountLocation(*user_credentials.keyword, *user_credentials.pin)};
