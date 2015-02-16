@@ -22,13 +22,20 @@
 
 #include "maidsafe/routing/parameters.h"
 
+#include "maidsafe/launcher/tests/test_utils.h"
+
 namespace maidsafe {
 
 namespace launcher {
 
 namespace test {
 
-TEST(AccountGetterTest, FUNC_Constructor) {
+class AccountGetterTest : public TestUsingFakeStore {
+ protected:
+  AccountGetterTest() : TestUsingFakeStore("AccountGetter") {}
+};
+
+TEST_F(AccountGetterTest, FUNC_Constructor) {
   auto account_getter_future = AccountGetter::CreateAccountGetter();
   LOG(kVerbose) << "Started CreateAccountGetter thread";
   std::unique_ptr<AccountGetter> account_getter;

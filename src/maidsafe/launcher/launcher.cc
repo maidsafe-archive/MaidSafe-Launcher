@@ -129,7 +129,6 @@ std::unique_ptr<Launcher> Launcher::CreateAccount(Keyword keyword, Pin pin, Pass
 boost::filesystem::path Launcher::FakeStorePath(const boost::filesystem::path* const disk_path) {
   static boost::filesystem::path path;
   if (disk_path) {
-    assert(path.empty());
     path = *disk_path;
   } else {
     // Ensure the test environment has been set up before trying to call this function or
@@ -143,7 +142,6 @@ boost::filesystem::path Launcher::FakeStorePath(const boost::filesystem::path* c
 DiskUsage Launcher::FakeStoreDiskUsage(const DiskUsage* const disk_usage) {
   static DiskUsage usage(0);
   if (disk_usage) {
-    assert(usage == 0);
     usage = *disk_usage;
   } else {
     // Ensure the test environment has been set up before trying to call this function or
