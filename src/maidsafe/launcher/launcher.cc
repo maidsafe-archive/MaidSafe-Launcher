@@ -70,6 +70,12 @@ Launcher::Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& a
   account_handler_.Login(ConvertToCredentials(keyword, pin, password), account_getter);
   maid_client_ = nfs_client::MaidClient::MakeShared(account_handler_.account_->passport->GetMaid());
   app_handler_.Initialise(GetConfigFilePath(), account_handler_.account_.get(), &account_mutex_);
+  // Auto-start any relevant apps
+  std::set<AppDetails> local_apps(app_handler_.GetApps(true));
+  for (const auto& app : local_apps) {
+    if (app.auto_start)
+      LaunchApp(app.name, app.path, app.args);
+  }
 }
 
 Launcher::Launcher(Keyword keyword, Pin pin, Password password,
@@ -103,22 +109,23 @@ void Launcher::LogoutAndStop() {
   maid_client_->Stop();
 }
 
-void Launcher::AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
-                      SerialisedData app_icon) {
-  AddOrLinkApp(std::move(app_name), std::move(app_path), std::move(app_args), &app_icon);
+void Launcher::AddApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+                      SerialisedData app_icon, bool auto_start) {
+  AddOrLinkApp(std::move(app_name), std::move(app_path), std::move(app_args), &app_icon,
+               auto_start);
 }
 
-void Launcher::LinkApp(std::string app_name, boost::filesystem::path app_path,
-                       std::string app_args) {
-  AddOrLinkApp(std::move(app_name), std::move(app_path), std::move(app_args), nullptr);
+void Launcher::LinkApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+                       bool auto_start) {
+  AddOrLinkApp(std::move(app_name), std::move(app_path), std::move(app_args), nullptr, auto_start);
 }
 
-void Launcher::AddOrLinkApp(std::string app_name, boost::filesystem::path app_path,
-                            std::string app_args, const SerialisedData* const app_icon) {
+void Launcher::AddOrLinkApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+                            const SerialisedData* const app_icon, bool auto_start) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   AppDetails app{app_handler_.AddOrLinkApp(std::move(app_name), std::move(app_path),
-                                           std::move(app_args), app_icon)};
+                                           std::move(app_args), app_icon, auto_start)};
   if (app_icon) {  // we're adding the app
                    // TODO(Fraser#5#): 2015-01-23 - Add the app.dir to maid_client_
   }
@@ -127,7 +134,7 @@ void Launcher::AddOrLinkApp(std::string app_name, boost::filesystem::path app_pa
   strong_guarantee.Release();
 }
 
-void Launcher::UpdateAppName(const std::string& app_name, const std::string& new_name) {
+void Launcher::UpdateAppName(const AppName& app_name, const AppName& new_name) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.UpdateName(app_name, new_name);
@@ -136,7 +143,7 @@ void Launcher::UpdateAppName(const std::string& app_name, const std::string& new
   strong_guarantee.Release();
 }
 
-void Launcher::UpdateAppPath(const std::string& app_name, const boost::filesystem::path& new_path) {
+void Launcher::UpdateAppPath(const AppName& app_name, const boost::filesystem::path& new_path) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.UpdatePath(app_name, new_path);
@@ -144,7 +151,7 @@ void Launcher::UpdateAppPath(const std::string& app_name, const boost::filesyste
   strong_guarantee.Release();
 }
 
-void Launcher::UpdateAppArgs(const std::string& app_name, const std::string& new_args) {
+void Launcher::UpdateAppArgs(const AppName& app_name, const AppArgs& new_args) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.UpdateArgs(app_name, new_args);
@@ -152,7 +159,7 @@ void Launcher::UpdateAppArgs(const std::string& app_name, const std::string& new
   strong_guarantee.Release();
 }
 
-void Launcher::UpdateAppSafeDriveAccess(const std::string& app_name,
+void Launcher::UpdateAppSafeDriveAccess(const AppName& app_name,
                                         DirectoryInfo::AccessRights new_rights) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
@@ -170,7 +177,7 @@ void Launcher::UpdateAppSafeDriveAccess(const std::string& app_name,
   strong_guarantee.Release();
 }
 
-void Launcher::UpdateAppIcon(const std::string& app_name, const SerialisedData& new_icon) {
+void Launcher::UpdateAppIcon(const AppName& app_name, const SerialisedData& new_icon) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.UpdateIcon(app_name, new_icon);
@@ -179,7 +186,15 @@ void Launcher::UpdateAppIcon(const std::string& app_name, const SerialisedData& 
   strong_guarantee.Release();
 }
 
-void Launcher::RemoveAppLocally(const std::string& app_name) {
+void Launcher::UpdateAppAutoStart(const AppName& app_name, bool new_auto_start_value) {
+  auto snapshot(app_handler_.GetSnapshot());
+  on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
+  app_handler_.UpdateAutoStart(app_name, new_auto_start_value);
+  // No need to keep snapshot since auto_start isn't held in the account, so no need to rollback.
+  strong_guarantee.Release();
+}
+
+void Launcher::RemoveAppLocally(const AppName& app_name) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.RemoveLocally(app_name);
@@ -188,7 +203,7 @@ void Launcher::RemoveAppLocally(const std::string& app_name) {
   strong_guarantee.Release();
 }
 
-void Launcher::RemoveAppFromNetwork(const std::string& app_name) {
+void Launcher::RemoveAppFromNetwork(const AppName& app_name) {
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   app_handler_.RemoveFromNetwork(app_name);
@@ -197,8 +212,13 @@ void Launcher::RemoveAppFromNetwork(const std::string& app_name) {
   strong_guarantee.Release();
 }
 
-void Launcher::LaunchApp(const std::string& app_name) {
+void Launcher::LaunchApp(const AppName& app_name) {
   auto path_and_args(app_handler_.GetPathAndArgs(app_name));
+  LaunchApp(app_name, path_and_args.first, path_and_args.second);
+}
+
+void Launcher::LaunchApp(const AppName& /*app_name*/, const boost::filesystem::path& /*path*/,
+                         const AppArgs& /*args*/) {
   //  tcp::Port listening_port{StartListening()};
 }
 

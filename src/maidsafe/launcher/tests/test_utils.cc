@@ -75,6 +75,7 @@ AppDetails CreateRandomAppDetails() {
     app.permitted_dirs.insert(CreateRandomDirectoryInfo());
   std::string icon(RandomString((RandomUint32() % 1000) + 10));
   app.icon.assign(icon.begin(), icon.end());
+  app.auto_start = (count % 2 == 1);
   return app;
 }
 
@@ -147,6 +148,11 @@ testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& ac
            << HexEncode(std::string(expected.icon.begin(), expected.icon.end()))
            << ") does not match actual icon ("
            << HexEncode(std::string(actual.icon.begin(), actual.icon.end())) << ")\n";
+  }
+  if (!(ignore_field & kIgnoreAutoStart) && expected.auto_start != actual.auto_start) {
+    return testing::AssertionFailure() << "\n    Expected auto start value (" << expected.auto_start
+                                       << ") does not match actual auto start value ("
+                                       << actual.auto_start << ")\n";
   }
   return testing::AssertionSuccess();
 }
