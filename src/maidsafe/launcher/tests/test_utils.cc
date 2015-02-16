@@ -27,6 +27,7 @@
 #include "maidsafe/common/utils.h"
 
 #include "maidsafe/launcher/account.h"
+#include "maidsafe/launcher/launcher.h"
 
 namespace maidsafe {
 
@@ -34,11 +35,28 @@ namespace launcher {
 
 namespace test {
 
-std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple() {
-  std::string keyword_str{RandomAlphaNumericString((RandomUint32() % 100) + 1)};
-  uint32_t pin_value{RandomUint32()};
-  std::string password_str{RandomAlphaNumericString((RandomUint32() % 100) + 1)};
-  return std::tuple<std::string, uint32_t, std::string>(keyword_str, pin_value, password_str);
+TestUsingFakeStore::TestUsingFakeStore(std::string name)
+    : test_root_(maidsafe::test::CreateTestPath(std::string("MaidSafe_Test") + std::move(name))) {
+  DiskUsage usage(1024 * 1024);
+  Launcher::FakeStorePath(test_root_.get());
+  Launcher::FakeStoreDiskUsage(&usage);
+}
+
+std::shared_ptr<NetworkClient> TestUsingFakeStore::GetNetworkClient(const passport::Maid& maid) {
+#ifdef USE_FAKE_STORE
+  static_cast<void>(maid);
+  return std::make_shared<NetworkClient>(Launcher::FakeStorePath(), Launcher::FakeStoreDiskUsage());
+#else
+  return nfs_client::MaidClient::MakeShared(maid);
+#endif
+}
+
+std::tuple<Keyword, Pin, Password> GetRandomUserCredentialsTuple() {
+  std::string keyword{RandomAlphaNumericString((RandomUint32() % 100) + 1)};
+  std::string password{RandomAlphaNumericString((RandomUint32() % 100) + 1)};
+  return std::make_tuple<Keyword, Pin, Password>(Keyword(keyword.begin(), keyword.end()),
+                                                 RandomUint32(),
+                                                 Password(password.begin(), password.end()));
 }
 
 authentication::UserCredentials GetRandomUserCredentials() {
@@ -46,7 +64,7 @@ authentication::UserCredentials GetRandomUserCredentials() {
 }
 
 authentication::UserCredentials MakeUserCredentials(
-    const std::tuple<std::string, uint32_t, std::string>& user_credentials_tuple) {
+    const std::tuple<Keyword, Pin, Password>& user_credentials_tuple) {
   authentication::UserCredentials user_credentials;
   user_credentials.keyword = maidsafe::make_unique<authentication::UserCredentials::Keyword>(
       std::get<0>(user_credentials_tuple));

@@ -22,6 +22,8 @@
 
 #include "maidsafe/common/make_unique.h"
 
+#include "maidsafe/launcher/launcher.h"
+
 namespace maidsafe {
 
 namespace launcher {
@@ -35,21 +37,33 @@ AccountGetter::AccountGetter()
     : network_health_mutex_(),
       network_health_condition_variable_(),
       network_health_(-1),
+#ifdef USE_FAKE_STORE
+      data_getter_(maidsafe::make_unique<DataGetter>(Launcher::FakeStorePath(),
+                                                     Launcher::FakeStoreDiskUsage())),
+#else
       routing_(maidsafe::make_unique<routing::Routing>()),
       data_getter_(),  // deferred construction until asio service is created
+#endif
       public_pmid_helper_(),
       asio_service_(2) {
-  data_getter_ = maidsafe::make_unique<nfs_client::DataGetter>(asio_service_, *routing_);
+#ifndef USE_FAKE_STORE
+  data_getter_ = maidsafe::make_unique<DataGetter>(asio_service_, *routing_);
   InitRouting();
+  static_cast<void>(data_getter);
+#endif
 }
 
 AccountGetter::~AccountGetter() {
+#ifndef USE_FAKE_STORE
   data_getter_->Stop();
   routing_.reset();
+#endif
 }
 
+#ifndef USE_FAKE_STORE
+
 void AccountGetter::InitRouting() {
-  routing::Functors functors{InitialiseRoutingCallbacks()};
+  routing::Functors functors(InitialiseRoutingCallbacks());
   routing_->Join(functors);
   // FIXME BEFORE_RELEASE discuss: parallel attempts, max no. of endpoints to try,
   // prioritise live ports. To reduce the blocking duration in case of no network connectivity
@@ -107,6 +121,8 @@ void AccountGetter::OnNetworkStatusChange(int updated_network_health, const Node
                                  network_health_condition_variable_, node_id);
   });
 }
+
+#endif
 
 }  // namespace launcher
 

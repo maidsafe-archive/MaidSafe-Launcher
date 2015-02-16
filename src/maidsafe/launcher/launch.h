@@ -16,43 +16,48 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#ifndef MAIDSAFE_LAUNCHER_TYPES_H_
-#define MAIDSAFE_LAUNCHER_TYPES_H_
+#ifndef MAIDSAFE_LAUNCHER_LAUNCH_H_
+#define MAIDSAFE_LAUNCHER_LAUNCH_H_
 
-#include <cstdint>
-#include <string>
-#include <vector>
+#include <chrono>
 
-#ifdef USE_FAKE_STORE
-#include "maidsafe/nfs/client/fake_store.h"
-#else
-#include "maidsafe/nfs/client/data_getter.h"
-#include "maidsafe/nfs/client/maid_client.h"
-#endif
+#include "asio/io_service_strand.hpp"
+#include "asio/steady_timer.hpp"
+
+#include "maidsafe/common/asio_service.h"
+#include "maidsafe/common/config.h"
+#include "maidsafe/common/tcp/connection.h"
+#include "maidsafe/common/tcp/listener.h"
+
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
-using AppName = std::string;
-using AppArgs = std::string;
-using Keyword = std::vector<unsigned char>;
-using Pin = std::uint32_t;
-using Password = std::vector<unsigned char>;
+struct Launch {
+  Launch(AppName name_in, AsioService& asio_service,
+         const std::chrono::steady_clock::duration& expiry_time)
+      : name(std::move(name_in)),
+        strand(asio_service.service()),
+        timer(asio_service.service(), expiry_time),
+        connection() {}
+  Launch() = delete;
+  ~Launch() = default;
+  Launch(const Launch&) = delete;
+  Launch(Launch&&) = delete;
+  Launch& operator=(const Launch&) = delete;
+  Launch& operator=(Launch&&) = delete;
 
-#ifdef USE_FAKE_STORE
-#ifndef TESTING
-#error USE_FAKE_STORE must only be defined if TESTING is also defined
-#endif
-using NetworkClient = nfs::FakeStore;
-using DataGetter = nfs::FakeStore;
-#else
-using NetworkClient = nfs_client::MaidClient;
-using DataGetter = nfs_client::DataGetter;
-#endif
+  AppName name;
+  asio::io_service::strand strand;
+  asio::steady_timer timer;
+  tcp::ConnectionPtr connection;
+  tcp::ListenerPtr listener;
+};
 
 }  // namespace launcher
 
 }  // namespace maidsafe
 
-#endif  // MAIDSAFE_LAUNCHER_TYPES_H_
+#endif  // MAIDSAFE_LAUNCHER_LAUNCH_H_

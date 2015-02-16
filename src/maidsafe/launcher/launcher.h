@@ -19,6 +19,7 @@
 #ifndef MAIDSAFE_LAUNCHER_LAUNCHER_H_
 #define MAIDSAFE_LAUNCHER_LAUNCHER_H_
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -30,8 +31,8 @@
 #include "maidsafe/directory_info.h"
 #include "maidsafe/common/asio_service.h"
 #include "maidsafe/common/on_scope_exit.h"
+#include "maidsafe/common/tcp/connection.h"
 #include "maidsafe/passport/passport.h"
-#include "maidsafe/nfs/client/maid_client.h"
 
 #include "maidsafe/launcher/account_handler.h"
 #include "maidsafe/launcher/app_handler.h"
@@ -43,6 +44,7 @@ namespace maidsafe {
 namespace launcher {
 
 class AccountGetter;
+struct Launch;
 
 // Unless otherwise indicated, this class' public functions all throw on error and provide the
 // strong exception-safety guarantee.
@@ -115,7 +117,32 @@ class Launcher {
   void RevertToLastSavedSession();
 
   // Launches a new instance of the app indicated by 'app_name' as a detached child.
+  //
+  // The app will be passed the Launcher's TCP listening port in a command line argument
+  // "--launcher_port=X" where X will be a random port between 1025 and 65535 inclusive.  The app
+  // must then establish a TCP connection to the launcher on the loopback address at this port
+  // within the 'connect_timeout_' duration or the launch attempt fails.
+  //
+  // Once the connection is established, the app should immediately pass through its session public
+  // key and wait for the Launcher to reply with the set of NFS directories to which it has access.
+  // The app should then reply to confirm receipt, at which time the connection is closed and the
+  // app is orphaned so that it no longer depends on the Launcher running.
+  //
+  // The time from the connection being established until the Launcher receives the final
+  // confirmation from the app must be within the 'handshake_timeout_' duration or the launch fails.
+  //
+  // For apps, there is a blocking function to handle this entire process in the API project named
+  // 'RegisterAppSession'.
   void LaunchApp(const AppName& app_name);
+
+  static const std::chrono::steady_clock::duration connect_timeout_;
+  static const std::chrono::steady_clock::duration handshake_timeout_;
+
+#ifdef USE_FAKE_STORE
+  static boost::filesystem::path FakeStorePath(
+      const boost::filesystem::path* const disk_path = nullptr);
+  static DiskUsage FakeStoreDiskUsage(const DiskUsage* const disk_usage = nullptr);
+#endif
 
  private:
   // For already existing accounts.
@@ -129,12 +156,14 @@ class Launcher {
 
   void RevertAppHandler(AppHandler::Snapshot snapshot);
 
-  void LaunchApp(const AppName& app_name, const boost::filesystem::path& path, const AppArgs& args);
+  void LaunchApp(const AppName& app_name, const boost::filesystem::path& path, AppArgs args);
 
-  tcp::Port StartListening();
+  void HandleNewConnection(std::shared_ptr<Launch> launch, tcp::ConnectionPtr connection);
+
+  void HandleMessage(std::shared_ptr<Launch> launch, tcp::Message message);
 
   AsioService asio_service_;
-  std::shared_ptr<nfs_client::MaidClient> maid_client_;
+  std::shared_ptr<NetworkClient> network_client_;
   AccountHandler account_handler_;
   mutable std::mutex account_mutex_;
   AppHandler app_handler_;

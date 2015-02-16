@@ -71,8 +71,8 @@ Account::Account(const passport::MaidAndSigner& maid_and_signer)
       timestamp(),
       ip(),
       port(0),
-      unique_user_id(),
-      root_parent_id(),
+      unique_user_id(RandomString(crypto::SHA512::DIGESTSIZE)),
+      root_parent_id(RandomString(crypto::SHA512::DIGESTSIZE)),
       config_file_aes_key(RandomString(crypto::AES256_KeySize)),
       config_file_aes_iv(RandomString(crypto::AES256_IVSize)),
       apps() {}

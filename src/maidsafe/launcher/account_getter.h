@@ -32,7 +32,8 @@
 #include "maidsafe/routing/api_config.h"
 #include "maidsafe/routing/routing_api.h"
 #include "maidsafe/nfs/public_pmid_helper.h"
-#include "maidsafe/nfs/client/data_getter.h"
+
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
@@ -60,16 +61,20 @@ class AccountGetter {
 
  private:
   AccountGetter();
+#ifndef USE_FAKE_STORE
   void InitRouting();
   routing::Functors InitialiseRoutingCallbacks();
   void OnNetworkStatusChange(int updated_network_health, const NodeId& this_node_id);
-  nfs_client::DataGetter& data_getter() { return *data_getter_; }
+#endif
+  DataGetter& data_getter() { return *data_getter_; }
 
   std::mutex network_health_mutex_;
   std::condition_variable network_health_condition_variable_;
   int network_health_;
+#ifndef USE_FAKE_STORE
   std::unique_ptr<routing::Routing> routing_;
-  std::unique_ptr<nfs_client::DataGetter> data_getter_;
+#endif
+  std::unique_ptr<DataGetter> data_getter_;
   nfs::detail::PublicPmidHelper public_pmid_helper_;
   BoostAsioService asio_service_;
 };

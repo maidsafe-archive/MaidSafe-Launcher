@@ -58,6 +58,7 @@ target_compile_definitions(maidsafe_launcher PUBLIC COMPANY_NAME=MaidSafe APPLIC
 target_link_libraries(maidsafe_launcher maidsafe_api maidsafe_drive)
 
 if(INCLUDE_TESTS)
+  target_compile_definitions(maidsafe_launcher PUBLIC USE_FAKE_STORE)
   target_link_libraries(maidsafe_launcher maidsafe_test)
 
   set(dummy_launcherName ${ApplicationName})
