@@ -28,7 +28,7 @@ Rectangle {
   property real yOffset: 0
   property bool wipeTextsOnNoVisibility: true
 
-  y: pointToItem ? pointToItem.y + pointToItem.height / 2 - height / 2 + yOffset : 0
+  y: pointToItem.y //? pointToItem.y + pointToItem.height / 2 - height / 2 + yOffset : 0
 
   width: Math.min(180,
                   metaInformationText.implicitWidth   +

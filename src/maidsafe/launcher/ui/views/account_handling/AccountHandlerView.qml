@@ -22,9 +22,8 @@ import SAFEAppLauncher.AccountHandler 1.0
 import "./detail"
 import "../../custom_components"
 
-FocusScope {
-  id: accountHandlerviewRoot
-  objectName: "accountHandlerviewRoot"
+Item {
+  id: accountHandlerView
 
   AccountHandlerBrushes {
     id: customBrushes
@@ -37,9 +36,6 @@ FocusScope {
   }
 
   Image {
-    id: accountHandlerView
-    objectName: "accountHandlerView"
-
     // TODO(Spandan) Check this for other flavours of linux and for stability
     readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
 
@@ -56,6 +52,8 @@ FocusScope {
         mainWindowTitleBar.maximiseRestoreEnabled = false
         globalWindowResizeHelper.enabled = false
       }
+
+      loginForm.pinTextField.forceActiveFocus()
     }
 
     Component.onDestruction: {
@@ -65,57 +63,64 @@ FocusScope {
       }
     }
 
-    source: "/resources/images/login_bg.png"
-
-    CustomText {
-      id: placeHolderTextFirstLine
-      objectName: "placeHolderTextFirstLine"
-
-      anchors {
-        horizontalCenter: parent.horizontalCenter
-        bottom: placeHolderTextSecondLine.top
-        bottomMargin: 5
-      }
-
-      font { pixelSize: 45 }
-      text: qsTr("SAFE")
-    }
-
-    CustomText {
-      id: placeHolderTextSecondLine
-      objectName: "placeHolderTextSecondLine"
-
-      anchors {
-        horizontalCenter: parent.horizontalCenter
-        bottom: parent.bottom
-        bottomMargin: 375
-      }
-
-      font {
-        pixelSize: 45
-        family: globalFontFamily.name
-      }
-      text: qsTr("App Launcher")
-    }
-
-    Loader {
-      id: accountHandlerLoader
-      objectName: "accountHandlerLoader"
-
+      source: "/resources/images/login_bg.png"
       anchors.fill: parent
-
-      source: {
-        if (accountHandlerController_.currentView === AccountHandlerController.CreateAccountView) {
-          "CreateAccount.qml"
-        } else if (accountHandlerController_.currentView === AccountHandlerController.LoginView) {
-          "Login.qml"
-        } else {
-          ""
-        }
-      }
-
-      focus: true
-      onLoaded: item.focus = true
     }
-  }
+
+
+  state: "LOGIN"
+  property string fromState: ""
+  property Item currentView: loginForm
+  property int bottomButtonY: accountHandlerView.height - customProperties.cancelButtonBottom - customProperties.blueButtonMargin
+
+  states: [State {
+    name: "LOGIN"
+    PropertyChanges { target: accountHandlerView; currentView: loginForm }
+    PropertyChanges { target: loadingView; state: "HIDDEN" }
+    PropertyChanges { target: registerForm; state: "HIDDEN" }
+    PropertyChanges { target: loginForm; state: "VISIBLE" }
+  }, State {
+    name: "REGISTER"
+    PropertyChanges { target: accountHandlerView; currentView: registerForm }
+    PropertyChanges { target: loginForm; state: "HIDDEN" }
+    PropertyChanges { target: loadingView; state: "HIDDEN" }
+    PropertyChanges { target: registerForm; state: "PIN" }
+  }, State {
+    name: "LOADING"
+    PropertyChanges { target: accountHandlerView; currentView: loadingView }
+    PropertyChanges { target: loginForm; state: "HIDDEN" }
+    PropertyChanges { target: registerForm; state: "HIDDEN" }
+    PropertyChanges { target: loadingView; state: "VISIBLE" }
+  }]
+
+
+  Image {
+     id: logo
+     source: "/resources/images/launcher_logo.png"
+     y: 50
+     anchors.horizontalCenter: parent.horizontalCenter
+   }
+
+   Rectangle {
+     id: sharedBackgroundButton
+
+     y: accountHandlerView.bottomButtonY
+     height: customProperties.cancelButtonHeight
+     anchors.horizontalCenter: parent.horizontalCenter
+     radius: customProperties.blueButtonRadius
+     antialiasing: true
+     color: {
+       if (accountHandlerView.currentView.bottomButton.pressed) {
+         customBrushes.buttonPressedBlue
+       } else if (accountHandlerView.currentView.bottomButton.hovered || accountHandlerView.currentView.bottomButton.activeFocus) {
+         customBrushes.buttonHoveredBlue
+       } else {
+         customBrushes.buttonDefaultBlue
+       }
+     }
+   }
+
+  LoginForm { id: loginForm }
+  RegisterForm { id: registerForm; visible: false }
+  LoadingView { id: loadingView; visible: false }
 }

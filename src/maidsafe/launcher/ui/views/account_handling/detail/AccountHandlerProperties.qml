@@ -23,17 +23,21 @@ QtObject {
   objectName: "properties"
 
   readonly property int defaultFontPixelSize: 18
+  readonly property int customTextPixelSize: 15
+
+  readonly property int cancelButtonWidth: 120
+  readonly property int cancelButtonBottom: 120
+  readonly property int cancelButtonHeight: 35
 
   readonly property int textFieldWidth: 320
   readonly property int textFieldHeight: 35
   readonly property int textFieldRadius: 5
   readonly property int textFieldVerticalSpacing: 15
 
-  readonly property int nextButtonBottomMargin: 130
-  readonly property int loginButtonBottomMargin: 130
   readonly property int clickableTextBottomMargin: 45
 
   readonly property int blueButtonWidth: textFieldWidth
   readonly property int blueButtonHeight: textFieldHeight
   readonly property int blueButtonRadius: textFieldRadius
+  readonly property int blueButtonMargin: 15
 }

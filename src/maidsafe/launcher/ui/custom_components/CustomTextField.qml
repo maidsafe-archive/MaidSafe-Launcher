@@ -24,6 +24,8 @@ TextField {
   id: textField
   objectName: "textField"
 
+  anchors.horizontalCenter: parent.horizontalCenter
+
   property bool showTickImage: false
   property bool showErrorImage: false
   property bool clearAllImagesOnTextChange: true

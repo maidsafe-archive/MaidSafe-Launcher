@@ -24,23 +24,17 @@ import "./detail"
 import "../../custom_components"
 import "../../resources/js/password_strength.js" as PasswordStrength
 
-FocusScope {
+Item {
   id: createAccountRoot
-  objectName: "createAccountRoot"
 
-  QtObject {
-    id: dPtr
-    objectName: "dPtr"
+  property var passwordStrength: new PasswordStrength.StrengthChecker()
+  property string pin: ""
+  property string keyword: ""
 
-    property var passwordStrength: new PasswordStrength.StrengthChecker()
-    property int currentTabIndex: 0
-    property string pin: ""
-    property string keyword: ""
-  }
+  property Item bottomButton: goBackLabel
 
   Row {
     id: createAccountTabRow
-    objectName: "createAccountTabRow"
 
     anchors {
       horizontalCenter: parent.horizontalCenter
@@ -52,16 +46,14 @@ FocusScope {
 
     Repeater {
       id: tabRepeater
-      objectName: "tabRepeater"
 
-      model: [qsTr("PIN"), qsTr("Keyword"), qsTr("Password")]
+      model: ["PIN", "KEYWORD", "PASSWORD"]
 
       delegate: CustomLabel {
         id: tabLabel
-        objectName: "tabLabel"
 
-        text: modelData
-        color: model.index === dPtr.currentTabIndex ?
+        text: qsTr(modelData)
+        color: modelData == createAccountRoot.state ?
                  customBrushes.labelSelected
                :
                  customBrushes.labelNotSelected
@@ -71,19 +63,18 @@ FocusScope {
 
   Loader {
     id: userInputLoader
-    objectName: "userInputLoader"
 
     anchors {
       horizontalCenter: parent.horizontalCenter
       bottom: parent.bottom
-      bottomMargin: customProperties.nextButtonBottomMargin
+      bottomMargin: customProperties.buttonBottomMargin
     }
 
     focus: true
     sourceComponent: {
-      if (!dPtr.currentTabIndex) {
+      if (createAccountRoot.state == "PIN") {
         acceptPINComponent
-      } else if (dPtr.currentTabIndex === 1) {
+      } else if (createAccountRoot.state == "KEYWORD") {
         acceptKeywordComponent
       } else {
         acceptPasswordComponent
@@ -91,7 +82,7 @@ FocusScope {
     }
 
     onLoaded: {
-      item.passwordStrength = dPtr.passwordStrength
+      item.passwordStrength = createAccountRoot.passwordStrength
       item.nextFocusItem = clickableTextLoader
       item.focus = true
     }
@@ -109,8 +100,11 @@ FocusScope {
       confirmationTextField.placeholderText: qsTr("Confirm PIN")
 
       onProceed: {
-        dPtr.pin = primaryTextField.text
-        ++dPtr.currentTabIndex
+        createAccountRoot.pin = primaryTextField.text
+        createAccountRoot.state = "KEYWORD"
+        goBackLabel.onClicked = function(){
+          createAccountRoot.state = "PIN"
+        }
       }
     }
   }
@@ -127,8 +121,11 @@ FocusScope {
       confirmationTextField.placeholderText: qsTr("Confirm Keyword")
 
       onProceed: {
-        dPtr.keyword = primaryTextField.text
-        ++dPtr.currentTabIndex
+        createAccountRoot.keyword = primaryTextField.text
+        createAccountRoot.state = "PASSWORD"
+        goBackLabel.onClicked = function(){
+          createAccountRoot.state = "KEYWORD"
+        }
       }
     }
   }
@@ -145,7 +142,7 @@ FocusScope {
       confirmationTextField.placeholderText: qsTr("Confirm Password")
 
       onProceed: {
-        accountHandlerController_.createAccount(dPtr.pin, dPtr.keyword, primaryTextField.text)
+        accountHandlerController_.createAccount(createAccountRoot.pin, createAccountRoot.keyword, primaryTextField.text)
       }
     }
   }
@@ -160,7 +157,7 @@ FocusScope {
       bottomMargin: customProperties.clickableTextBottomMargin
     }
 
-    sourceComponent: dPtr.currentTabIndex ?
+    sourceComponent: createAccountRoot.state != "PIN" ?
                        goBackComponent
                      :
                        showLoginPageLabelComponent
@@ -175,7 +172,7 @@ FocusScope {
       id: showLoginPageLabel
       objectName: "showLoginPageLabel"
 
-      label.text: qsTr("Already have an account? Log In")
+      text: qsTr("Already have an account? Log In")
       onClicked: accountHandlerController_.showLoginView()
     }
   }
@@ -187,8 +184,8 @@ FocusScope {
       id: goBackLabel
       objectName: "goBackLabel"
 
-      label.text: qsTr("Go back")
-      onClicked: --dPtr.currentTabIndex
+      text: qsTr("Go back")
+//      onClicked: previous.state ==
     }
   }
 }

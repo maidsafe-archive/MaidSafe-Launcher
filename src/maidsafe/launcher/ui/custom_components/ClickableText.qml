@@ -17,44 +17,32 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 
-FocusScope {
-  id: focusScope
-  objectName: "focusScope"
+Button {
+  property bool underlineLabelOnFocus: true
+  property bool italiciseLabelOnFocus: false
 
-  signal clicked()
-  property alias label: customLabel
-  property alias mouseArea: mouseArea
+  Keys.onEnterPressed: clicked();
+  Keys.onSpacePressed: clicked();
+  Keys.onReturnPressed: clicked();
 
-  width: childrenRect.width
-  height: childrenRect.height
+  style: ButtonStyle {
+    background: null
+    label: CustomLabel {
+      id: buttonLabel
+      objectName: "buttonLabel"
 
-  clip: true
+      text: control.text
+      verticalAlignment: Qt.AlignVCenter
+      horizontalAlignment: Qt.AlignHCenter
 
-  MouseArea {
-    id: mouseArea
-    objectName: "mouseArea"
-
-    height: customLabel.implicitHeight
-    width: customLabel.implicitWidth
-
-    hoverEnabled: true
-    acceptedButtons: Qt.LeftButton
-    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
-
-    onClicked: focusScope.clicked()
-
-    CustomLabel {
-      id: customLabel
-      objectName: "customLabel"
-
-      focus: true
-      anchors.centerIn: parent
-      font.underline: mouseArea.containsMouse || activeFocus
-
-      Keys.onEnterPressed: focusScope.clicked()
-      Keys.onSpacePressed: focusScope.clicked()
-      Keys.onReturnPressed: focusScope.clicked()
+      font {
+        pixelSize: customProperties.customTextPixelSize
+        italic: control.italiciseLabelOnFocus && control.activeFocus ? true : false
+        underline: control.underlineLabelOnFocus && control.activeFocus || control.hovered ? true : false
+      }
     }
   }
 }

@@ -17,28 +17,28 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 
-ButtonBase {
-  id: buttonBaseRoot
-  objectName: "buttonBaseRoot"
+Button {
+  anchors.horizontalCenter: parent.horizontalCenter
 
-  backgroundComponent: Rectangle {
-    id: backgroundRect
-    objectName: "backgroundRect"
+  width: customProperties.blueButtonWidth
+  height: customProperties.blueButtonHeight
+  Keys.onEnterPressed:  clicked();
+  Keys.onSpacePressed:  clicked();
+  Keys.onReturnPressed: clicked();
 
-    implicitHeight: customProperties.blueButtonHeight
-    implicitWidth: customProperties.blueButtonWidth
-    radius: customProperties.blueButtonRadius
-    antialiasing: true
-
-    color: {
-      if (buttonBaseRoot.pressed) {
-        customBrushes.buttonPressedBlue
-      } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
-        customBrushes.buttonHoveredBlue
-      } else {
-        customBrushes.buttonDefaultBlue
+  style: ButtonStyle {
+    label: CustomLabel {
+      text: control.text
+      verticalAlignment: Qt.AlignVCenter
+      horizontalAlignment: Qt.AlignHCenter
+      font {
+        italic: control.activeFocus ? true : false
+        underline: control.activeFocus ? true : false
       }
     }
+    background: null
   }
 }

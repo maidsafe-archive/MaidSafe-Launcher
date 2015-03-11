@@ -29,7 +29,7 @@ QtObject {
   readonly property color labelSelected: "#1d6499"
   readonly property color labelNotSelected: "#ceebf4"
 
-  readonly property color buttonDefaultBlue: "#1d6499"
-  readonly property color buttonHoveredBlue: "#2a81b7"
-  readonly property color buttonPressedBlue: "#124360"
+  readonly property color buttonDefaultBlue: "#32ffffff"
+  readonly property color buttonHoveredBlue: "#64ffffff"
+  readonly property color buttonPressedBlue: "#23ffffff"
 }

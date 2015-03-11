@@ -58,9 +58,6 @@ Item {
               "account_handling/AccountHandlerView.qml"
             :
               ""
-
-    focus: true
-    onLoaded: item.focus = true
   }
 
   ResizeMainWindowHelper {
