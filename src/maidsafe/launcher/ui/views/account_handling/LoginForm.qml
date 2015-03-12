@@ -170,19 +170,18 @@ Item {
   }
 
   Rectangle { // white line
-      width: customProperties.textFieldWidth
-      height: 1
-      anchors.horizontalCenter: parent.horizontalCenter
-      y: accountHandlerView.height -
-         registerButton.height -
-         customProperties.clickableTextBottomMargin - 4
-      color: "#ffffff"
+    width: customProperties.textFieldWidth
+    height: 1
+    anchors.horizontalCenter: parent.horizontalCenter
+    y: accountHandlerView.height -
+       registerButton.height -
+       customProperties.clickableTextBottomMargin - 4
+    color: "#ffffff"
   }
 
   ClickableText {
     id: registerButton
 
-    anchors.horizontalCenter: parent.horizontalCenter
     y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
 
     text: qsTr("Don't have an account yet? Create one")

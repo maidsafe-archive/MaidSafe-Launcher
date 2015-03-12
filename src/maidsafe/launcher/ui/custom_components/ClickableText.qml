@@ -28,6 +28,8 @@ Button {
   Keys.onSpacePressed: clicked();
   Keys.onReturnPressed: clicked();
 
+  anchors.horizontalCenter: parent.horizontalCenter
+
   style: ButtonStyle {
     background: null
     label: CustomLabel {

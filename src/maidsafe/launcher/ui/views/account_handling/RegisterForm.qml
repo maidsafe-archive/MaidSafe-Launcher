@@ -101,6 +101,14 @@ Item {
       target: registerForm
       currentTextFields: pinTextFields
     }
+    PropertyChanges {
+      target: registerButton
+      visible: true
+    }
+    PropertyChanges {
+      target: backButton
+      visible: false
+    }
 
   }, State {
     name: "KEYWORD"
@@ -112,6 +120,14 @@ Item {
     PropertyChanges {
       target: registerForm
       currentTextFields: keywordTextFields
+    }
+    PropertyChanges {
+      target: registerButton
+      visible: false
+    }
+    PropertyChanges {
+      target: backButton
+      visible: true
     }
 
   }, State {
@@ -125,6 +141,14 @@ Item {
       target: registerForm
       currentTextFields: passwordTextFields
     }
+    PropertyChanges {
+      target: registerButton
+      visible: false
+    }
+    PropertyChanges {
+      target: backButton
+      visible: true
+    }
 
   }, State {
     name: "HIDDEN"
@@ -132,6 +156,10 @@ Item {
       target: registerForm
       opacity: 0
     }
+/*    PropertyChanges {
+      target: sharedBackgroundButton
+      width: customProperties.cancelButtonWidth
+    }*/
   }]
 
   transitions: [Transition {
@@ -176,8 +204,8 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     y: accountHandlerView.bottomButtonY -
        customProperties.blueButtonMargin -
-       customProperties.textFieldHeight*4 -
-       customProperties.textFieldVerticalSpacing*4
+       customProperties.textFieldHeight*3 -
+       customProperties.textFieldVerticalSpacing*3
 
     spacing: 15
 
@@ -208,8 +236,8 @@ Item {
       submitButton: nextButton
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
-         customProperties.textFieldHeight*3 -
-         customProperties.textFieldVerticalSpacing*3
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
     }
 
     CustomTextField {
@@ -219,8 +247,8 @@ Item {
       submitButton: nextButton
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
-         customProperties.textFieldHeight*2 -
-         customProperties.textFieldVerticalSpacing*2
+         customProperties.textFieldHeight -
+         customProperties.textFieldVerticalSpacing
     }
 
     function goBack() {
@@ -253,8 +281,8 @@ Item {
       submitButton: nextButton
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
-         customProperties.textFieldHeight*3 -
-         customProperties.textFieldVerticalSpacing*3
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
 
       onTextChanged: checkPasswordStrength(this)
     }
@@ -266,8 +294,8 @@ Item {
       submitButton: nextButton
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
-         customProperties.textFieldHeight*2 -
-         customProperties.textFieldVerticalSpacing*2
+         customProperties.textFieldHeight -
+         customProperties.textFieldVerticalSpacing
     }
 
     function goBack() {
@@ -299,8 +327,8 @@ Item {
       submitButton: nextButton
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
-         customProperties.textFieldHeight*3 -
-         customProperties.textFieldVerticalSpacing*3
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
 
       onTextChanged: checkPasswordStrength(this)
     }
@@ -312,8 +340,8 @@ Item {
       submitButton: nextButton
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
-         customProperties.textFieldHeight*2 -
-         customProperties.textFieldVerticalSpacing*2
+         customProperties.textFieldHeight -
+         customProperties.textFieldVerticalSpacing
     }
 
     function goBack() {
@@ -334,42 +362,6 @@ Item {
     }
   }
 
-  Rectangle {
-    id: backBackground
-
-    visible: backButton.visible
-    y: backButton.y
-    width: customProperties.textFieldWidth
-    height: customProperties.cancelButtonHeight
-    anchors.horizontalCenter: parent.horizontalCenter
-    radius: customProperties.blueButtonRadius
-    antialiasing: true
-    color: {
-      if (backButton.pressed) {
-        customBrushes.buttonPressedBlue
-      } else if (backButton.hovered ||
-                 backButton.activeFocus) {
-        customBrushes.buttonHoveredBlue
-      } else {
-        customBrushes.buttonDefaultBlue
-      }
-    }
-  }
-
-  BlueButton {
-    id: backButton
-
-    y: accountHandlerView.bottomButtonY -
-       nextButton.height -
-       customProperties.textFieldVerticalSpacing
-
-    text: qsTr("Go back")
-    onClicked: {
-      floatingStatus.hide()
-      registerForm.currentTextFields.goBack()
-    }
-  }
-
   BlueButton {
     id: nextButton
 
@@ -382,14 +374,26 @@ Item {
     }
   }
 
+  ClickableText {
+    id: backButton
+
+    y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
+
+    text: qsTr("Go back")
+    onClicked: {
+      floatingStatus.hide()
+      registerForm.currentTextFields.goBack()
+    }
+  }
+
   Rectangle { // white line
-      width: customProperties.textFieldWidth
-      height: 1
-      anchors.horizontalCenter: parent.horizontalCenter
-      y: accountHandlerView.height -
-         registerButton.height -
-         customProperties.clickableTextBottomMargin - 4
-      color: "#ffffff"
+    width: customProperties.textFieldWidth
+    height: 1
+    anchors.horizontalCenter: parent.horizontalCenter
+    y: accountHandlerView.height -
+       registerButton.height -
+       customProperties.clickableTextBottomMargin - 4
+    color: "#ffffff"
   }
 
   ClickableText {
@@ -397,7 +401,6 @@ Item {
 
     anchors.horizontalCenter: parent.horizontalCenter
     y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
-
     text: qsTr("Already have an account? Log In")
     onClicked: {
       accountHandlerView.fromState = "REGISTER"
