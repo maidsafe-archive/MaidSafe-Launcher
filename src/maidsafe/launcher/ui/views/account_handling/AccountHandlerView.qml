@@ -53,7 +53,6 @@ Item {
         globalWindowResizeHelper.enabled = false
       }
 
-      loginForm.pinTextField.forceActiveFocus()
     }
 
     Component.onDestruction: {
@@ -71,7 +70,9 @@ Item {
   state: "LOGIN"
   property string fromState: ""
   property Item currentView: loginForm
-  property int bottomButtonY: accountHandlerView.height - customProperties.cancelButtonBottom - customProperties.blueButtonMargin
+  property int bottomButtonY: accountHandlerView.height -
+                              customProperties.cancelButtonBottom -
+                              customProperties.blueButtonMargin
 
   states: [State {
     name: "LOGIN"
@@ -93,6 +94,13 @@ Item {
     PropertyChanges { target: loadingView; state: "VISIBLE" }
   }]
 
+  transitions: [Transition {
+    ScriptAction {
+        script: {
+          floatingStatus.visible = false
+        }
+     }
+  }]
 
   Image {
      id: logo
@@ -105,6 +113,7 @@ Item {
      id: sharedBackgroundButton
 
      y: accountHandlerView.bottomButtonY
+     width: customProperties.textFieldWidth
      height: customProperties.cancelButtonHeight
      anchors.horizontalCenter: parent.horizontalCenter
      radius: customProperties.blueButtonRadius
@@ -112,7 +121,8 @@ Item {
      color: {
        if (accountHandlerView.currentView.bottomButton.pressed) {
          customBrushes.buttonPressedBlue
-       } else if (accountHandlerView.currentView.bottomButton.hovered || accountHandlerView.currentView.bottomButton.activeFocus) {
+       } else if (accountHandlerView.currentView.bottomButton.hovered ||
+                  accountHandlerView.currentView.bottomButton.activeFocus) {
          customBrushes.buttonHoveredBlue
        } else {
          customBrushes.buttonDefaultBlue
@@ -123,4 +133,5 @@ Item {
   LoginForm { id: loginForm }
   RegisterForm { id: registerForm; visible: false }
   LoadingView { id: loadingView; visible: false }
+  FloatingStatusBox { id: floatingStatus; visible: false }
 }

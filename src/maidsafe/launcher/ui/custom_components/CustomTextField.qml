@@ -22,13 +22,13 @@ import QtQuick.Controls.Styles 1.3
 
 TextField {
   id: textField
-  objectName: "textField"
 
   anchors.horizontalCenter: parent.horizontalCenter
+  echoMode: TextInput.Password
 
   property bool showTickImage: false
   property bool showErrorImage: false
-  property bool clearAllImagesOnTextChange: true
+  property Button submitButton: null
 
   function clearAllImages() { showTickImage = showErrorImage = false }
 
@@ -48,8 +48,12 @@ TextField {
     }
   }
   onTextChanged: {
-    if (clearAllImagesOnTextChange) { clearAllImages() }
+    if (floatingStatus.pointToItem === this) {
+      floatingStatus.hide()
+    }
   }
+  Keys.onEnterPressed: if (submitButton) submitButton.clicked()
+  Keys.onReturnPressed: if (submitButton) submitButton.clicked()
 
   font {
     pixelSize: customProperties.defaultFontPixelSize

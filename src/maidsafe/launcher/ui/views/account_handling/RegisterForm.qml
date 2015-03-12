@@ -25,22 +25,159 @@ import "../../custom_components"
 import "../../resources/js/password_strength.js" as PasswordStrength
 
 Item {
-  id: createAccountRoot
-
   property var passwordStrength: new PasswordStrength.StrengthChecker()
   property string pin: ""
   property string keyword: ""
 
-  property Item bottomButton: goBackLabel
+  property Item bottomButton: nextButton
+
+  property Item currentTextFields: null
+
+  function checkPasswordStrength(textField) {
+    var result = passwordStrength.check(textField.text)
+    var text = ""
+    var color = ""
+    switch (result.score) {
+    case 0:
+    case 1:
+      text = qsTr("Weak")
+      color = customBrushes.textWeakPassword
+      break
+    case 2:
+      text = qsTr("Medium")
+      color = customBrushes.textMediumPassword
+      break
+    default:
+      text = qsTr("Strong")
+      color = customBrushes.textStrongPassword
+      break
+    }
+
+    floatingStatus.show(textField, qsTr("Strength:"), text, color, false)
+  }
+
+  function checkBlankField(fieldName, textField) {
+    if (textField.text !== "") return true
+
+    floatingStatus.showError(textField, qsTr(fieldName + " cannot be left blank"))
+    return false
+  }
+
+  function checkIdenticalField(fieldName, textField1, textField2) {
+    if (textField1.text === textField2.text) return true
+
+    floatingStatus.showError(textField2, qsTr("Entries don't match"))
+    return false
+  }
+
+  anchors.fill: parent
+
+  states: [State {
+    name: "VISIBLE"
+    PropertyChanges {
+      target: backButton
+      visible: true
+    }
+    PropertyChanges {
+      target: registerForm
+      opacity: 1
+    }
+    PropertyChanges {
+      target: sharedBackgroundButton
+      width: customProperties.textFieldWidth
+    }
+  }, State {
+    name: "PIN"
+    extend: "VISIBLE"
+    PropertyChanges {
+      target: backButton
+      visible: false
+    }
+    PropertyChanges {
+      target: pinTextFields
+      visible: true
+    }
+    PropertyChanges {
+      target: registerForm
+      currentTextFields: pinTextFields
+    }
+
+  }, State {
+    name: "KEYWORD"
+    extend: "VISIBLE"
+    PropertyChanges {
+      target: keywordTextFields
+      visible: true
+    }
+    PropertyChanges {
+      target: registerForm
+      currentTextFields: keywordTextFields
+    }
+
+  }, State {
+    name: "PASSWORD"
+    extend: "VISIBLE"
+    PropertyChanges {
+      target: passwordTextFields
+      visible: true
+    }
+    PropertyChanges {
+      target: registerForm
+      currentTextFields: passwordTextFields
+    }
+
+  }, State {
+    name: "HIDDEN"
+    PropertyChanges {
+      target: registerForm
+      opacity: 0
+    }
+  }]
+
+  transitions: [Transition {
+      from: "HIDDEN";// to: "VISIBLE"
+      SequentialAnimation {
+        PauseAnimation {
+          duration: 500
+        }
+        ScriptAction {
+            script: {
+              registerForm.visible = true
+              accountHandlerView.currentView = registerForm
+              primaryPinTextField.forceActiveFocus()
+            }
+         }
+        NumberAnimation {
+            duration: 1000
+            easing.type: Easing.OutQuad
+            properties: "width,y,opacity"
+        }
+      }
+  },Transition {
+      //from: "VISIBLE";
+      to: "HIDDEN"
+      SequentialAnimation {
+        NumberAnimation {
+            duration: 1000
+            easing.type: Easing.InQuad
+            properties: "width,y,opacity"
+        }
+        ScriptAction {
+           script: {
+             registerForm.visible = false
+           }
+        }
+      }
+  }]
 
   Row {
     id: createAccountTabRow
 
-    anchors {
-      horizontalCenter: parent.horizontalCenter
-      bottom: userInputLoader.top
-      bottomMargin: customProperties.textFieldHeight
-    }
+    anchors.horizontalCenter: parent.horizontalCenter
+    y: accountHandlerView.bottomButtonY -
+       customProperties.blueButtonMargin -
+       customProperties.textFieldHeight*4 -
+       customProperties.textFieldVerticalSpacing*4
 
     spacing: 15
 
@@ -48,12 +185,9 @@ Item {
       id: tabRepeater
 
       model: ["PIN", "KEYWORD", "PASSWORD"]
-
       delegate: CustomLabel {
-        id: tabLabel
-
         text: qsTr(modelData)
-        color: modelData == createAccountRoot.state ?
+        color: modelData == registerForm.state ?
                  customBrushes.labelSelected
                :
                  customBrushes.labelNotSelected
@@ -61,131 +195,213 @@ Item {
     }
   }
 
-  Loader {
-    id: userInputLoader
+  Item {
+    id: pinTextFields
 
-    anchors {
-      horizontalCenter: parent.horizontalCenter
-      bottom: parent.bottom
-      bottomMargin: customProperties.buttonBottomMargin
+    visible: false
+    anchors.fill: parent
+
+    CustomTextField {
+      id: primaryPinTextField
+
+      placeholderText: qsTr("Choose a 4 digit PIN")
+      submitButton: nextButton
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*3 -
+         customProperties.textFieldVerticalSpacing*3
     }
 
-    focus: true
-    sourceComponent: {
-      if (createAccountRoot.state == "PIN") {
-        acceptPINComponent
-      } else if (createAccountRoot.state == "KEYWORD") {
-        acceptKeywordComponent
+    CustomTextField {
+      id: confirmationPinTextField
+
+      placeholderText: qsTr("Confirm PIN")
+      submitButton: nextButton
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
+    }
+
+    function goBack() {
+    }
+
+    function validateValuesAndContinueIfOk() {
+      if ( ! primaryPinTextField.text.match(/^\d{4}$/)) {
+        floatingStatus.showError(primaryPinTextField,
+                                 qsTr("PIN must be only and exactly 4 digits"))
+      } else if ( ! checkIdenticalField(qsTr("PIN"),
+                                        primaryPinTextField,
+                                        confirmationPinTextField)) {
       } else {
-        acceptPasswordComponent
-      }
-    }
-
-    onLoaded: {
-      item.passwordStrength = createAccountRoot.passwordStrength
-      item.nextFocusItem = clickableTextLoader
-      item.focus = true
-    }
-  }
-
-  Component {
-    id: acceptPINComponent
-
-    CreateAccountUserInputColumn {
-      id: textFieldsAndButtonColumn
-      objectName: "textFieldsAndButtonColumn"
-
-      fieldName: qsTr("PIN")
-      primaryTextField.placeholderText: qsTr("Choose a 4 digit PIN")
-      confirmationTextField.placeholderText: qsTr("Confirm PIN")
-
-      onProceed: {
-        createAccountRoot.pin = primaryTextField.text
-        createAccountRoot.state = "KEYWORD"
-        goBackLabel.onClicked = function(){
-          createAccountRoot.state = "PIN"
-        }
+        registerForm.state = "KEYWORD"
+        primaryKeywordTextField.forceActiveFocus()
       }
     }
   }
 
-  Component {
-    id: acceptKeywordComponent
+  Item {
+    id: keywordTextFields
 
-    CreateAccountUserInputColumn {
-      id: textFieldsAndButtonColumn
-      objectName: "textFieldsAndButtonColumn"
+    visible: false
+    anchors.fill: parent
 
-      fieldName: qsTr("Keyword")
-      primaryTextField.placeholderText: qsTr("Choose a Keyword")
-      confirmationTextField.placeholderText: qsTr("Confirm Keyword")
+    CustomTextField {
+      id: primaryKeywordTextField
 
-      onProceed: {
-        createAccountRoot.keyword = primaryTextField.text
-        createAccountRoot.state = "PASSWORD"
-        goBackLabel.onClicked = function(){
-          createAccountRoot.state = "KEYWORD"
-        }
+      placeholderText: qsTr("Choose a Keyword")
+      submitButton: nextButton
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*3 -
+         customProperties.textFieldVerticalSpacing*3
+
+      onTextChanged: checkPasswordStrength(this)
+    }
+
+    CustomTextField {
+      id: confirmationKeywordTextField
+
+      placeholderText: qsTr("Confirm Keyword")
+      submitButton: nextButton
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
+    }
+
+    function goBack() {
+      registerForm.state = "PIN"
+    }
+
+    function validateValuesAndContinueIfOk() {
+      if ( ! checkBlankField(qsTr("KEYWORD"), primaryKeywordTextField)) {
+      } else if ( ! checkIdenticalField(qsTr("KEYWORD"),
+                                        primaryKeywordTextField,
+                                        confirmationKeywordTextField)) {
+      } else {
+        registerForm.state = "PASSWORD"
+        primaryPasswordTextField.forceActiveFocus()
       }
     }
   }
 
-  Component {
-    id: acceptPasswordComponent
+  Item {
+    id: passwordTextFields
 
-    CreateAccountUserInputColumn {
-      id: textFieldsAndButtonColumn
-      objectName: "textFieldsAndButtonColumn"
+    visible: false
+    anchors.fill: parent
 
-      fieldName: qsTr("Password")
-      primaryTextField.placeholderText: qsTr("Choose a Password")
-      confirmationTextField.placeholderText: qsTr("Confirm Password")
+    CustomTextField {
+      id: primaryPasswordTextField
 
-      onProceed: {
-        accountHandlerController_.createAccount(createAccountRoot.pin, createAccountRoot.keyword, primaryTextField.text)
+      placeholderText: qsTr("Choose a Password")
+      submitButton: nextButton
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*3 -
+         customProperties.textFieldVerticalSpacing*3
+
+      onTextChanged: checkPasswordStrength(this)
+    }
+
+    CustomTextField {
+      id: confirmationPasswordTextField
+
+      placeholderText: qsTr("Confirm Password")
+      submitButton: nextButton
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
+    }
+
+    function goBack() {
+      registerForm.state = "KEYWORD"
+    }
+
+    function validateValuesAndContinueIfOk() {
+      if ( ! checkBlankField(qsTr("PASSWORD"), primaryPasswordTextField)) {
+      } else if ( ! checkIdenticalField(qsTr("PASSWORD"),
+                                        primaryPasswordTextField,
+                                        confirmationPasswordTextField)) {
+      } else {
+        accountHandlerView.fromState = "REGISTER"
+        accountHandlerView.state = "LOADING"
+        //  accountHandlerController_.createAccount(registerForm.pin,
+        //registerForm.keyword, primaryTextField.text)
       }
     }
   }
 
-  Loader {
-    id: clickableTextLoader
-    objectName: "clickableTextLoader"
+  Rectangle {
+    id: backBackground
 
-    anchors {
-      horizontalCenter: parent.horizontalCenter
-      bottom: parent.bottom
-      bottomMargin: customProperties.clickableTextBottomMargin
-    }
-
-    sourceComponent: createAccountRoot.state != "PIN" ?
-                       goBackComponent
-                     :
-                       showLoginPageLabelComponent
-
-    onLoaded: item.focus = true
-  }
-
-  Component {
-    id: showLoginPageLabelComponent
-
-    ClickableText {
-      id: showLoginPageLabel
-      objectName: "showLoginPageLabel"
-
-      text: qsTr("Already have an account? Log In")
-      onClicked: accountHandlerController_.showLoginView()
+    visible: backButton.visible
+    y: backButton.y
+    width: customProperties.textFieldWidth
+    height: customProperties.cancelButtonHeight
+    anchors.horizontalCenter: parent.horizontalCenter
+    radius: customProperties.blueButtonRadius
+    antialiasing: true
+    color: {
+      if (backButton.pressed) {
+        customBrushes.buttonPressedBlue
+      } else if (backButton.hovered ||
+                 backButton.activeFocus) {
+        customBrushes.buttonHoveredBlue
+      } else {
+        customBrushes.buttonDefaultBlue
+      }
     }
   }
 
-  Component {
-    id: goBackComponent
+  BlueButton {
+    id: backButton
 
-    ClickableText {
-      id: goBackLabel
-      objectName: "goBackLabel"
+    y: accountHandlerView.bottomButtonY -
+       nextButton.height -
+       customProperties.textFieldVerticalSpacing
 
-      text: qsTr("Go back")
-//      onClicked: previous.state ==
+    text: qsTr("Go back")
+    onClicked: {
+      floatingStatus.hide()
+      registerForm.currentTextFields.goBack()
+    }
+  }
+
+  BlueButton {
+    id: nextButton
+
+    y: accountHandlerView.bottomButtonY
+
+    text: qsTr("Next")
+    onClicked: {
+      floatingStatus.hide()
+      registerForm.currentTextFields.validateValuesAndContinueIfOk()
+    }
+  }
+
+  Rectangle { // white line
+      width: customProperties.textFieldWidth
+      height: 1
+      anchors.horizontalCenter: parent.horizontalCenter
+      y: accountHandlerView.height -
+         registerButton.height -
+         customProperties.clickableTextBottomMargin - 4
+      color: "#ffffff"
+  }
+
+  ClickableText {
+    id: registerButton
+
+    anchors.horizontalCenter: parent.horizontalCenter
+    y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
+
+    text: qsTr("Already have an account? Log In")
+    onClicked: {
+      accountHandlerView.fromState = "REGISTER"
+      accountHandlerView.state = "LOGIN"
     }
   }
 }

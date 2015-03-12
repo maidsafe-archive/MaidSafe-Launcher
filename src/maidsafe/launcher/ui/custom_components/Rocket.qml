@@ -2,8 +2,6 @@ import QtQuick 2.4
 
 Canvas {
     id: rocketLoading
-    width: 400
-    height: 400
     antialiasing: true
     property real animationPosition
 
@@ -19,24 +17,12 @@ Canvas {
     onPaint: {
         var ctx = getContext("2d");
         ctx.save();
-        ctx.scale(width/500, height/500);
+        ctx.scale(width / 500, height / 500);
 
         ctx.clearRect(0, 0, 500, 500);
 
         // polygon 1
         ctx.beginPath();
-/*
-        ctx.moveTo(0.6168 *width, 0.2174 *height);
-        ctx.lineTo(0.5532 *width, 0.0860 *height);
-        ctx.lineTo(0.5020 *width, 0.0486 *height);
-        ctx.lineTo(0.5020 *width, 0.2608 *height);
-        ctx.lineTo(0.5710 *width, 0.3008 *height);
-        ctx.lineTo(0.5710 *width, 0.3844 *height);
-        ctx.lineTo(0.5020 *width, 0.4204 *height);
-        ctx.lineTo(0.5020 *width, 0.5686 *height);
-        ctx.lineTo(0.6652 *width, 0.4744 *height);
-        ctx.lineTo(0.6652 *width, 0.4590 *height);
-        */
 
         ctx.moveTo(308.4, 108.7);
         ctx.lineTo(276.6, 43);

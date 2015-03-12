@@ -21,6 +21,7 @@ import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
 
 Button {
+  property bool backgroundDisabled: false
   anchors.horizontalCenter: parent.horizontalCenter
 
   width: customProperties.blueButtonWidth
@@ -39,6 +40,22 @@ Button {
         underline: control.activeFocus ? true : false
       }
     }
-    background: null
+    background: null/*(backgroundDisabled ? null : Rectangle {
+      implicitHeight: customProperties.greyButtonHeight
+      implicitWidth: customProperties.greyButtonWidth
+      radius: customProperties.greyButtonRadius
+      antialiasing: true
+
+      color: {
+        if (buttonBaseRoot.pressed) {
+          globalBrushes.buttonPressedGrey
+        } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
+          globalBrushes.buttonHoveredGrey
+        } else {
+          globalBrushes.buttonDefaultGrey
+        }
+      }
+    })*/
+
   }
 }

@@ -26,7 +26,7 @@ QtObject {
   readonly property int customTextPixelSize: 15
 
   readonly property int cancelButtonWidth: 120
-  readonly property int cancelButtonBottom: 120
+  readonly property int cancelButtonBottom: 125
   readonly property int cancelButtonHeight: 35
 
   readonly property int textFieldWidth: 320

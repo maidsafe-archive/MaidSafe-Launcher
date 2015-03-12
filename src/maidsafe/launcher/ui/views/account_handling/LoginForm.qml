@@ -34,17 +34,26 @@ Item {
     PropertyChanges {
       target: pinTextField
       width: customProperties.textFieldWidth
-      y: accountHandlerView.bottomButtonY - customProperties.blueButtonMargin - customProperties.textFieldHeight*3 - customProperties.textFieldVerticalSpacing*3
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*3 -
+         customProperties.textFieldVerticalSpacing*3
     }
     PropertyChanges {
       target: keywordTextField
       width: customProperties.textFieldWidth
-      y: accountHandlerView.bottomButtonY - customProperties.blueButtonMargin - customProperties.textFieldHeight*2 - customProperties.textFieldVerticalSpacing*2
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
     }
     PropertyChanges {
       target: passwordTextField
       width: customProperties.textFieldWidth
-      y: accountHandlerView.bottomButtonY - customProperties.blueButtonMargin - customProperties.textFieldHeight - customProperties.textFieldVerticalSpacing
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight -
+         customProperties.textFieldVerticalSpacing
     }
     PropertyChanges {
       target: sharedBackgroundButton
@@ -70,6 +79,10 @@ Item {
       target: passwordTextField
       width: customProperties.cancelButtonWidth +20
       y: accountHandlerView.bottomButtonY
+    }
+    PropertyChanges {
+      target: sharedBackgroundButton
+      width: customProperties.cancelButtonWidth
     }
   }]
 
@@ -113,59 +126,25 @@ Item {
   }]
 
 
-
-  FloatingStatusBox {
-      id: floatingStatus
-
-      anchors {
-        left: pointToItem.right
-        leftMargin: 15
-      }
-      pointToItem: pinTextField
-      infoText.color: globalBrushes.textError
-      yOffset: pointToItem.y
-  }
-
   CustomTextField {
       id: pinTextField
-
       placeholderText: qsTr("PIN")
-      echoMode: TextInput.Password
-      Keys.onEnterPressed: loginButton.clicked()
-      Keys.onReturnPressed: loginButton.clicked()
-      onTextChanged: {
-        if (floatingStatus.pointToItem === pinTextField && floatingStatus.visible) {
-          floatingStatus.visible = false
-        }
+      submitButton: loginButton
+      Component.onCompleted: {
+        forceActiveFocus()
       }
   }
 
   CustomTextField {
       id: keywordTextField
-
       placeholderText: qsTr("Keyword")
-      echoMode: TextInput.Password
-      Keys.onEnterPressed: loginButton.clicked()
-      Keys.onReturnPressed: loginButton.clicked()
-      onTextChanged: {
-        if (floatingStatus.pointToItem === keywordTextField && floatingStatus.visible) {
-          floatingStatus.visible = false
-        }
-      }
+      submitButton: loginButton
   }
 
   CustomTextField {
       id: passwordTextField
-
       placeholderText: qsTr("Password")
-      echoMode: TextInput.Password
-      Keys.onEnterPressed: loginButton.clicked()
-      Keys.onReturnPressed: loginButton.clicked()
-      onTextChanged: {
-        if (floatingStatus.pointToItem === passwordTextField && floatingStatus.visible) {
-          floatingStatus.visible = false
-        }
-      }
+      submitButton: loginButton
   }
 
   BlueButton {
@@ -176,29 +155,16 @@ Item {
     text: qsTr("LOG IN")
 
     onClicked: {
-        floatingStatus.visible = false
-        pinTextField.clearAllImages()
-        keywordTextField.clearAllImages()
-        passwordTextField.clearAllImages()
-
         if (pinTextField.text === "") {
-            pinTextField.showErrorImage = true
-            floatingStatus.pointToItem = pinTextField
-            floatingStatus.infoText.text = qsTr("PIN cannot be left blank")
-            floatingStatus.visible = true
+          floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))
         } else if (keywordTextField.text === "") {
-          keywordTextField.showErrorImage = true
-          floatingStatus.pointToItem = keywordTextField
-          floatingStatus.infoText.text = qsTr("Keyword cannot be left blank")
-          floatingStatus.visible = true
+          floatingStatus.showError(keywordTextField, qsTr("Keyword cannot be left blank"))
         } else if (passwordTextField.text === "") {
-          passwordTextField.showErrorImage = true
-          floatingStatus.pointToItem = passwordTextField
-          floatingStatus.infoText.text = qsTr("Password cannot be left blank")
-          floatingStatus.visible = true
+          floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
         } else {
-            accountHandlerView.fromState = "LOGIN"
-            accountHandlerView.state = "LOADING"
+          floatingStatus.hide()
+          accountHandlerView.fromState = "LOGIN"
+          accountHandlerView.state = "LOADING"
         }
     }
   }
@@ -207,7 +173,9 @@ Item {
       width: customProperties.textFieldWidth
       height: 1
       anchors.horizontalCenter: parent.horizontalCenter
-      y: accountHandlerView.height - registerButton.height - customProperties.clickableTextBottomMargin -4
+      y: accountHandlerView.height -
+         registerButton.height -
+         customProperties.clickableTextBottomMargin - 4
       color: "#ffffff"
   }
 

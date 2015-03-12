@@ -34,10 +34,6 @@ Item {
       target: rocket
       y: 0
     }
-    PropertyChanges {
-      target: sharedBackgroundButton
-      width: customProperties.cancelButtonWidth
-    }
   }, State {
     name: "HIDDEN"
     PropertyChanges {

@@ -20,42 +20,87 @@ import QtQuick 2.4
 
 Rectangle {
   id: statusDisplayRect
-  objectName: "statusDisplayRect"
 
   property Item pointToItem: null
-  property alias metaText: metaInformationText
-  property alias infoText: informationText
-  property real yOffset: 0
-  property bool wipeTextsOnNoVisibility: true
 
-  y: pointToItem.y //? pointToItem.y + pointToItem.height / 2 - height / 2 + yOffset : 0
+  opacity: 0
+  transitions: [Transition {
+      to: "VISIBLE"
+      SequentialAnimation {
+        ScriptAction {
+            script: {
+              statusDisplayRect.visible = true
+              resetPostitionAndSize()
+            }
+         }
+        NumberAnimation {
+            duration: 400
+            target: statusDisplayRect
+            properties: "opacity"
+            to: 1
+        }
+      }
+  },Transition {
+      to: ""
+      SequentialAnimation {
+        NumberAnimation {
+            duration: 400
+            target: statusDisplayRect
+            properties: "opacity"
+            to: 0
+        }
+        ScriptAction {
+            script: {
+              statusDisplayRect.visible = false
+            }
+         }
+      }
+  }]
 
-  width: Math.min(180,
-                  metaInformationText.implicitWidth   +
-                  informationText.implicitWidth       +
-                  metaInformationText.anchors.leftMargin +
-                  informationText.anchors.leftMargin +  informationText.anchors.rightMargin)
-
-  height: Math.max(informationText.implicitHeight + informationText.implicitHeight *
-                   informationText.implicitWidth / (informationText.width ?
-                                                      informationText.width : 1),
-                   metaInformationText.implicitHeight + metaInformationText.implicitHeight *
-                   metaInformationText.implicitWidth / (metaInformationText.width ?
-                                                          metaInformationText.width : 1),
-                   customProperties.textFieldHeight)
-
-  radius: customProperties.textFieldRadius
-  visible: false
-
-  onVisibleChanged: {
-    if (!visible && wipeTextsOnNoVisibility) {
-      metaInformationText.text = informationText.text = ""
+  function hide() {
+    state = ""
+    if (pointToItem) {
+      pointToItem.clearAllImages()
+      pointToItem = null
     }
   }
 
+  function showError(item, info) {
+    show(item, "", info, customBrushes.textWeakPassword, true)
+  }
+  function show(item, meta, info, color, showError) {
+    hide()
+    pointToItem = item
+    if (pointToItem)
+      pointToItem.showErrorImage = showError
+    metaText.text = meta
+    infoText.text = info
+    infoText.color = color
+    state = "VISIBLE"
+    pointToItem.forceActiveFocus()
+  }
+
+  function resetPostitionAndSize() {
+    width = Math.min(180,
+                    metaText.implicitWidth   +
+                    infoText.implicitWidth       +
+                    metaText.anchors.leftMargin +
+                    infoText.anchors.leftMargin +  infoText.anchors.rightMargin)
+
+    height = Math.max(infoText.implicitHeight + infoText.implicitHeight *
+                     infoText.implicitWidth / (infoText.width ? infoText.width : 1),
+                     metaText.implicitHeight + metaText.implicitHeight *
+                     metaText.implicitWidth / (metaText.width ? metaText.width : 1),
+                     customProperties.textFieldHeight)
+
+    x = pointToItem.x + pointToItem.width + 15
+    y = pointToItem.y + pointToItem.height / 2 - height / 2
+  }
+
+  radius: customProperties.textFieldRadius
+
   Rectangle {
     id: pointerRect
-    objectName: "pointerRect"
 
     anchors {
       verticalCenter: parent.verticalCenter
@@ -68,8 +113,7 @@ Rectangle {
   }
 
   CustomText {
-    id: metaInformationText
-    objectName: "metaInformationText"
+    id: metaText
 
     anchors {
       left: parent.left
@@ -83,11 +127,10 @@ Rectangle {
   }
 
   CustomText {
-    id: informationText
-    objectName: "informationText"
+    id: infoText
 
     anchors {
-      left: metaInformationText.right
+      left: metaText.right
       right: parent.right
       rightMargin: 10
       verticalCenter: parent.verticalCenter
