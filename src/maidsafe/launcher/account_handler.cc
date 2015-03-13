@@ -42,69 +42,59 @@ Identity GetAccountLocation(const authentication::UserCredentials::Keyword& keyw
                                                pin.Hash<crypto::SHA512>().string())};
 }
 
-AccountHandler::AccountHandler() : account_(), current_account_version_(), user_credentials_() {}
+AccountHandler::AccountHandler() : account_(), account_versions_(20, 1), user_credentials_() {}
 
 AccountHandler::AccountHandler(Account&& account,
                                authentication::UserCredentials&& user_credentials,
                                NetworkClient& network_client)
     : account_(maidsafe::make_unique<Account>(std::move(account))),
-      current_account_version_(),
+      account_versions_(20, 1),
       user_credentials_(std::move(user_credentials)) {
   // throw if private_client & account are not coherent
   // TODO(Prakash) Validate credentials
   Identity account_location{GetAccountLocation(*user_credentials_.keyword, *user_credentials_.pin)};
   ImmutableData encrypted_account{EncryptAccount(user_credentials_, *account_)};
+  MutableData account_versions_wrapper;
   try {
-    LOG(kVerbose) << "Put encrypted_account";
-    auto put_future = network_client.Put(encrypted_account);
-    put_future.get();
-    StructuredDataVersions::VersionName account_version(0, encrypted_account.name());
-    auto create_version_tree_future = network_client.CreateVersionTree(
-        MutableData::Name(account_location), account_version, 20, 1);
-    create_version_tree_future.get();
-    current_account_version_ = account_version;
-    LOG(kVerbose) << "Created Version tree";
+    network_client.Store(encrypted_account.NameAndType(),
+                         NonEmptyString(Serialise(encrypted_account)));
+    StructuredDataVersions::VersionName first_version(0, encrypted_account.Name());
+    account_versions_.Put(StructuredDataVersions::VersionName(), first_version);
+    account_versions_wrapper = MutableData(account_location, account_versions_.Serialise());
+    network_client.Store(account_versions_wrapper.NameAndType(),
+                         NonEmptyString(Serialise(account_versions_wrapper)));
   } catch (const std::exception& e) {
     LOG(kError) << "Failed to store account: " << boost::diagnostic_information(e);
-    network_client.Delete(encrypted_account.name());
-    // TODO(Fraser) BEFORE_RELEASE need to delete version tree here
+    network_client.Delete(encrypted_account.NameAndType());
+    if (account_versions_wrapper.IsInitialised())
+      network_client.Delete(account_versions_wrapper.NameAndType());
     throw;
   }
-}
-
-AccountHandler::AccountHandler(AccountHandler&& other) MAIDSAFE_NOEXCEPT
-    : account_(std::move(other.account_)),
-      current_account_version_(std::move(other.current_account_version_)),
-      user_credentials_(std::move(other.user_credentials_)) {}
-
-AccountHandler& AccountHandler::operator=(AccountHandler&& other) MAIDSAFE_NOEXCEPT {
-  account_ = std::move(other.account_);
-  current_account_version_ = std::move(other.current_account_version_);
-  user_credentials_ = std::move(other.user_credentials_);
-  return *this;
 }
 
 void AccountHandler::Login(authentication::UserCredentials&& user_credentials,
                            AccountGetter& account_getter) {
   if (account_ && account_->passport)  // already logged in
-    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
+    BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_argument));
 
   Identity account_location{GetAccountLocation(*user_credentials.keyword, *user_credentials.pin)};
   try {
-    auto versions_future =
-        account_getter.data_getter().GetVersions(MutableData::Name(account_location));
-    LOG(kVerbose) << "Waiting for versions_future";
-    auto versions(versions_future.get());
-    LOG(kVerbose) << "GetVersions from account location succeeded";
+    MutableData account_versions_wrapper(
+        Parse<MutableData>(account_getter.data_getter()
+                               .Get(Data::NameAndTypeId(account_location, DataTypeId(1)))
+                               .string()));
+    account_versions_.ApplySerialised(
+        StructuredDataVersions::serialised_type(account_versions_wrapper.Value()));
+    auto versions(account_versions_.Get());
     assert(versions.size() == 1U);
     // TODO(Fraser#5#): 2014-04-17 - Get more than just the latest version - possibly just for the
     // case where the latest one fails.  Or just throw, but add 'int version_number' to this
     // function's signature where 0 == most recent, 1 == second newest, etc.
-    auto encrypted_account_future(account_getter.data_getter().Get(versions.at(0).id));
-    auto encrypted_account(encrypted_account_future.get());
-    LOG(kVerbose) << "Get encrypted_account succeeded";
+    ImmutableData encrypted_account(
+        Parse<ImmutableData>(account_getter.data_getter()
+                                 .Get(Data::NameAndTypeId(versions.at(0).id, DataTypeId(0)))
+                                 .string()));
     account_ = maidsafe::make_unique<Account>(encrypted_account, user_credentials);
-    current_account_version_ = versions.at(0);
     user_credentials_ = std::move(user_credentials);
   } catch (const std::exception& e) {
     LOG(kError) << "Failed to login: " << boost::diagnostic_information(e);
@@ -118,31 +108,27 @@ void AccountHandler::Save(NetworkClient& network_client) {
 
   ImmutableData encrypted_account(EncryptAccount(user_credentials_, *account_));
   try {
-    auto put_future = network_client.Put(encrypted_account);
-    put_future.get();
-    StructuredDataVersions::VersionName new_account_version{current_account_version_.index + 1,
-                                                            encrypted_account.name()};
-    assert(current_account_version_.id != new_account_version.id);
+    network_client.Store(encrypted_account.NameAndType(),
+                         NonEmptyString(Serialise(encrypted_account)));
+    // Get current tip-of-tree and create new version
+    auto versions(account_versions_.Get());
+    assert(versions.size() == 1U);
+    StructuredDataVersions::VersionName new_account_version{versions.at(0).index + 1,
+                                                            encrypted_account.Name()};
+    account_versions_.Put(versions.at(0), new_account_version);
+
     Identity account_location{
         GetAccountLocation(*user_credentials_.keyword, *user_credentials_.pin)};
-    auto put_version_future = network_client.PutVersion(
-        MutableData::Name(account_location), current_account_version_, new_account_version);
-    put_version_future.get();
-    current_account_version_ = new_account_version;
-    LOG(kVerbose) << "Save Account succeeded";
+    MutableData account_versions_wrapper(account_location, account_versions_.Serialise());
+    network_client.Store(account_versions_wrapper.NameAndType(),
+                         NonEmptyString(Serialise(account_versions_wrapper)));
+
     strong_guarantee.Release();
   } catch (const std::exception& e) {
     LOG(kError) << boost::diagnostic_information(e);
-    network_client.Delete(encrypted_account.name());
+    network_client.Delete(encrypted_account.NameAndType());
     throw;
   }
-}
-
-void swap(AccountHandler& lhs, AccountHandler& rhs) MAIDSAFE_NOEXCEPT {
-  using std::swap;
-  swap(lhs.account_, rhs.account_);
-  swap(lhs.current_account_version_, rhs.current_account_version_);
-  swap(lhs.user_credentials_, rhs.user_credentials_);
 }
 
 }  // namespace launcher

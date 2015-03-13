@@ -31,6 +31,7 @@
 #include "maidsafe/common/crypto.h"
 #include "maidsafe/common/types.h"
 #include "maidsafe/common/authentication/user_credentials.h"
+#include "maidsafe/common/data_types/immutable_data.h"
 #include "maidsafe/passport/passport.h"
 
 #include "maidsafe/launcher/app_details.h"
@@ -67,8 +68,7 @@ struct Account {
   asio::ip::address ip;
   uint16_t port;
   Identity unique_user_id, root_parent_id;
-  crypto::AES256Key config_file_aes_key;
-  crypto::AES256InitialisationVector config_file_aes_iv;
+  crypto::AES256KeyAndIV config_file_aes_key_and_iv;
   std::set<AppDetails> apps;
 };
 

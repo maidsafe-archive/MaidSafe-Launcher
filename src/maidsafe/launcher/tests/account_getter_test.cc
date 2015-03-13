@@ -20,8 +20,6 @@
 
 #include "maidsafe/common/test.h"
 
-#include "maidsafe/routing/parameters.h"
-
 #include "maidsafe/launcher/tests/test_utils.h"
 
 namespace maidsafe {

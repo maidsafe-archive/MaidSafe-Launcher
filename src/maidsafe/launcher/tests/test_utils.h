@@ -26,6 +26,7 @@
 #include "maidsafe/common/error.h"
 #include "maidsafe/common/test.h"
 #include "maidsafe/common/authentication/user_credentials.h"
+#include "maidsafe/passport/types.h"
 
 #include "maidsafe/launcher/types.h"
 

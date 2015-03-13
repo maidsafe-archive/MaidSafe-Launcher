@@ -21,7 +21,6 @@
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/test.h"
 #include "maidsafe/common/authentication/user_credentials.h"
-#include "maidsafe/routing/parameters.h"
 
 #include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"

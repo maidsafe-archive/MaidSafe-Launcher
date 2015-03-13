@@ -27,6 +27,7 @@
 #include "cereal/types/string.hpp"
 #include "cereal/types/set.hpp"
 
+#include "maidsafe/common/convert.h"
 #include "maidsafe/common/log.h"
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/utils.h"
@@ -212,8 +213,7 @@ void AppHandler::Add(AppDetails& app, std::set<AppDetails>::iterator account_itr
   }
   assert(local_apps_.count(app) == 0 && non_local_apps_.count(app) == 0);
 
-  app.permitted_dirs.emplace(std::string("/") + app.name, drive::ParentId(account_->root_parent_id),
-                             drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
+  app.permitted_dirs.emplace(std::string("/") + app.name, account_->root_parent_id, MakeIdentity(),
                              DirectoryInfo::AccessRights::kReadWrite);
 
   // Add to account and local set
@@ -322,14 +322,14 @@ void AppHandler::ReadConfigFile() {
   assert(fs::is_regular_file(config_file_path_));
 
   // Read from file.
-  crypto::CipherText encrypted_contents{ReadFile(config_file_path_)};
+  crypto::CipherText encrypted_contents{NonEmptyString{ReadFile(config_file_path_).value()}};
 
   // Decrypt and uncompress the contents.
-  auto serialised_contents(crypto::Uncompress(crypto::CompressedText(crypto::SymmDecrypt(
-      encrypted_contents, account_->config_file_aes_key, account_->config_file_aes_iv))));
+  auto serialised_contents(crypto::Uncompress(crypto::CompressedText(
+      crypto::SymmDecrypt(encrypted_contents, account_->config_file_aes_key_and_iv))));
 
   // Parse the set of local apps.
-  std::stringstream str_stream{serialised_contents.string()};
+  std::stringstream str_stream{convert::ToString(serialised_contents.string())};
   std::size_t app_count(ConvertFromStream<std::size_t>(str_stream));
   for (std::size_t i{0}; i < app_count; ++i) {
     AppDetails app_details;
@@ -347,9 +347,10 @@ void AppHandler::WriteConfigFile() const {
     serialised_contents += ConvertToString(app.name, app.path, app.args, app.auto_start);
 
   // Compress and encrypt the serialised contents.
-  auto encrypted_contents(
-      crypto::SymmEncrypt(crypto::Compress(crypto::UncompressedText(serialised_contents), 9).data,
-                          account_->config_file_aes_key, account_->config_file_aes_iv));
+  auto encrypted_contents(crypto::SymmEncrypt(
+      crypto::Compress(crypto::UncompressedText(convert::ToByteVector(serialised_contents)), 9)
+          .data,
+      account_->config_file_aes_key_and_iv));
 
   // Write to file.
   if (!WriteFile(config_file_path_, encrypted_contents->string())) {

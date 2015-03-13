@@ -79,11 +79,16 @@ Launcher::Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& a
       app_handler_(),
       rollback_snapshot_() {
   account_handler_.Login(ConvertToCredentials(keyword, pin, password), account_getter);
+#ifdef ROUTING_AND_NFS_UPDATED
 #ifdef USE_FAKE_STORE
   network_client_ = std::make_shared<NetworkClient>(FakeStorePath(), FakeStoreDiskUsage());
 #else
   network_client_ =
       nfs_client::MaidClient::MakeShared(account_handler_.account_->passport->GetMaid());
+#endif
+#else
+  network_client_ = std::make_shared<NetworkClient>(
+      MemoryUsage(1 << 7), Launcher::FakeStoreDiskUsage(), nullptr, Launcher::FakeStorePath());
 #endif
   app_handler_.Initialise(GetConfigFilePath(), account_handler_.account_.get(), &account_mutex_);
   // Auto-start any relevant apps
@@ -97,10 +102,15 @@ Launcher::Launcher(Keyword keyword, Pin pin, Password password, AccountGetter& a
 Launcher::Launcher(Keyword keyword, Pin pin, Password password,
                    passport::MaidAndSigner&& maid_and_signer)
     : asio_service_(1),
+#ifdef ROUTING_AND_NFS_UPDATED
 #ifdef USE_FAKE_STORE
       network_client_(std::make_shared<NetworkClient>(FakeStorePath(), FakeStoreDiskUsage())),
 #else
       network_client_(nfs_client::MaidClient::MakeShared(maid_and_signer)),
+#endif
+#else
+      network_client_(std::make_shared<NetworkClient>(
+          MemoryUsage(1 << 7), Launcher::FakeStoreDiskUsage(), nullptr, Launcher::FakeStorePath())),
 #endif
       account_handler_(Account{std::move(maid_and_signer)},
                        ConvertToCredentials(keyword, pin, password), *network_client_),
@@ -216,11 +226,11 @@ void Launcher::UpdateAppSafeDriveAccess(const AppName& app_name,
   auto snapshot(app_handler_.GetSnapshot());
   on_scope_exit strong_guarantee{[&] { RevertAppHandler(std::move(snapshot)); }};
   // TODO(Fraser#5#): 2015-01-20 - Replace "SafeDrive" string with constant defined... where?
-  DirectoryInfo safe_dir("SafeDrive", drive::ParentId(), drive::DirectoryId(), new_rights);
+  DirectoryInfo safe_dir("SafeDrive", Identity{}, Identity{}, new_rights);
   {
     std::lock_guard<std::mutex> lock{account_mutex_};
     // TODO(Fraser#5#): 2015-01-20 - Confirm with Lee if these IDs should be used.
-    safe_dir.parent_id = drive::ParentId{account_handler_.account_->unique_user_id};
+    safe_dir.parent_id = Identity{account_handler_.account_->unique_user_id};
     safe_dir.directory_id = account_handler_.account_->root_parent_id;
   }
   app_handler_.UpdatePermittedDirs(app_name, safe_dir);
@@ -275,11 +285,9 @@ void Launcher::LaunchApp(const AppName& app_name, const boost::filesystem::path&
   auto launch(std::make_shared<Launch>(app_name, asio_service_, connect_timeout_));
 
   // Start listening
-  launch->listener =
-      tcp::Listener::MakeShared(launch->strand, [=](tcp::ConnectionPtr connection) {
-                                                  HandleNewConnection(launch, connection);
-                                                },
-                                static_cast<tcp::Port>((RandomUint32() % 64512) + 1024));
+  launch->listener = tcp::Listener::MakeShared(launch->strand, [=](tcp::ConnectionPtr connection) {
+    HandleNewConnection(launch, connection);
+  }, static_cast<tcp::Port>((RandomUint32() % 64512) + 1024));
 
   // Set the steady_timer's timeout handler
   launch->timer.async_wait([=](const asio::error_code& error) {

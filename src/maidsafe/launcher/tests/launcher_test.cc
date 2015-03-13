@@ -27,7 +27,6 @@ extern "C" char** environ;
 
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/test.h"
-#include "maidsafe/routing/parameters.h"
 
 #include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"
@@ -78,11 +77,10 @@ TEST_F(LauncherTest, FUNC_CreateDuplicateAccount) {
     // Try to create duplicate account
     // TODO(Prakash): Verify the error code being checked for as accurate
     EXPECT_TRUE(ThrowsAs([&] {
-                           Launcher::CreateAccount(std::get<0>(user_credentials_tuple),
-                                                   std::get<1>(user_credentials_tuple),
-                                                   std::get<2>(user_credentials_tuple));
-                         },
-                         VaultErrors::data_already_exists));
+      Launcher::CreateAccount(std::get<0>(user_credentials_tuple),
+                              std::get<1>(user_credentials_tuple),
+                              std::get<2>(user_credentials_tuple));
+    }, VaultErrors::data_already_exists));
   }
 }
 
@@ -104,11 +102,9 @@ TEST_F(LauncherTest, FUNC_InvalidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   // TODO(Prakash): Verify the error code being checked for as accurate
   EXPECT_TRUE(ThrowsAs([&] {
-                         Launcher::Login(std::get<0>(user_credentials_tuple),
-                                         std::get<1>(user_credentials_tuple),
-                                         std::get<2>(user_credentials_tuple));
-                       },
-                       VaultErrors::no_such_account));
+    Launcher::Login(std::get<0>(user_credentials_tuple), std::get<1>(user_credentials_tuple),
+                    std::get<2>(user_credentials_tuple));
+  }, VaultErrors::no_such_account));
 }
 
 

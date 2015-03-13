@@ -48,12 +48,10 @@ class AccountHandler {
   AccountHandler(Account&& account, authentication::UserCredentials&& user_credentials,
                  NetworkClient& network_client);
 
-  // Move-constructible and move-assignable only.
   AccountHandler(const AccountHandler&) = delete;
-  AccountHandler(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
+  AccountHandler(AccountHandler&& other) = delete;
   AccountHandler& operator=(const AccountHandler&) = delete;
-  AccountHandler& operator=(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
-  friend void swap(AccountHandler& lhs, AccountHandler& rhs) MAIDSAFE_NOEXCEPT;
+  AccountHandler& operator=(AccountHandler&& other) = delete;
 
   // Retrieves and decrypts account info when logging in to an existing account.  'account_getter'
   // should already be joined to the network.  Throws on error, including already having logged in.
@@ -68,7 +66,7 @@ class AccountHandler {
   std::unique_ptr<Account> account_;
 
  private:
-  StructuredDataVersions::VersionName current_account_version_;
+  StructuredDataVersions account_versions_;
   authentication::UserCredentials user_credentials_;
 };
 

@@ -29,9 +29,7 @@
 
 #include "maidsafe/common/asio_service.h"
 #include "maidsafe/common/rsa.h"
-#include "maidsafe/routing/api_config.h"
-#include "maidsafe/routing/routing_api.h"
-#include "maidsafe/nfs/public_pmid_helper.h"
+// #include "maidsafe/nfs/public_pmid_helper.h"
 
 #include "maidsafe/launcher/types.h"
 
@@ -75,7 +73,7 @@ class AccountGetter {
   std::unique_ptr<routing::Routing> routing_;
 #endif
   std::unique_ptr<DataGetter> data_getter_;
-  nfs::detail::PublicPmidHelper public_pmid_helper_;
+  //  nfs::detail::PublicPmidHelper public_pmid_helper_;
   BoostAsioService asio_service_;
 };
 

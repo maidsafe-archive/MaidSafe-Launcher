@@ -23,11 +23,19 @@
 #include <string>
 #include <vector>
 
+#ifdef ROUTING_AND_NFS_UPDATED
+
 #ifdef USE_FAKE_STORE
 #include "maidsafe/nfs/client/fake_store.h"
 #else
 #include "maidsafe/nfs/client/data_getter.h"
 #include "maidsafe/nfs/client/maid_client.h"
+#endif
+
+#else
+
+#include "maidsafe/common/data_buffer.h"
+
 #endif
 
 namespace maidsafe {
@@ -40,6 +48,11 @@ using Keyword = std::vector<unsigned char>;
 using Pin = std::uint32_t;
 using Password = std::vector<unsigned char>;
 
+// Once Routing and NFS are updated, this block should be reduced to just the #ifdef USE_FAKE_STORE
+// ... #else ... #endif block.  Other blocks inside ROUTING_AND_NFS_UPDATED guards should be handled
+// similarly.
+#ifdef ROUTING_AND_NFS_UPDATED
+
 #ifdef USE_FAKE_STORE
 #ifndef TESTING
 #error USE_FAKE_STORE must only be defined if TESTING is also defined
@@ -49,6 +62,13 @@ using DataGetter = nfs::FakeStore;
 #else
 using NetworkClient = nfs_client::MaidClient;
 using DataGetter = nfs_client::DataGetter;
+#endif
+
+#else
+
+using NetworkClient = DataBuffer;
+using DataGetter = DataBuffer;
+
 #endif
 
 }  // namespace launcher

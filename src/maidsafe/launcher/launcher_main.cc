@@ -25,6 +25,7 @@
 #include <future>
 #include <iostream>
 
+#include "maidsafe/common/convert.h"
 #include "maidsafe/common/error.h"
 #include "maidsafe/common/log.h"
 
@@ -64,7 +65,9 @@ int main(int argc, char** argv) {
   try {
 #ifdef _MSC_VER
     if (SetConsoleCtrlHandler(reinterpret_cast<PHANDLER_ROUTINE>(CtrlHandler), TRUE)) {
-      std::unique_ptr<Launcher> launcher(Launcher::CreateAccount("aaaaa", 1111, "bbbbb"));
+      std::unique_ptr<Launcher> launcher(
+          Launcher::CreateAccount(maidsafe::convert::ToByteVector("aaaaa"), 1111,
+                                  maidsafe::convert::ToByteVector("bbbbb")));
       g_shutdown_promise.get_future().get();
       launcher->LogoutAndStop();
     } else {
