@@ -362,6 +362,7 @@ void Launcher::HandleNewConnection(std::shared_ptr<Launch> launch, tcp::Connecti
 
 void Launcher::HandleMessage(std::shared_ptr<Launch> launch, tcp::Message /*message*/) {
   assert(launch->strand.running_in_this_thread());
+  static_cast<void>(launch);
 }
 
 }  // namespace launcher
