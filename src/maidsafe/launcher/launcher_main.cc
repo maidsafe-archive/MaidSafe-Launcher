@@ -75,7 +75,8 @@ int main(int argc, char** argv) {
       return maidsafe::ErrorToInt(MakeError(maidsafe::CommonErrors::unable_to_handle_request));
     }
 #else
-    std::unique_ptr<Launcher> launcher(Launcher::CreateAccount("aaaaa", 1111, "bbbbb"));
+    std::unique_ptr<Launcher> launcher(Launcher::CreateAccount(
+        maidsafe::convert::ToByteVector("aaaaa"), 1111, maidsafe::convert::ToByteVector("bbbbb")));
     signal(SIGINT, ShutDownLauncher);
     signal(SIGTERM, ShutDownLauncher);
     g_shutdown_promise.get_future().get();
