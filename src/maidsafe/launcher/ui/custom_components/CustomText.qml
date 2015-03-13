@@ -27,4 +27,6 @@ Text {
     pixelSize: customProperties.defaultFontPixelSize
     family: globalFontFamily.name
   }
+  horizontalAlignment: TextInput.AlignHCenter
+  verticalAlignment: TextInput.AlignVCenter
 }

@@ -34,6 +34,10 @@ Item {
       target: rocket
       y: 0
     }
+    PropertyChanges {
+      target: errorMessage
+      text: ""
+    }
   }, State {
     name: "HIDDEN"
     PropertyChanges {
@@ -42,7 +46,7 @@ Item {
     }
     PropertyChanges {
       target: rocket
-      y: rocket.parent.height
+      y: rocketContainer.height
     }
   }]
 
@@ -54,10 +58,11 @@ Item {
         }
         ScriptAction {
             script: {
+              cancelButton.text = qsTr("Cancel")
               loadingView.visible = true
               accountHandlerView.currentView = loadingView
               cancelButton.forceActiveFocus()
-              rocket.startLoading()
+              rocket.showLoading()
               stopRocketTimer.start()
             }
          }
@@ -86,25 +91,32 @@ Item {
 
   Timer {
     id: stopRocketTimer
-    interval: 2000
+    interval: 1200
     running: false
     repeat: false
-    onTriggered: rocket.goToError()
+    onTriggered: rocket.showFailed()
+  }
+
+  CustomText {
+    id: errorMessage
+    y: accountHandlerView.bottomButtonY - rocketContainer.height - height
+    anchors.horizontalCenter: parent.horizontalCenter
   }
 
   Item {
+    id: rocketContainer
     y: accountHandlerView.bottomButtonY - height
     anchors.horizontalCenter: parent.horizontalCenter
     height: 140
-    width: 100
+    width: 250
     clip: true
 
     Rocket {
       id: rocket
-      width:100
-      height:100
       onFinished: {
-        floatingStatus.showError(cancelButton, qsTr("Finished !"))
+        // TODO Gildas: if (success)
+        cancelButton.text = qsTr("GO BACK")
+        errorMessage.text = qsTr("There was an error creating your account.\nPlease try again.")
       }
     }
   }
@@ -112,8 +124,6 @@ Item {
   BlueButton {
     id: cancelButton
     y: accountHandlerView.bottomButtonY
-
-    text: qsTr("Cancel")
     onClicked: {
       accountHandlerView.state = accountHandlerView.fromState
     }

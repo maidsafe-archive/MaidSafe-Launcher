@@ -1,23 +1,33 @@
 import QtQuick 2.4
+Item {
+  id: rocket
+  width: 250
+  height: 100
 
-Canvas {
-    id: rocketLoading
+  signal finished(bool success)
+  function showLoading() {
+    rocketCanvas.visible = true
+    rocketLoadingImage.visible = false
+    rocketCanvas.startLoadingWithColor("#ffffffff");
+  }
 
-// PUBLIC
+  function showFailed() {
+    breakAtTheEnd = true
+    rocketCanvas.stopToColor("#aaff0000");
+  }
+  function showSuccess() {
+    breakAtTheEnd = false
+    rocketCanvas.stopToColor("#aaffffff");
+  }
 
-    signal finished()
-    function startLoading() {
-      return startLoadingWithColor("#ffffff");
-    }
+  property bool breakAtTheEnd: false
 
-    function goToError() {
-      return stopToColor("#ff0000");
-    }
-    function goToSuccess() {
-      return stopToColor("#ffffff");
-    }
+  Canvas {
+    id: rocketCanvas
 
-// PRIVATE
+    x: 75
+    width: 95 // to match the pngs
+    height: 95 // to match the pngs
 
     function startLoadingWithColor(color) {
       currentColor = color
@@ -38,12 +48,12 @@ Canvas {
         return Qt.rgba(toColor.r,
                        toColor.g,
                        toColor.b,
-                       Math.min(angle - 6 -polygon, 1))
+                       Math.min(angle - 6 -polygon, 1) * toColor.a)
       } else {
         return Qt.rgba(currentColor.r,
                        currentColor.g,
                        currentColor.b,
-                       getFillColorAlpha(polygon))
+                       getFillColorAlpha(polygon) * currentColor.a)
       }
     }
 
@@ -161,7 +171,7 @@ Canvas {
       running: false
       from: 0
       to: 6
-      duration: 5000
+      duration: 1000
       loops: Animation.Infinite
       onStopped: finishAnimation.start()
       alwaysRunToEnd: true
@@ -170,8 +180,45 @@ Canvas {
       id: finishAnimation
       running: false
       to: 12
-      duration: 5000
-      onStopped: rocketLoading.finished()
-      alwaysRunToEnd: true
+      duration: 1000
+      onStopped: {
+        if (rocket.breakAtTheEnd) {
+          rocketLoadingImage.visible = true
+          rocketCanvas.visible = false
+          rocketLoadingImage.frameNumber = rocketLoadingImage.fromFrame
+          frameNumberTimer.start()
+        } else {
+          rocket.finished(true)
+        }
+      }
     }
+  }
+
+  Image {
+    id: rocketLoadingImage
+    visible: false
+    x: 7
+    y: -7
+    height: 100
+    width: 250
+    source: "/resources/images/rocket_breaking/Comp\ 2_" + frameNumber + ".png"
+    readonly property int fromFrame: 1048
+    readonly property int toFrame: 1119
+    property int frameNumber: fromFrame
+
+    Timer {
+      id: frameNumberTimer
+      interval: 633
+      onTriggered: frameNumberAnimation.start()
+    }
+
+    NumberAnimation on frameNumber {
+      id: frameNumberAnimation
+      running: false
+      from: rocketLoadingImage.fromFrame
+      to: rocketLoadingImage.toFrame
+      duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 30
+      onStopped: rocket.finished(false)
+    }
+  }
 }
