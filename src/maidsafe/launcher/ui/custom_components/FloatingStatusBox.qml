@@ -59,7 +59,7 @@ Rectangle {
 
   function hide() {
     state = ""
-    if (pointToItem) {
+    if (pointToItem && pointToItem.clearAllImages) {
       pointToItem.clearAllImages()
       pointToItem = null
     }
@@ -71,7 +71,7 @@ Rectangle {
   function show(item, meta, info, color, showError) {
     hide()
     pointToItem = item
-    if (pointToItem)
+    if (pointToItem && pointToItem.showErrorImage)
       pointToItem.showErrorImage = showError
     metaText.text = meta
     infoText.text = info

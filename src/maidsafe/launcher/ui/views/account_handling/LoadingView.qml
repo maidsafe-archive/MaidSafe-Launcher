@@ -57,6 +57,8 @@ Item {
               loadingView.visible = true
               accountHandlerView.currentView = loadingView
               cancelButton.forceActiveFocus()
+              rocket.startLoading()
+              stopRocketTimer.start()
             }
          }
         NumberAnimation {
@@ -82,6 +84,13 @@ Item {
   }]
 
 
+  Timer {
+    id: stopRocketTimer
+    interval: 2000
+    running: false
+    repeat: false
+    onTriggered: rocket.goToError()
+  }
 
   Item {
     y: accountHandlerView.bottomButtonY - height
@@ -94,6 +103,9 @@ Item {
       id: rocket
       width:100
       height:100
+      onFinished: {
+        floatingStatus.showError(cancelButton, qsTr("Finished !"))
+      }
     }
   }
 
