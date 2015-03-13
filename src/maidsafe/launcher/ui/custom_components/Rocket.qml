@@ -6,9 +6,12 @@ Item {
 
   signal finished(bool success)
   function showLoading() {
+    if (running)
+      stopAnimations()
     rocketCanvas.visible = true
     rocketLoadingImage.visible = false
     rocketCanvas.startLoadingWithColor("#ffffffff");
+    running = true
   }
 
   function showFailed() {
@@ -19,8 +22,16 @@ Item {
     breakAtTheEnd = false
     rocketCanvas.stopToColor("#aaffffff");
   }
+  function stopAnimations() {
+    running = false
+    angleAnimation.stop()
+    finishAnimation.stop()
+    frameNumberTimer.stop()
+    frameNumberAnimation.stop()
+  }
 
   property bool breakAtTheEnd: false
+  property bool running: false
 
   Canvas {
     id: rocketCanvas
@@ -173,7 +184,7 @@ Item {
       to: 6
       duration: 1000
       loops: Animation.Infinite
-      onStopped: finishAnimation.start()
+      onStopped: if (rocket.running) finishAnimation.start()
       alwaysRunToEnd: true
     }
     NumberAnimation on angle {
@@ -182,13 +193,15 @@ Item {
       to: 12
       duration: 1000
       onStopped: {
-        if (rocket.breakAtTheEnd) {
-          rocketLoadingImage.visible = true
-          rocketCanvas.visible = false
-          rocketLoadingImage.frameNumber = rocketLoadingImage.fromFrame
-          frameNumberTimer.start()
-        } else {
-          rocket.finished(true)
+        if (rocket.running) {
+          if (rocket.breakAtTheEnd) {
+            rocketLoadingImage.visible = true
+            rocketCanvas.visible = false
+            rocketLoadingImage.frameNumber = rocketLoadingImage.fromFrame
+            frameNumberTimer.start()
+          } else {
+            rocket.finished(true)
+          }
         }
       }
     }
@@ -209,7 +222,7 @@ Item {
     Timer {
       id: frameNumberTimer
       interval: 633
-      onTriggered: frameNumberAnimation.start()
+      onTriggered: if (rocket.running) frameNumberAnimation.start()
     }
 
     NumberAnimation on frameNumber {
@@ -218,7 +231,7 @@ Item {
       from: rocketLoadingImage.fromFrame
       to: rocketLoadingImage.toFrame
       duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 30
-      onStopped: rocket.finished(false)
+      onStopped: if (rocket.running) rocket.finished(false)
     }
   }
 }
