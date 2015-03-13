@@ -25,8 +25,8 @@ extern "C" char** environ;
 #include <future>
 #include <memory>
 
+#include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/test.h"
-#include "maidsafe/routing/parameters.h"
 
 #include "maidsafe/launcher/account.h"
 #include "maidsafe/launcher/account_getter.h"
@@ -38,7 +38,12 @@ namespace launcher {
 
 namespace test {
 
-TEST(LauncherTest, FUNC_CreateValidAccount) {
+class LauncherTest : public TestUsingFakeStore {
+ protected:
+  LauncherTest() : TestUsingFakeStore("Launcher") {}
+};
+
+TEST_F(LauncherTest, FUNC_CreateValidAccount) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   std::unique_ptr<Launcher> launcher;
   ASSERT_NO_THROW(launcher = Launcher::CreateAccount(std::get<0>(user_credentials_tuple),
@@ -47,7 +52,7 @@ TEST(LauncherTest, FUNC_CreateValidAccount) {
   launcher->LogoutAndStop();
 }
 
-TEST(LauncherTest, FUNC_CreateMultipleAccounts) {
+TEST_F(LauncherTest, FUNC_CreateMultipleAccounts) {
   const int kCount{3};
   for (int i(0); i != kCount; ++i) {
     auto user_credentials_tuple(GetRandomUserCredentialsTuple());
@@ -59,7 +64,7 @@ TEST(LauncherTest, FUNC_CreateMultipleAccounts) {
   }
 }
 
-TEST(LauncherTest, FUNC_CreateDuplicateAccount) {
+TEST_F(LauncherTest, FUNC_CreateDuplicateAccount) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   {  // Create first account
     std::unique_ptr<Launcher> launcher;
@@ -72,15 +77,14 @@ TEST(LauncherTest, FUNC_CreateDuplicateAccount) {
     // Try to create duplicate account
     // TODO(Prakash): Verify the error code being checked for as accurate
     EXPECT_TRUE(ThrowsAs([&] {
-                           Launcher::CreateAccount(std::get<0>(user_credentials_tuple),
-                                                   std::get<1>(user_credentials_tuple),
-                                                   std::get<2>(user_credentials_tuple));
-                         },
-                         VaultErrors::data_already_exists));
+      Launcher::CreateAccount(std::get<0>(user_credentials_tuple),
+                              std::get<1>(user_credentials_tuple),
+                              std::get<2>(user_credentials_tuple));
+    }, VaultErrors::data_already_exists));
   }
 }
 
-TEST(LauncherTest, FUNC_ValidLogin) {
+TEST_F(LauncherTest, FUNC_ValidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   // Create account
   Launcher::CreateAccount(std::get<0>(user_credentials_tuple), std::get<1>(user_credentials_tuple),
@@ -94,15 +98,13 @@ TEST(LauncherTest, FUNC_ValidLogin) {
   launcher->LogoutAndStop();
 }
 
-TEST(LauncherTest, FUNC_InvalidLogin) {
+TEST_F(LauncherTest, FUNC_InvalidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   // TODO(Prakash): Verify the error code being checked for as accurate
   EXPECT_TRUE(ThrowsAs([&] {
-                         Launcher::Login(std::get<0>(user_credentials_tuple),
-                                         std::get<1>(user_credentials_tuple),
-                                         std::get<2>(user_credentials_tuple));
-                       },
-                       VaultErrors::no_such_account));
+    Launcher::Login(std::get<0>(user_credentials_tuple), std::get<1>(user_credentials_tuple),
+                    std::get<2>(user_credentials_tuple));
+  }, VaultErrors::no_such_account));
 }
 
 

@@ -1,4 +1,4 @@
-/*  Copyright 2014 MaidSafe.net limited
+/*  Copyright 2015 MaidSafe.net limited
 
     This MaidSafe Software is licensed to you under (1) the MaidSafe.net Commercial License,
     version 1.0 or later, or (2) The General Public License (GPL), version 3, depending on which
@@ -16,32 +16,48 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/launcher/account_getter.h"
+#ifndef MAIDSAFE_LAUNCHER_LAUNCH_H_
+#define MAIDSAFE_LAUNCHER_LAUNCH_H_
 
-#include "maidsafe/common/test.h"
+#include <chrono>
 
-#include "maidsafe/launcher/tests/test_utils.h"
+#include "asio/io_service_strand.hpp"
+#include "asio/steady_timer.hpp"
+
+#include "maidsafe/common/asio_service.h"
+#include "maidsafe/common/config.h"
+#include "maidsafe/common/tcp/connection.h"
+#include "maidsafe/common/tcp/listener.h"
+
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
-namespace test {
+struct Launch {
+  Launch(AppName name_in, AsioService& asio_service,
+         const std::chrono::steady_clock::duration& expiry_time)
+      : name(std::move(name_in)),
+        strand(asio_service.service()),
+        timer(asio_service.service(), expiry_time),
+        connection() {}
+  Launch() = delete;
+  ~Launch() = default;
+  Launch(const Launch&) = delete;
+  Launch(Launch&&) = delete;
+  Launch& operator=(const Launch&) = delete;
+  Launch& operator=(Launch&&) = delete;
 
-class AccountGetterTest : public TestUsingFakeStore {
- protected:
-  AccountGetterTest() : TestUsingFakeStore("AccountGetter") {}
+  AppName name;
+  asio::io_service::strand strand;
+  asio::steady_timer timer;
+  tcp::ConnectionPtr connection;
+  tcp::ListenerPtr listener;
 };
-
-TEST_F(AccountGetterTest, FUNC_Constructor) {
-  auto account_getter_future = AccountGetter::CreateAccountGetter();
-  LOG(kVerbose) << "Started CreateAccountGetter thread";
-  std::unique_ptr<AccountGetter> account_getter;
-  ASSERT_NO_THROW(account_getter = account_getter_future.get());
-}
-
-}  // namespace test
 
 }  // namespace launcher
 
 }  // namespace maidsafe
+
+#endif  // MAIDSAFE_LAUNCHER_LAUNCH_H_

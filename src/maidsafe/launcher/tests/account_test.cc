@@ -44,10 +44,9 @@ TEST(AccountTest, BEH_Create) {
   EXPECT_EQ(boost::posix_time::ptime(boost::date_time::not_a_date_time), account->timestamp);
   EXPECT_TRUE(account->ip.is_unspecified());
   EXPECT_EQ(0, account->port);
-  EXPECT_FALSE(account->unique_user_id.IsInitialised());
-  EXPECT_FALSE(account->root_parent_id.IsInitialised());
-  EXPECT_TRUE(account->config_file_aes_key.IsInitialised());
-  EXPECT_TRUE(account->config_file_aes_iv.IsInitialised());
+  EXPECT_TRUE(account->unique_user_id.IsInitialised());
+  EXPECT_TRUE(account->root_parent_id.IsInitialised());
+  EXPECT_TRUE(account->config_file_aes_key_and_iv.IsInitialised());
   EXPECT_TRUE(account->apps.empty());
 }
 
@@ -73,16 +72,15 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   EXPECT_EQ(account0.port, account1->port);
   EXPECT_EQ(account0.unique_user_id, account1->unique_user_id);
   EXPECT_EQ(account0.root_parent_id, account1->root_parent_id);
-  EXPECT_EQ(account0.config_file_aes_key, account1->config_file_aes_key);
-  EXPECT_EQ(account0.config_file_aes_iv, account1->config_file_aes_iv);
+  EXPECT_EQ(account0.config_file_aes_key_and_iv, account1->config_file_aes_key_and_iv);
   EXPECT_TRUE(Equals(account0.apps, account1->apps));
 
   const auto ip(asio::ip::make_address_v6(maidsafe::test::GetRandomIPv6AddressAsString()));
   const uint16_t port(static_cast<uint16_t>(RandomUint32()));
-  const Identity unique_user_id(RandomString(crypto::SHA512::DIGESTSIZE));
-  const Identity root_parent_id(RandomString(crypto::SHA512::DIGESTSIZE));
-  const crypto::AES256Key aes_key(RandomString(crypto::AES256_KeySize));
-  const crypto::AES256InitialisationVector aes_iv(RandomString(crypto::AES256_IVSize));
+  const Identity unique_user_id(MakeIdentity());
+  const Identity root_parent_id(MakeIdentity());
+  const crypto::AES256KeyAndIV aes_key_and_iv(
+      RandomBytes(crypto::AES256_KeySize + crypto::AES256_IVSize));
   std::set<AppDetails> apps;
   apps.insert(CreateRandomAppDetails());
   apps.insert(CreateRandomAppDetails());
@@ -92,8 +90,7 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   account1->port = port;
   account1->unique_user_id = unique_user_id;
   account1->root_parent_id = root_parent_id;
-  account1->config_file_aes_key = aes_key;
-  account1->config_file_aes_iv = aes_iv;
+  account1->config_file_aes_key_and_iv = aes_key_and_iv;
   account1->apps = apps;
 
   // Encrypt updated account, then parse and check.
@@ -105,8 +102,7 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   EXPECT_EQ(account1->port, port);
   EXPECT_EQ(account1->unique_user_id, unique_user_id);
   EXPECT_EQ(account1->root_parent_id, root_parent_id);
-  EXPECT_EQ(account1->config_file_aes_key, aes_key);
-  EXPECT_EQ(account1->config_file_aes_iv, aes_iv);
+  EXPECT_EQ(account1->config_file_aes_key_and_iv, aes_key_and_iv);
   EXPECT_TRUE(Equals(account1->apps, apps));
 
   std::unique_ptr<Account> account2;
@@ -118,9 +114,9 @@ TEST(AccountTest, FUNC_SaveAndLogin) {
   EXPECT_EQ(account1->port, account2->port);
   EXPECT_EQ(account1->unique_user_id, account2->unique_user_id);
   EXPECT_EQ(account1->root_parent_id, account2->root_parent_id);
-  EXPECT_EQ(account1->config_file_aes_key, account2->config_file_aes_key);
-  EXPECT_EQ(account1->config_file_aes_iv, account2->config_file_aes_iv);
-  EXPECT_TRUE(Equals(account1->apps, account2->apps, (kIgnorePath | kIgnoreArgs)));
+  EXPECT_EQ(account1->config_file_aes_key_and_iv, account2->config_file_aes_key_and_iv);
+  EXPECT_TRUE(
+      Equals(account1->apps, account2->apps, (kIgnorePath | kIgnoreArgs | kIgnoreAutoStart)));
 }
 
 TEST(AccountTest, FUNC_MoveConstructAndAssign) {
@@ -131,10 +127,10 @@ TEST(AccountTest, FUNC_MoveConstructAndAssign) {
   const boost::posix_time::ptime timestamp{initial_account.timestamp};
   const auto ip(asio::ip::make_address_v6(maidsafe::test::GetRandomIPv6AddressAsString()));
   const uint16_t port{static_cast<uint16_t>(RandomUint32())};
-  const Identity unique_user_id{RandomString(crypto::SHA512::DIGESTSIZE)};
-  const Identity root_parent_id{RandomString(crypto::SHA512::DIGESTSIZE)};
-  const crypto::AES256Key aes_key{RandomString(crypto::AES256_KeySize)};
-  const crypto::AES256InitialisationVector aes_iv{RandomString(crypto::AES256_IVSize)};
+  const Identity unique_user_id{MakeIdentity()};
+  const Identity root_parent_id{MakeIdentity()};
+  const crypto::AES256KeyAndIV aes_key_and_iv{
+      RandomBytes(crypto::AES256_KeySize + crypto::AES256_IVSize)};
   std::set<AppDetails> apps;
   apps.insert(CreateRandomAppDetails());
   apps.insert(CreateRandomAppDetails());
@@ -143,8 +139,7 @@ TEST(AccountTest, FUNC_MoveConstructAndAssign) {
   initial_account.port = port;
   initial_account.unique_user_id = unique_user_id;
   initial_account.root_parent_id = root_parent_id;
-  initial_account.config_file_aes_key = aes_key;
-  initial_account.config_file_aes_iv = aes_iv;
+  initial_account.config_file_aes_key_and_iv = aes_key_and_iv;
   initial_account.apps = apps;
 
   Account moved_to_account{std::move(initial_account)};
@@ -154,8 +149,7 @@ TEST(AccountTest, FUNC_MoveConstructAndAssign) {
   EXPECT_EQ(port, moved_to_account.port);
   EXPECT_EQ(unique_user_id, moved_to_account.unique_user_id);
   EXPECT_EQ(root_parent_id, moved_to_account.root_parent_id);
-  EXPECT_EQ(aes_key, moved_to_account.config_file_aes_key);
-  EXPECT_EQ(aes_iv, moved_to_account.config_file_aes_iv);
+  EXPECT_EQ(aes_key_and_iv, moved_to_account.config_file_aes_key_and_iv);
   EXPECT_TRUE(Equals(apps, moved_to_account.apps));
 
   Account assigned_to_account{passport::CreateMaidAndSigner()};
@@ -166,8 +160,7 @@ TEST(AccountTest, FUNC_MoveConstructAndAssign) {
   EXPECT_EQ(port, assigned_to_account.port);
   EXPECT_EQ(unique_user_id, assigned_to_account.unique_user_id);
   EXPECT_EQ(root_parent_id, assigned_to_account.root_parent_id);
-  EXPECT_EQ(aes_key, assigned_to_account.config_file_aes_key);
-  EXPECT_EQ(aes_iv, assigned_to_account.config_file_aes_iv);
+  EXPECT_EQ(aes_key_and_iv, assigned_to_account.config_file_aes_key_and_iv);
   EXPECT_TRUE(Equals(apps, assigned_to_account.apps));
 }
 

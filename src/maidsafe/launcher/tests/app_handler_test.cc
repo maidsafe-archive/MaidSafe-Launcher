@@ -49,8 +49,8 @@ class AppHandlerTest : public testing::Test {
         account_mutex_() {
     account_.ip = asio::ip::make_address_v6(maidsafe::test::GetRandomIPv6AddressAsString());
     account_.port = static_cast<std::uint16_t>(RandomUint32());
-    account_.unique_user_id = Identity{RandomString(crypto::SHA512::DIGESTSIZE)};
-    account_.root_parent_id = Identity{RandomString(crypto::SHA512::DIGESTSIZE)};
+    account_.unique_user_id = Identity{MakeIdentity()};
+    account_.root_parent_id = Identity{MakeIdentity()};
     for (int i{0}; i < 5; ++i)
       account_.apps.insert(CreateRandomAppDetails());
   }
@@ -82,7 +82,8 @@ TEST_F(AppHandlerTest, BEH_Snapshot) {
   std::set<AppDetails> apps;
   for (std::uint32_t i{0}; i < app_count; ++i) {
     AppDetails app{CreateRandomAppDetails()};
-    AppDetails added_app(app_handler.AddOrLinkApp(app.name, app.path, app.args, &app.icon));
+    AppDetails added_app(
+        app_handler.AddOrLinkApp(app.name, app.path, app.args, &app.icon, app.auto_start));
     app.permitted_dirs.insert(*added_app.permitted_dirs.begin());
     for (const auto& dir : app.permitted_dirs)
       app_handler.UpdatePermittedDirs(app.name, dir);
@@ -102,22 +103,22 @@ TEST_F(AppHandlerTest, BEH_Snapshot) {
         AppHandler::Snapshot snapshot2(app_handler.GetSnapshot());
         snapshot_config_file = SnapshotConfigFile(snapshot2);
         EXPECT_TRUE(fs::exists(snapshot_config_file));
-        EXPECT_EQ(ReadFile(config_file), ReadFile(snapshot_config_file));
+        EXPECT_EQ(ReadFile(config_file).value(), ReadFile(snapshot_config_file).value());
         snapshot1 = snapshot2;
       }
       EXPECT_TRUE(fs::exists(snapshot_config_file));
-      EXPECT_EQ(ReadFile(config_file), ReadFile(snapshot_config_file));
+      EXPECT_EQ(ReadFile(config_file).value(), ReadFile(snapshot_config_file).value());
       snapshot0 = std::move(snapshot1);
     }
     EXPECT_TRUE(fs::exists(snapshot_config_file));
-    EXPECT_EQ(ReadFile(config_file), ReadFile(snapshot_config_file));
+    EXPECT_EQ(ReadFile(config_file).value(), ReadFile(snapshot_config_file).value());
   }
   EXPECT_FALSE(fs::exists(snapshot_config_file));
 
   // Keep a copy of the current snapshot to try applying later
   auto snapshot(maidsafe::make_unique<AppHandler::Snapshot>(app_handler.GetSnapshot()));
   snapshot_config_file = SnapshotConfigFile(*snapshot);
-  auto config_file_contents(ReadFile(config_file));
+  auto config_file_contents(ReadFile(config_file).value());
 
   // Check that applying the "empty" snapshot clears the data and removes the config file
   ASSERT_EQ(app_count, app_handler.GetApps(true).size());
@@ -131,7 +132,7 @@ TEST_F(AppHandlerTest, BEH_Snapshot) {
   app_handler.ApplySnapshot(std::move(*snapshot));
   EXPECT_TRUE(Equals(apps, app_handler.GetApps(true)));
   EXPECT_TRUE(fs::exists(config_file));
-  EXPECT_EQ(config_file_contents, ReadFile(config_file));
+  EXPECT_EQ(config_file_contents, ReadFile(config_file).value());
   EXPECT_FALSE(fs::exists(snapshot_config_file));
 }
 

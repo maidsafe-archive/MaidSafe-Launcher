@@ -19,11 +19,11 @@
 #ifndef MAIDSAFE_LAUNCHER_LAUNCHER_H_
 #define MAIDSAFE_LAUNCHER_LAUNCHER_H_
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <mutex>
 #include <set>
-#include <string>
 
 #include "boost/filesystem/path.hpp"
 #include "boost/optional.hpp"
@@ -31,18 +31,20 @@
 #include "maidsafe/directory_info.h"
 #include "maidsafe/common/asio_service.h"
 #include "maidsafe/common/on_scope_exit.h"
+#include "maidsafe/common/tcp/connection.h"
 #include "maidsafe/passport/passport.h"
-#include "maidsafe/nfs/client/maid_client.h"
 
 #include "maidsafe/launcher/account_handler.h"
 #include "maidsafe/launcher/app_handler.h"
 #include "maidsafe/launcher/app_details.h"
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
 namespace launcher {
 
 class AccountGetter;
+struct Launch;
 
 // Unless otherwise indicated, this class' public functions all throw on error and provide the
 // strong exception-safety guarantee.
@@ -55,10 +57,6 @@ class AccountGetter;
 // A non-local app can be added locally by calling 'LinkApp', not 'AddApp'.
 class Launcher {
  public:
-  using Keyword = std::string;
-  using Pin = uint32_t;
-  using Password = std::string;
-
   Launcher(const Launcher&) = delete;
   Launcher(Launcher&&) = delete;
   Launcher& operator=(const Launcher&) = delete;
@@ -82,30 +80,31 @@ class Launcher {
   // Adds an instance of 'app_name' to the set of local apps.  Throws if the app has already been
   // added locally or non-locally.  (To add an app which has previously been added non-locally, use
   // the 'LinkApp' function.)
-  void AddApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
-              SerialisedData app_icon);
+  void AddApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+              SerialisedData app_icon, bool auto_start);
 
   // Adds an instance of 'app_name' to the set of local apps where this app must have been
   // previously added non-locally.  Throws if the app has already been added locally, linked, or has
   // *not* been added non-locally.
-  void LinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args);
+  void LinkApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+               bool auto_start);
 
   // The 'Update...' functions all replace the existing field with the new one for the app indicated
   // by 'app_name'.
-  void UpdateAppName(const std::string& app_name, const std::string& new_name);
-  void UpdateAppPath(const std::string& app_name, const boost::filesystem::path& new_path);
-  void UpdateAppArgs(const std::string& app_name, const std::string& new_args);
-  void UpdateAppSafeDriveAccess(const std::string& app_name,
-                                DirectoryInfo::AccessRights new_rights);
-  void UpdateAppIcon(const std::string& app_name, const SerialisedData& new_icon);
+  void UpdateAppName(const AppName& app_name, const AppName& new_name);
+  void UpdateAppPath(const AppName& app_name, const boost::filesystem::path& new_path);
+  void UpdateAppArgs(const AppName& app_name, const AppArgs& new_args);
+  void UpdateAppSafeDriveAccess(const AppName& app_name, DirectoryInfo::AccessRights new_rights);
+  void UpdateAppIcon(const AppName& app_name, const SerialisedData& new_icon);
+  void UpdateAppAutoStart(const AppName& app_name, bool new_auto_start_value);
 
   // Removes an instance of the app indicated by 'app_name' from the set of locally-available apps.
   // Throws if the app isn't in the set.
-  void RemoveAppLocally(const std::string& app_name);
+  void RemoveAppLocally(const AppName& app_name);
 
   // Removes an instance of the app indicated by 'app_name' from the set of non-locally available
   // apps.  Throws if the app isn't in the set.
-  void RemoveAppFromNetwork(const std::string& app_name);
+  void RemoveAppFromNetwork(const AppName& app_name);
 
   // Save the account to the network.  If 'force' is false, the account is only saved if there are
   // unsaved changes in the account (e.g. if AddApp has been called).  If 'force' is true, the
@@ -118,7 +117,32 @@ class Launcher {
   void RevertToLastSavedSession();
 
   // Launches a new instance of the app indicated by 'app_name' as a detached child.
-  void LaunchApp(const std::string& app_name);
+  //
+  // The app will be passed the Launcher's TCP listening port in a command line argument
+  // "--launcher_port=X" where X will be a random port between 1025 and 65535 inclusive.  The app
+  // must then establish a TCP connection to the launcher on the loopback address at this port
+  // within the 'connect_timeout_' duration or the launch attempt fails.
+  //
+  // Once the connection is established, the app should immediately pass through its session public
+  // key and wait for the Launcher to reply with the set of NFS directories to which it has access.
+  // The app should then reply to confirm receipt, at which time the connection is closed and the
+  // app is orphaned so that it no longer depends on the Launcher running.
+  //
+  // The time from the connection being established until the Launcher receives the final
+  // confirmation from the app must be within the 'handshake_timeout_' duration or the launch fails.
+  //
+  // For apps, there is a blocking function to handle this entire process in the API project named
+  // 'RegisterAppSession'.
+  void LaunchApp(const AppName& app_name);
+
+  static const std::chrono::steady_clock::duration connect_timeout_;
+  static const std::chrono::steady_clock::duration handshake_timeout_;
+
+#ifdef USE_FAKE_STORE
+  static boost::filesystem::path FakeStorePath(
+      const boost::filesystem::path* const disk_path = nullptr);
+  static DiskUsage FakeStoreDiskUsage(const DiskUsage* const disk_usage = nullptr);
+#endif
 
  private:
   // For already existing accounts.
@@ -127,15 +151,19 @@ class Launcher {
   // For new accounts.  Throws on failure to create account.
   Launcher(Keyword keyword, Pin pin, Password password, passport::MaidAndSigner&& maid_and_signer);
 
-  void AddOrLinkApp(std::string app_name, boost::filesystem::path app_path, std::string app_args,
-                    const SerialisedData* const app_icon);
+  void AddOrLinkApp(AppName app_name, boost::filesystem::path app_path, AppArgs app_args,
+                    const SerialisedData* const app_icon, bool auto_start);
 
   void RevertAppHandler(AppHandler::Snapshot snapshot);
 
-  tcp::Port StartListening();
+  void LaunchApp(const AppName& app_name, const boost::filesystem::path& path, AppArgs args);
+
+  void HandleNewConnection(std::shared_ptr<Launch> launch, tcp::ConnectionPtr connection);
+
+  void HandleMessage(std::shared_ptr<Launch> launch, tcp::Message message);
 
   AsioService asio_service_;
-  std::shared_ptr<nfs_client::MaidClient> maid_client_;
+  std::shared_ptr<NetworkClient> network_client_;
   AccountHandler account_handler_;
   mutable std::mutex account_mutex_;
   AppHandler app_handler_;

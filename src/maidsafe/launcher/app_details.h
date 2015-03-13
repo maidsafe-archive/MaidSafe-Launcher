@@ -20,7 +20,6 @@
 #define MAIDSAFE_LAUNCHER_APP_DETAILS_H_
 
 #include <cstdint>
-#include <string>
 #include <set>
 
 #include "boost/filesystem/path.hpp"
@@ -28,6 +27,8 @@
 #include "maidsafe/common/config.h"
 #include "maidsafe/common/serialisation/serialisation.h"
 #include "maidsafe/directory_info.h"
+
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
@@ -41,11 +42,12 @@ struct AppDetails {
   AppDetails& operator=(const AppDetails&) = default;
   AppDetails& operator=(AppDetails&& other) MAIDSAFE_NOEXCEPT;
 
-  std::string name;
+  AppName name;
   boost::filesystem::path path;
-  std::string args;
+  AppArgs args;
   std::set<DirectoryInfo> permitted_dirs;
   SerialisedData icon;
+  bool auto_start;
 };
 
 void swap(AppDetails& lhs, AppDetails& rhs) MAIDSAFE_NOEXCEPT;
