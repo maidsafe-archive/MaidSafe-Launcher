@@ -52,7 +52,6 @@ Item {
         mainWindowTitleBar.maximiseRestoreEnabled = false
         globalWindowResizeHelper.enabled = false
       }
-
     }
 
     Component.onDestruction: {
@@ -62,9 +61,9 @@ Item {
       }
     }
 
-      source: "/resources/images/login_bg.png"
-      anchors.fill: parent
-    }
+    source: "/resources/images/login_bg.png"
+    anchors.fill: parent
+  }
 
 
   state: "LOGIN"

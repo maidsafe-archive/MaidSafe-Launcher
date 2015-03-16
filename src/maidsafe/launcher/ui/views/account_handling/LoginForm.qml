@@ -89,17 +89,18 @@ Item {
   transitions: [Transition {
       from: "HIDDEN"; to: "VISIBLE"
       SequentialAnimation {
-        PauseAnimation {
+/*        PauseAnimation {
           duration: 500
-        }
+        }*/
         ScriptAction {
             script: {
               loginForm.visible = true
               accountHandlerView.currentView = loginForm
-              pinTextField.forceActiveFocus()
+              pinTextField.focus = true
+              pinTextField.cursorPosition = pinTextField.text.length
             }
          }
-        NumberAnimation {
+/*        NumberAnimation {
             duration: 1000
             easing.type: Easing.OutQuad
             properties: "width,y,opacity"
@@ -107,14 +108,14 @@ Item {
         ScriptAction {
            script: {
            }
-        }
+        }*/
       }
   },Transition {
       from: "VISIBLE"; to: "HIDDEN"
       SequentialAnimation {
         NumberAnimation {
             duration: 1000
-            easing.type: Easing.InQuad
+            easing.type: Easing.InExpo
             properties: "width,y,opacity"
         }
         ScriptAction {
@@ -165,6 +166,10 @@ Item {
           floatingStatus.hide()
           accountHandlerView.fromState = "LOGIN"
           accountHandlerView.state = "LOADING"
+          accountHandlerController_.createAccount(pinTextField.text,
+                                                  keywordTextField.text,
+                                                  passwordTextField.text)
+          //accountHandlerController_.LoginCompleted
         }
     }
   }

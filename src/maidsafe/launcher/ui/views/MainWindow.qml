@@ -49,15 +49,47 @@ Item {
     enabled: mainWindowTitleBar.visible
   }
 
-  Loader {
-    id: mainWindowLoader
-    objectName: "mainWindowLoader"
+  state: "" + mainController_.currentView
+/*  transitions: [Transition {
+    from: "" + MainController.HandleAccount; to: "" + MainController.ApplicationList
+    SequentialAnimation {
+      PauseAnimation {
+        duration: 2000
+      }
+      ScriptAction {
+         script: { // load application manager
+           applicationManagerLoader.source = "application_manager/ApplicationManager.qml"
+         }
+      }
+      NumberAnimation {
+        target: accountHandlingLoader
+        property: "y"
+        from: 0
+        to: - accountHandlingLoader.height
+        duration: 1500
+        easing.type: Easing.InOutQuad
+      }
+      ScriptAction {
+         script: { // unload account handling
+           accountHandlingLoader.source = ""
+         }
+      }
+    }
+  }]*/
 
-    anchors.fill: parent
-    source: mainController_.currentView === MainController.HandleAccount ?
-              "account_handling/AccountHandlerView.qml"
-            :
-              ""
+
+  Loader {
+    id: applicationManagerLoader
+    width: parent.width
+    height: parent.height
+    source: ""
+  }
+
+  Loader {
+    id: accountHandlingLoader
+    width: parent.width
+    height: parent.height
+    source: "account_handling/AccountHandlerView.qml"
   }
 
   ResizeMainWindowHelper {

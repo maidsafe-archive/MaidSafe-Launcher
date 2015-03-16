@@ -37,6 +37,7 @@ Item {
     PropertyChanges {
       target: errorMessage
       text: ""
+      opacity: 0
     }
   }, State {
     name: "HIDDEN"
@@ -54,11 +55,11 @@ Item {
       from: "HIDDEN"; to: "VISIBLE"
       SequentialAnimation {
         PauseAnimation {
-          duration: 500
+          duration: 800
         }
         ScriptAction {
             script: {
-              cancelButton.text = qsTr("Cancel")
+              cancelButton.text = qsTr("CANCEL")
               loadingView.visible = true
               accountHandlerView.currentView = loadingView
               cancelButton.forceActiveFocus()
@@ -67,19 +68,19 @@ Item {
             }
          }
         NumberAnimation {
-            duration: 1000
-            easing.type: Easing.OutQuad
+            duration: 600
+            easing.type: Easing.OutExpo
             properties: "width,y,opacity"
         }
       }
   },Transition {
       from: "VISIBLE"; to: "HIDDEN"
       SequentialAnimation {
-        NumberAnimation {
+/*        NumberAnimation {
             duration: 1000
             easing.type: Easing.InQuad
             properties: "width,y,opacity"
-        }
+        }*/
         ScriptAction {
            script: {
              loadingView.visible = false
@@ -99,24 +100,38 @@ Item {
 
   CustomText {
     id: errorMessage
-    y: accountHandlerView.bottomButtonY - rocketContainer.height - height
+    opacity: 0
+    y: accountHandlerView.bottomButtonY - rocketContainer.height - height + 10
     anchors.horizontalCenter: parent.horizontalCenter
+
+    NumberAnimation {
+      id: errorMessageAnimation
+      target: errorMessage
+      property: "opacity"
+      to: 1
+      duration: 700
+      running: true
+    }
   }
 
   Item {
     id: rocketContainer
     y: accountHandlerView.bottomButtonY - height
+    x: 4 // center the rocket
     anchors.horizontalCenter: parent.horizontalCenter
-    height: 140
-    width: 250
+    height: 125
+    width: 257 // +7 because png are moved 7px on the right to center the rocket
     clip: true
 
     Rocket {
       id: rocket
       onFinished: {
         // TODO Gildas: if (success)
+      }
+      onStartBreaking: {
         cancelButton.text = qsTr("GO BACK")
         errorMessage.text = qsTr("There was an error creating your account.\nPlease try again.")
+        errorMessageAnimation.start()
       }
     }
   }

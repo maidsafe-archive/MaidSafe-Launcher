@@ -356,8 +356,9 @@ Item {
       } else {
         accountHandlerView.fromState = "REGISTER"
         accountHandlerView.state = "LOADING"
-        //  accountHandlerController_.createAccount(registerForm.pin,
-        //registerForm.keyword, primaryTextField.text)
+        accountHandlerController_.createAccount(primaryPinTextField.text,
+                                                primaryKeywordTextField.text,
+                                                primaryPasswordTextField.text)
       }
     }
   }

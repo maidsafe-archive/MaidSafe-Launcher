@@ -36,8 +36,9 @@ Button {
       verticalAlignment: Qt.AlignVCenter
       horizontalAlignment: Qt.AlignHCenter
       font {
-        italic: control.activeFocus ? true : false
-        underline: control.activeFocus ? true : false
+        weight: Font.DemiBold
+//        italic: control.activeFocus ? true : false
+//        underline: control.activeFocus ? true : false
       }
     }
     background: null/*(backgroundDisabled ? null : Rectangle {
