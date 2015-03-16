@@ -130,36 +130,60 @@ Item {
               duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
           }
           SequentialAnimation {
+            PauseAnimation { duration: 366 }
+            NumberAnimation {
+                target: pinTextField; properties: "width"
+                duration: 634; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+            }
+          }
+          SequentialAnimation {
+            PauseAnimation { duration: 300 }
+            ParallelAnimation {
+              NumberAnimation {
+                  target: pinTextField; properties: "y"
+                  duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+              }
+              ColorAnimation {target: pinTextField; property: "backgroundColor"
+                duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+              }
+            }
+          }
+          SequentialAnimation {
+            PauseAnimation { duration: 266 }
+            NumberAnimation {
+                target: keywordTextField; properties: "width"
+                duration: 734; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+            }
+          }
+          SequentialAnimation {
             PauseAnimation { duration: 200 }
             ParallelAnimation {
               NumberAnimation {
-                  target: pinTextField; properties: "width,y"
+                  target: keywordTextField; properties: "y"
                   duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
-              ColorAnimation {target: pinTextField; property: "backgroundColor"
+              ColorAnimation {target: keywordTextField; property: "backgroundColor"
                 duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
+            }
+          }
+          SequentialAnimation {
+            PauseAnimation { duration: 166 }
+            NumberAnimation {
+                target: passwordTextField; properties: "width"
+                duration: 834; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
             }
           }
           SequentialAnimation {
             PauseAnimation { duration: 100 }
             ParallelAnimation {
               NumberAnimation {
-                  target: keywordTextField; properties: "width,y"
+                  target: passwordTextField; properties: "y"
                   duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
-              ColorAnimation {target: keywordTextField; property: "backgroundColor"
+              ColorAnimation {target: passwordTextField; property: "backgroundColor"
                 duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
-            }
-          }
-          ParallelAnimation {
-            NumberAnimation {
-                target: passwordTextField; properties: "width,y"
-                duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-            }
-            ColorAnimation {target: passwordTextField; property: "backgroundColor"
-              duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
             }
           }
         }
