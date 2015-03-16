@@ -34,10 +34,6 @@ Item {
       target: rocket
       y: 0
     }
-    PropertyChanges {
-      target: errorMessage
-      text: ""
-    }
   }, State {
     name: "HIDDEN"
     PropertyChanges {
@@ -58,6 +54,9 @@ Item {
         }
         ScriptAction {
             script: {
+              errorMessageAnimation.stop()
+              errorMessage.text = 0
+              errorMessage.opacity = 0
               cancelButton.text = qsTr("CANCEL")
               loadingView.visible = true
               accountHandlerView.currentView = loadingView
@@ -74,7 +73,7 @@ Item {
       }
   },Transition {
       from: "VISIBLE"; to: "HIDDEN"
-      SequentialAnimation {
+//      SequentialAnimation {
 /*        NumberAnimation {
             duration: 1000
             easing.type: Easing.InQuad
@@ -83,10 +82,9 @@ Item {
         ScriptAction {
            script: {
              loadingView.visible = false
-             errorMessage.opacity = 0
            }
         }
-      }
+//      }
   }]
 
 

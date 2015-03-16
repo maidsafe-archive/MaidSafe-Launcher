@@ -258,7 +258,7 @@ Item {
       to: rocketLoadingImage.toFrame
 
       // Gildas: should be 30 instead of 22 for 30fps, but ... don't understand why it's not working
-      duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 22
+      duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 21
       onStopped: {
         if (rocket.running) {
           rocket.finished(false)
