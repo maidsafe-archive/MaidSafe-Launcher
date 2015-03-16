@@ -129,8 +129,8 @@ Item {
      }
    }
 
+  LoadingView { id: loadingView; visible: false }
   LoginForm { id: loginForm }
   RegisterForm { id: registerForm; visible: false }
-  LoadingView { id: loadingView; visible: false }
   FloatingStatusBox { id: floatingStatus; visible: false }
 }
