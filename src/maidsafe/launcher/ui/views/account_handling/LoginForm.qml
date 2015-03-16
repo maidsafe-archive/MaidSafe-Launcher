@@ -22,6 +22,7 @@ import "../../custom_components"
 
 Item {
   property Item bottomButton: loginButton
+  property var easingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 
   anchors.fill: parent
 
@@ -122,21 +123,21 @@ Item {
         ParallelAnimation {
           NumberAnimation {
               target: fadeOutItems; property: "opacity"
-              duration: 1000; easing.type: Easing.InExpo
+              duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
           }
           NumberAnimation {
               target: sharedBackgroundButton; property: "width"
-              duration: 1000; easing.type: Easing.InExpo
+              duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
           }
           SequentialAnimation {
             PauseAnimation { duration: 200 }
             ParallelAnimation {
               NumberAnimation {
                   target: pinTextField; properties: "width,y"
-                  duration: 800; easing.type: Easing.InExpo
+                  duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
               ColorAnimation {target: pinTextField; property: "backgroundColor"
-                duration: 800; easing.type: Easing.InExpo
+                duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
             }
           }
@@ -145,20 +146,20 @@ Item {
             ParallelAnimation {
               NumberAnimation {
                   target: keywordTextField; properties: "width,y"
-                  duration: 900; easing.type: Easing.InExpo
+                  duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
               ColorAnimation {target: keywordTextField; property: "backgroundColor"
-                duration: 900; easing.type: Easing.InExpo
+                duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
             }
           }
           ParallelAnimation {
             NumberAnimation {
                 target: passwordTextField; properties: "width,y"
-                duration: 1000; easing.type: Easing.InExpo
+                duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
             }
             ColorAnimation {target: passwordTextField; property: "backgroundColor"
-              duration: 1000; easing.type: Easing.InExpo
+              duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
             }
           }
         }
