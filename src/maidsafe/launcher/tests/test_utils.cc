@@ -21,12 +21,14 @@
 #include <string>
 
 #include "maidsafe/directory_info.h"
-#include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/crypto.h"
+#include "maidsafe/common/encode.h"
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/utils.h"
+#include "maidsafe/common/authentication/user_credentials.h"
 
 #include "maidsafe/launcher/account.h"
+#include "maidsafe/launcher/launcher.h"
 
 namespace maidsafe {
 
@@ -34,11 +36,34 @@ namespace launcher {
 
 namespace test {
 
-std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple() {
-  std::string keyword_str{RandomAlphaNumericString((RandomUint32() % 100) + 1)};
-  uint32_t pin_value{RandomUint32()};
-  std::string password_str{RandomAlphaNumericString((RandomUint32() % 100) + 1)};
-  return std::tuple<std::string, uint32_t, std::string>(keyword_str, pin_value, password_str);
+TestUsingFakeStore::TestUsingFakeStore(std::string name)
+    : test_root_(maidsafe::test::CreateTestPath(std::string("MaidSafe_Test") + std::move(name))) {
+  DiskUsage usage(1024 * 1024);
+  Launcher::FakeStorePath(test_root_.get());
+  Launcher::FakeStoreDiskUsage(&usage);
+}
+
+std::shared_ptr<NetworkClient> TestUsingFakeStore::GetNetworkClient(const passport::Maid& maid) {
+#ifdef ROUTING_AND_NFS_UPDATED
+#ifdef USE_FAKE_STORE
+  static_cast<void>(maid);
+  return std::make_shared<NetworkClient>(Launcher::FakeStorePath(), Launcher::FakeStoreDiskUsage());
+#else
+  return nfs_client::MaidClient::MakeShared(maid);
+#endif
+#else
+  static_cast<void>(maid);
+  return std::make_shared<NetworkClient>(MemoryUsage(1 << 7), Launcher::FakeStoreDiskUsage(),
+                                         nullptr, Launcher::FakeStorePath());
+#endif
+}
+
+std::tuple<Keyword, Pin, Password> GetRandomUserCredentialsTuple() {
+  std::string keyword{RandomAlphaNumericString(1, 100)};
+  std::string password{RandomAlphaNumericString(1, 100)};
+  return std::make_tuple<Keyword, Pin, Password>(Keyword(keyword.begin(), keyword.end()),
+                                                 RandomUint32(),
+                                                 Password(password.begin(), password.end()));
 }
 
 authentication::UserCredentials GetRandomUserCredentials() {
@@ -46,7 +71,7 @@ authentication::UserCredentials GetRandomUserCredentials() {
 }
 
 authentication::UserCredentials MakeUserCredentials(
-    const std::tuple<std::string, uint32_t, std::string>& user_credentials_tuple) {
+    const std::tuple<Keyword, Pin, Password>& user_credentials_tuple) {
   authentication::UserCredentials user_credentials;
   user_credentials.keyword = maidsafe::make_unique<authentication::UserCredentials::Keyword>(
       std::get<0>(user_credentials_tuple));
@@ -58,23 +83,21 @@ authentication::UserCredentials MakeUserCredentials(
 }
 
 DirectoryInfo CreateRandomDirectoryInfo() {
-  return DirectoryInfo(
-      RandomAlphaNumericString((RandomUint32() % 10) + 10),
-      drive::ParentId(drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE))),
-      drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
-      static_cast<DirectoryInfo::AccessRights>((RandomUint32() % 2) + 1));
+  return DirectoryInfo(RandomAlphaNumericString(10, 20), MakeIdentity(), MakeIdentity(),
+                       static_cast<DirectoryInfo::AccessRights>((RandomUint32() % 2) + 1));
 }
 
 AppDetails CreateRandomAppDetails() {
   AppDetails app;
-  app.name = RandomAlphaNumericString((RandomUint32() % 10) + 30);
-  app.path = RandomAlphaNumericString((RandomUint32() % 246) + 10);
-  app.args = RandomAlphaNumericString(RandomUint32() % 10);
+  app.name = RandomAlphaNumericString(1, 40);
+  app.path = RandomAlphaNumericString(10, 255);
+  app.args = RandomAlphaNumericString(0, 100);
   int count = (RandomUint32() % 10) + 1;
   for (int i = 0; i < count; ++i)
     app.permitted_dirs.insert(CreateRandomDirectoryInfo());
-  std::string icon(RandomString((RandomUint32() % 1000) + 10));
+  std::string icon(RandomString(10, 1000));
   app.icon.assign(icon.begin(), icon.end());
+  app.auto_start = (count % 2 == 1);
   return app;
 }
 
@@ -111,8 +134,8 @@ testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& ac
 
       auto print_dir([&output](const DirectoryInfo& dir) {
         output += "        path:          " + dir.path.string();
-        output += "        parent_id:     " + HexSubstr(dir.parent_id.data);
-        output += "        directory_id:  " + HexSubstr(dir.directory_id);
+        output += "        parent_id:     " + hex::Substr(dir.parent_id);
+        output += "        directory_id:  " + hex::Substr(dir.directory_id);
         switch (dir.access_rights) {
           case DirectoryInfo::AccessRights::kNone:
             output += "        access_rights: kNone\n";
@@ -124,7 +147,7 @@ testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& ac
             output += "        access_rights: kReadWrite\n";
             break;
           default:
-            BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_parameter));
+            BOOST_THROW_EXCEPTION(MakeError(CommonErrors::invalid_argument));
         }
       });
 
@@ -144,9 +167,14 @@ testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& ac
   if (!(ignore_field & kIgnoreIcon) && expected.icon != actual.icon) {
     return testing::AssertionFailure()
            << "\n    Expected icon ("
-           << HexEncode(std::string(expected.icon.begin(), expected.icon.end()))
+           << hex::Encode(std::string(expected.icon.begin(), expected.icon.end()))
            << ") does not match actual icon ("
-           << HexEncode(std::string(actual.icon.begin(), actual.icon.end())) << ")\n";
+           << hex::Encode(std::string(actual.icon.begin(), actual.icon.end())) << ")\n";
+  }
+  if (!(ignore_field & kIgnoreAutoStart) && expected.auto_start != actual.auto_start) {
+    return testing::AssertionFailure() << "\n    Expected auto start value (" << expected.auto_start
+                                       << ") does not match actual auto start value ("
+                                       << actual.auto_start << ")\n";
   }
   return testing::AssertionSuccess();
 }

@@ -21,11 +21,13 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <string>
 
 #include "boost/filesystem/operations.hpp"
 #include "cereal/types/string.hpp"
 #include "cereal/types/set.hpp"
 
+#include "maidsafe/common/convert.h"
 #include "maidsafe/common/log.h"
 #include "maidsafe/common/make_unique.h"
 #include "maidsafe/common/utils.h"
@@ -42,12 +44,13 @@ namespace launcher {
 
 namespace {
 
-void UpdateAppDetails(AppDetails& app, const std::string* const new_name,
-                      const boost::filesystem::path* const new_path,
-                      const std::string* const new_args, const DirectoryInfo* const new_dir,
-                      const SerialisedData* const new_icon) {
-  // Check exactly one of the four pointers is non-null.
-  assert(int(!!new_name) + int(!!new_path) + int(!!new_args) + int(!!new_dir) + int(!!new_icon) ==
+void UpdateAppDetails(AppDetails& app, const AppName* const new_name,
+                      const boost::filesystem::path* const new_path, const AppArgs* const new_args,
+                      const DirectoryInfo* const new_dir, const SerialisedData* const new_icon,
+                      const bool* const new_auto_start_value) {
+  // Check exactly one of the six pointers is non-null.
+  assert(int(!!new_name) + int(!!new_path) + int(!!new_args) + int(!!new_dir) + int(!!new_icon) +
+             int(!!new_auto_start_value) ==
          1);
 
   if (new_name) {
@@ -60,8 +63,10 @@ void UpdateAppDetails(AppDetails& app, const std::string* const new_name,
     app.permitted_dirs.erase(*new_dir);
     if (new_dir->access_rights != DirectoryInfo::AccessRights::kNone)
       app.permitted_dirs.insert(*new_dir);
-  } else {
+  } else if (new_icon) {
     app.icon = *new_icon;
+  } else {
+    app.auto_start = *new_auto_start_value;
   }
 }
 
@@ -177,12 +182,13 @@ std::set<AppDetails> AppHandler::GetApps(bool locally_available) const {
   return locally_available ? local_apps_ : non_local_apps_;
 }
 
-AppDetails AppHandler::AddOrLinkApp(std::string app_name, fs::path app_path, std::string app_args,
-                                    const SerialisedData* const app_icon) {
+AppDetails AppHandler::AddOrLinkApp(AppName app_name, fs::path app_path, AppArgs app_args,
+                                    const SerialisedData* const app_icon, bool auto_start) {
   AppDetails app;
   app.name = app_name;
   app.path = app_path;
   app.args = app_args;
+  app.auto_start = auto_start;
 
   auto locks(AcquireLocks());
   auto account_itr(account_->apps.find(app));
@@ -207,8 +213,7 @@ void AppHandler::Add(AppDetails& app, std::set<AppDetails>::iterator account_itr
   }
   assert(local_apps_.count(app) == 0 && non_local_apps_.count(app) == 0);
 
-  app.permitted_dirs.emplace(std::string("/") + app.name, drive::ParentId(account_->root_parent_id),
-                             drive::DirectoryId(RandomString(crypto::SHA512::DIGESTSIZE)),
+  app.permitted_dirs.emplace(std::string("/") + app.name, account_->root_parent_id, MakeIdentity(),
                              DirectoryInfo::AccessRights::kReadWrite);
 
   // Add to account and local set
@@ -237,27 +242,31 @@ void AppHandler::Link(AppDetails& app, std::set<AppDetails>::iterator account_it
   non_local_apps_.erase(non_local_itr);
 }
 
-void AppHandler::UpdateName(const std::string& app_name, const std::string& new_name) {
-  Update(app_name, &new_name, nullptr, nullptr, nullptr, nullptr);
+void AppHandler::UpdateName(const AppName& app_name, const AppName& new_name) {
+  Update(app_name, &new_name, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
-void AppHandler::UpdatePath(const std::string& app_name, const fs::path& new_path) {
-  Update(app_name, nullptr, &new_path, nullptr, nullptr, nullptr);
+void AppHandler::UpdatePath(const AppName& app_name, const fs::path& new_path) {
+  Update(app_name, nullptr, &new_path, nullptr, nullptr, nullptr, nullptr);
 }
 
-void AppHandler::UpdateArgs(const std::string& app_name, const std::string& new_args) {
-  Update(app_name, nullptr, nullptr, &new_args, nullptr, nullptr);
+void AppHandler::UpdateArgs(const AppName& app_name, const AppArgs& new_args) {
+  Update(app_name, nullptr, nullptr, &new_args, nullptr, nullptr, nullptr);
 }
 
-void AppHandler::UpdatePermittedDirs(const std::string& app_name, const DirectoryInfo& new_dir) {
-  Update(app_name, nullptr, nullptr, nullptr, &new_dir, nullptr);
+void AppHandler::UpdatePermittedDirs(const AppName& app_name, const DirectoryInfo& new_dir) {
+  Update(app_name, nullptr, nullptr, nullptr, &new_dir, nullptr, nullptr);
 }
 
-void AppHandler::UpdateIcon(const std::string& app_name, const SerialisedData& new_icon) {
-  Update(app_name, nullptr, nullptr, nullptr, nullptr, &new_icon);
+void AppHandler::UpdateIcon(const AppName& app_name, const SerialisedData& new_icon) {
+  Update(app_name, nullptr, nullptr, nullptr, nullptr, &new_icon, nullptr);
 }
 
-void AppHandler::RemoveLocally(const std::string& app_name) {
+void AppHandler::UpdateAutoStart(const AppName& app_name, bool new_auto_start_value) {
+  Update(app_name, nullptr, nullptr, nullptr, nullptr, nullptr, &new_auto_start_value);
+}
+
+void AppHandler::RemoveLocally(const AppName& app_name) {
   AppDetails app;
   app.name = app_name;
   std::lock_guard<std::mutex> lock{mutex_};
@@ -268,7 +277,7 @@ void AppHandler::RemoveLocally(const std::string& app_name) {
   WriteConfigFile();
 }
 
-void AppHandler::RemoveFromNetwork(const std::string& app_name) {
+void AppHandler::RemoveFromNetwork(const AppName& app_name) {
   AppDetails app;
   app.name = app_name;
   auto locks(AcquireLocks());
@@ -288,7 +297,7 @@ void AppHandler::RemoveFromNetwork(const std::string& app_name) {
   WriteConfigFile();
 }
 
-std::pair<fs::path, std::string> AppHandler::GetPathAndArgs(std::string app_name) const {
+std::pair<fs::path, AppArgs> AppHandler::GetPathAndArgs(AppName app_name) const {
   AppDetails app;
   app.name = app_name;
   std::lock_guard<std::mutex> lock{mutex_};
@@ -313,18 +322,19 @@ void AppHandler::ReadConfigFile() {
   assert(fs::is_regular_file(config_file_path_));
 
   // Read from file.
-  crypto::CipherText encrypted_contents{ReadFile(config_file_path_)};
+  crypto::CipherText encrypted_contents{NonEmptyString{ReadFile(config_file_path_).value()}};
 
   // Decrypt and uncompress the contents.
-  auto serialised_contents(crypto::Uncompress(crypto::CompressedText(crypto::SymmDecrypt(
-      encrypted_contents, account_->config_file_aes_key, account_->config_file_aes_iv))));
+  auto serialised_contents(crypto::Uncompress(crypto::CompressedText(
+      crypto::SymmDecrypt(encrypted_contents, account_->config_file_aes_key_and_iv))));
 
   // Parse the set of local apps.
-  std::stringstream str_stream{serialised_contents.string()};
+  std::stringstream str_stream{convert::ToString(serialised_contents.string())};
   std::size_t app_count(ConvertFromStream<std::size_t>(str_stream));
   for (std::size_t i{0}; i < app_count; ++i) {
     AppDetails app_details;
-    ConvertFromStream(str_stream, app_details.name, app_details.permitted_dirs);
+    ConvertFromStream(str_stream, app_details.name, app_details.path, app_details.args,
+                      app_details.auto_start);
     local_apps_.insert(std::move(app_details));
   }
 }
@@ -334,12 +344,13 @@ void AppHandler::WriteConfigFile() const {
   // held in the serialised Account.
   std::string serialised_contents(ConvertToString(local_apps_.size()));
   for (const auto& app : local_apps_)
-    serialised_contents += ConvertToString(app.name, app.path, app.args);
+    serialised_contents += ConvertToString(app.name, app.path, app.args, app.auto_start);
 
   // Compress and encrypt the serialised contents.
-  auto encrypted_contents(
-      crypto::SymmEncrypt(crypto::Compress(crypto::UncompressedText(serialised_contents), 9).data,
-                          account_->config_file_aes_key, account_->config_file_aes_iv));
+  auto encrypted_contents(crypto::SymmEncrypt(
+      crypto::Compress(crypto::UncompressedText(convert::ToByteVector(serialised_contents)), 9)
+          .data,
+      account_->config_file_aes_key_and_iv));
 
   // Write to file.
   if (!WriteFile(config_file_path_, encrypted_contents->string())) {
@@ -348,10 +359,11 @@ void AppHandler::WriteConfigFile() const {
   }
 }
 
-void AppHandler::Update(const std::string& app_name, const std::string* const new_name,
+void AppHandler::Update(const AppName& app_name, const AppName* const new_name,
                         const boost::filesystem::path* const new_path,
-                        const std::string* const new_args, const DirectoryInfo* const new_dir,
-                        const SerialisedData* const new_icon) {
+                        const AppArgs* const new_args, const DirectoryInfo* const new_dir,
+                        const SerialisedData* const new_icon,
+                        const bool* const new_auto_start_value) {
   AppDetails current_app;
   current_app.name = app_name;
   auto locks(AcquireLocks());
@@ -370,7 +382,8 @@ void AppHandler::Update(const std::string& app_name, const std::string* const ne
     app_set = &local_apps_;
   }
   AppDetails updated_app{*itr};
-  UpdateAppDetails(updated_app, new_name, new_path, new_args, new_dir, new_icon);
+  UpdateAppDetails(updated_app, new_name, new_path, new_args, new_dir, new_icon,
+                   new_auto_start_value);
   app_set->erase(itr);
   app_set->insert(updated_app);
 

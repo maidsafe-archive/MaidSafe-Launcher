@@ -49,8 +49,8 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
   OutputVectorStream binary_output_stream;
   BinaryOutputArchive output_archive{binary_output_stream};
   output_archive(account.passport->Encrypt(user_credentials), serialised_timestamp, account.ip,
-                 account.port, unique_user_id, root_parent_id, account.config_file_aes_key,
-                 account.config_file_aes_iv, account.apps.size());
+                 account.port, unique_user_id, root_parent_id, account.config_file_aes_key_and_iv,
+                 account.apps.size());
   for (const auto& app : account.apps)
     output_archive(app.name, app.permitted_dirs, app.icon);
 
@@ -59,11 +59,9 @@ ImmutableData EncryptAccount(const authentication::UserCredentials& user_credent
 
   account.timestamp = TimeStampToPtime(serialised_timestamp);
 
-  crypto::SecurePassword secure_password{authentication::CreateSecurePassword(user_credentials)};
   return ImmutableData{
       crypto::SymmEncrypt(authentication::Obfuscate(user_credentials, serialised_account),
-                          authentication::DeriveSymmEncryptKey(secure_password),
-                          authentication::DeriveSymmEncryptIv(secure_password)).data};
+                          authentication::CreateSecurePassword(user_credentials))};
 }
 
 Account::Account(const passport::MaidAndSigner& maid_and_signer)
@@ -71,10 +69,9 @@ Account::Account(const passport::MaidAndSigner& maid_and_signer)
       timestamp(),
       ip(),
       port(0),
-      unique_user_id(),
-      root_parent_id(),
-      config_file_aes_key(RandomString(crypto::AES256_KeySize)),
-      config_file_aes_iv(RandomString(crypto::AES256_IVSize)),
+      unique_user_id(MakeIdentity()),
+      root_parent_id(MakeIdentity()),
+      config_file_aes_key_and_iv(RandomBytes(crypto::AES256_KeySize + crypto::AES256_IVSize)),
       apps() {}
 
 Account::Account(const ImmutableData& encrypted_account,
@@ -85,14 +82,12 @@ Account::Account(const ImmutableData& encrypted_account,
       port(0),
       unique_user_id(),
       root_parent_id(),
-      config_file_aes_key(),
-      config_file_aes_iv(),
+      config_file_aes_key_and_iv(),
       apps() {
-  crypto::SecurePassword secure_password{authentication::CreateSecurePassword(user_credentials)};
   NonEmptyString serialised_account{authentication::Obfuscate(
-      user_credentials, crypto::SymmDecrypt(crypto::CipherText{encrypted_account.data()},
-                                            authentication::DeriveSymmEncryptKey(secure_password),
-                                            authentication::DeriveSymmEncryptIv(secure_password)))};
+      user_credentials,
+      crypto::SymmDecrypt(crypto::CipherText{encrypted_account.Value()},
+                          authentication::CreateSecurePassword(user_credentials)))};
 
   crypto::CipherText encrypted_passport;
   uint64_t serialised_timestamp{0};
@@ -103,7 +98,7 @@ Account::Account(const ImmutableData& encrypted_account,
       SerialisedData(serialised_account.string().begin(), serialised_account.string().end())};
   BinaryInputArchive input_archive{binary_input_stream};
   input_archive(encrypted_passport, serialised_timestamp, ip, port, optional_unique_user_id,
-                optional_root_parent_id, config_file_aes_key, config_file_aes_iv, app_count);
+                optional_root_parent_id, config_file_aes_key_and_iv, app_count);
   for (std::size_t i{0}; i < app_count; ++i) {
     AppDetails app_details;
     input_archive(app_details.name, app_details.permitted_dirs, app_details.icon);
@@ -125,8 +120,7 @@ Account::Account(Account&& other) MAIDSAFE_NOEXCEPT
       port(std::move(other.port)),
       unique_user_id(std::move(other.unique_user_id)),
       root_parent_id(std::move(other.root_parent_id)),
-      config_file_aes_key(std::move(other.config_file_aes_key)),
-      config_file_aes_iv(std::move(other.config_file_aes_iv)),
+      config_file_aes_key_and_iv(std::move(other.config_file_aes_key_and_iv)),
       apps(std::move(other.apps)) {}
 
 Account& Account::operator=(Account&& other) MAIDSAFE_NOEXCEPT {
@@ -136,8 +130,7 @@ Account& Account::operator=(Account&& other) MAIDSAFE_NOEXCEPT {
   port = std::move(other.port);
   unique_user_id = std::move(other.unique_user_id);
   root_parent_id = std::move(other.root_parent_id);
-  config_file_aes_key = std::move(other.config_file_aes_key);
-  config_file_aes_iv = std::move(other.config_file_aes_iv);
+  config_file_aes_key_and_iv = std::move(other.config_file_aes_key_and_iv);
   apps = std::move(other.apps);
   return *this;
 }
@@ -150,8 +143,7 @@ void swap(Account& lhs, Account& rhs) MAIDSAFE_NOEXCEPT {
   swap(lhs.port, rhs.port);
   swap(lhs.unique_user_id, rhs.unique_user_id);
   swap(lhs.root_parent_id, rhs.root_parent_id);
-  swap(lhs.config_file_aes_key, rhs.config_file_aes_key);
-  swap(lhs.config_file_aes_iv, rhs.config_file_aes_iv);
+  swap(lhs.config_file_aes_key_and_iv, rhs.config_file_aes_key_and_iv);
   swap(lhs.apps, rhs.apps);
 }
 

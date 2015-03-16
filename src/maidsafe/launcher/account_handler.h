@@ -25,9 +25,9 @@
 #include "maidsafe/common/types.h"
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/data_types/structured_data_versions.h"
-#include "maidsafe/nfs/client/maid_client.h"
 
 #include "maidsafe/launcher/account.h"
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
@@ -43,32 +43,30 @@ class AccountHandler {
   AccountHandler();
 
   // This constructor should be used when creating a new account, i.e. where a account has never
-  // been put to the network.  'maid_client' should already be joined to the network.  Internally
+  // been put to the network.  'network_client' should already be joined to the network.  Internally
   // saves the first account after creating the new account.  Throws on error.
   AccountHandler(Account&& account, authentication::UserCredentials&& user_credentials,
-                 nfs_client::MaidClient& maid_client);
+                 NetworkClient& network_client);
 
-  // Move-constructible and move-assignable only.
   AccountHandler(const AccountHandler&) = delete;
-  AccountHandler(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
+  AccountHandler(AccountHandler&& other) = delete;
   AccountHandler& operator=(const AccountHandler&) = delete;
-  AccountHandler& operator=(AccountHandler&& other) MAIDSAFE_NOEXCEPT;
-  friend void swap(AccountHandler& lhs, AccountHandler& rhs) MAIDSAFE_NOEXCEPT;
+  AccountHandler& operator=(AccountHandler&& other) = delete;
 
   // Retrieves and decrypts account info when logging in to an existing account.  'account_getter'
   // should already be joined to the network.  Throws on error, including already having logged in.
   // Provides strong exception guarantee.
   void Login(authentication::UserCredentials&& user_credentials, AccountGetter& account_getter);
 
-  // Saves account on the network using 'maid_client', which should already be joined to the
+  // Saves account on the network using 'network_client', which should already be joined to the
   // network.  Throws on error, with strong exception guarantee.
-  void Save(nfs_client::MaidClient& maid_client);
+  void Save(NetworkClient& network_client);
 
   // Give full access to the account
   std::unique_ptr<Account> account_;
 
  private:
-  StructuredDataVersions::VersionName current_account_version_;
+  StructuredDataVersions account_versions_;
   authentication::UserCredentials user_credentials_;
 };
 

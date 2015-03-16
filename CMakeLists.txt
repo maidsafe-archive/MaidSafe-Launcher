@@ -55,9 +55,10 @@ target_include_directories(maidsafe_launcher PUBLIC ${PROJECT_SOURCE_DIR}/includ
 set(ApplicationName SafeLauncher)
 target_compile_definitions(maidsafe_launcher PUBLIC COMPANY_NAME=MaidSafe APPLICATION_NAME=${ApplicationName})
 # TODO - Once NFS has taken over Drive's duties, swap maidsafe_drive for maidsafe_nfs
-target_link_libraries(maidsafe_launcher maidsafe_api maidsafe_drive)
+target_link_libraries(maidsafe_launcher maidsafe_api maidsafe_passport) # maidsafe_drive)
 
 if(INCLUDE_TESTS)
+  target_compile_definitions(maidsafe_launcher PUBLIC USE_FAKE_STORE)
   target_link_libraries(maidsafe_launcher maidsafe_test)
 
   set(dummy_launcherName ${ApplicationName})

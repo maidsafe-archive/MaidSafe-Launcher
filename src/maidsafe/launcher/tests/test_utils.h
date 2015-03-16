@@ -26,6 +26,9 @@
 #include "maidsafe/common/error.h"
 #include "maidsafe/common/test.h"
 #include "maidsafe/common/authentication/user_credentials.h"
+#include "maidsafe/passport/types.h"
+
+#include "maidsafe/launcher/types.h"
 
 namespace maidsafe {
 
@@ -37,12 +40,20 @@ struct AppDetails;
 
 namespace test {
 
-std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple();
+class TestUsingFakeStore : public testing::Test {
+ protected:
+  explicit TestUsingFakeStore(std::string name);
+  std::shared_ptr<NetworkClient> GetNetworkClient(const passport::Maid& maid);
+
+  maidsafe::test::TestPath test_root_;
+};
+
+std::tuple<Keyword, Pin, Password> GetRandomUserCredentialsTuple();
 
 authentication::UserCredentials GetRandomUserCredentials();
 
 authentication::UserCredentials MakeUserCredentials(
-    const std::tuple<std::string, uint32_t, std::string>& credentials_tuple);
+    const std::tuple<Keyword, Pin, Password>& credentials_tuple);
 
 template <typename ErrorCodeEnum>
 testing::AssertionResult ThrowsAs(std::function<void()> statement,
@@ -72,7 +83,13 @@ DirectoryInfo CreateRandomDirectoryInfo();
 
 AppDetails CreateRandomAppDetails();
 
-enum IgnoreField { kIgnorePath = 1, kIgnoreArgs = 2, kIgnorePermittedDirs = 4, kIgnoreIcon = 8 };
+enum IgnoreField {
+  kIgnorePath = 1,
+  kIgnoreArgs = 2,
+  kIgnorePermittedDirs = 4,
+  kIgnoreIcon = 8,
+  kIgnoreAutoStart = 16
+};
 
 testing::AssertionResult Equals(const AppDetails& expected, const AppDetails& actual,
                                 int ignore_field = 0);

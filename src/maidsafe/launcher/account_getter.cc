@@ -22,6 +22,8 @@
 
 #include "maidsafe/common/make_unique.h"
 
+#include "maidsafe/launcher/launcher.h"
+
 namespace maidsafe {
 
 namespace launcher {
@@ -35,21 +37,38 @@ AccountGetter::AccountGetter()
     : network_health_mutex_(),
       network_health_condition_variable_(),
       network_health_(-1),
+#ifdef ROUTING_AND_NFS_UPDATED
+#ifdef USE_FAKE_STORE
+      data_getter_(maidsafe::make_unique<DataGetter>(Launcher::FakeStorePath(),
+                                                     Launcher::FakeStoreDiskUsage())),
+#else
       routing_(maidsafe::make_unique<routing::Routing>()),
       data_getter_(),  // deferred construction until asio service is created
-      public_pmid_helper_(),
+#endif
+#else
+      data_getter_(maidsafe::make_unique<DataGetter>(
+          MemoryUsage(1 << 7), Launcher::FakeStoreDiskUsage(), nullptr, Launcher::FakeStorePath())),
+#endif
+      //      public_pmid_helper_(),
       asio_service_(2) {
-  data_getter_ = maidsafe::make_unique<nfs_client::DataGetter>(asio_service_, *routing_);
+#ifndef USE_FAKE_STORE
+  data_getter_ = maidsafe::make_unique<DataGetter>(asio_service_, *routing_);
   InitRouting();
+  static_cast<void>(data_getter);
+#endif
 }
 
 AccountGetter::~AccountGetter() {
+#ifndef USE_FAKE_STORE
   data_getter_->Stop();
   routing_.reset();
+#endif
 }
 
+#ifndef USE_FAKE_STORE
+
 void AccountGetter::InitRouting() {
-  routing::Functors functors{InitialiseRoutingCallbacks()};
+  routing::Functors functors(InitialiseRoutingCallbacks());
   routing_->Join(functors);
   // FIXME BEFORE_RELEASE discuss: parallel attempts, max no. of endpoints to try,
   // prioritise live ports. To reduce the blocking duration in case of no network connectivity
@@ -74,10 +93,10 @@ routing::Functors AccountGetter::InitialiseRoutingCallbacks() {
       [this](std::shared_ptr<routing::CloseNodesChange> /*close_nodes_change*/) {};
   functors.request_public_key =
       [this](const NodeId& node_id, const routing::GivePublicKeyFunctor& give_key) {
-    auto future_key(data_getter_->Get(passport::PublicPmid::Name{Identity{node_id.string()}},
-                                      std::chrono::seconds(10)));
-    public_pmid_helper_.AddEntry(std::move(future_key), give_key);
-  };
+        auto future_key(data_getter_->Get(passport::PublicPmid::Name{Identity{node_id.string()}},
+                                          std::chrono::seconds(10)));
+        public_pmid_helper_.AddEntry(std::move(future_key), give_key);
+      };
 
   // Required to pick cached messages
   functors.typed_message_and_caching.single_to_single.message_received = [this](
@@ -107,6 +126,8 @@ void AccountGetter::OnNetworkStatusChange(int updated_network_health, const Node
                                  network_health_condition_variable_, node_id);
   });
 }
+
+#endif
 
 }  // namespace launcher
 
