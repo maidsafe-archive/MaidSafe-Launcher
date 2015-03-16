@@ -37,7 +37,6 @@ Item {
     PropertyChanges {
       target: errorMessage
       text: ""
-      opacity: 0
     }
   }, State {
     name: "HIDDEN"
@@ -55,7 +54,7 @@ Item {
       from: "HIDDEN"; to: "VISIBLE"
       SequentialAnimation {
         PauseAnimation {
-          duration: 800
+          duration: 750
         }
         ScriptAction {
             script: {
@@ -68,7 +67,7 @@ Item {
             }
          }
         NumberAnimation {
-            duration: 600
+            duration: 1000
             easing.type: Easing.OutExpo
             properties: "width,y,opacity"
         }
@@ -84,6 +83,7 @@ Item {
         ScriptAction {
            script: {
              loadingView.visible = false
+             errorMessage.opacity = 0
            }
         }
       }
@@ -120,7 +120,7 @@ Item {
     x: 4 // center the rocket
     anchors.horizontalCenter: parent.horizontalCenter
     height: 125
-    width: 257 // +7 because png are moved 7px on the right to center the rocket
+    width: 257 // +7 because png are uncentered 7px on the right to center the rocket
     clip: true
 
     Rocket {

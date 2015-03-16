@@ -244,8 +244,9 @@ Item {
       interval: 633
       onTriggered: {
         if (rocket.running) {
+          console.time("animation duration")
           frameNumberAnimation.start()
-          rocket.startBreaking()
+          rocket.startBreaking() // signal emited to start error message fade in
         }
       }
     }
@@ -255,8 +256,16 @@ Item {
       running: false
       from: rocketLoadingImage.fromFrame
       to: rocketLoadingImage.toFrame
-      duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 30
-      onStopped: if (rocket.running) rocket.finished(false)
+
+      // Gildas: should be 30 instead of 22 for 30fps, but ... don't understand why it's not working
+      duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 22
+      onStopped: {
+        if (rocket.running) {
+          rocket.finished(false)
+          console.timeEnd("animation duration")
+          console.log("animation duration should be " + frameNumberAnimation.duration + "ms")
+        }
+      }
     }
   }
 }
