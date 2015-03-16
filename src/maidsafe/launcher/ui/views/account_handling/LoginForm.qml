@@ -141,7 +141,7 @@ Item {
             ParallelAnimation {
               NumberAnimation {
                   target: pinTextField; properties: "y"
-                  duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+                  duration: 534; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
               ColorAnimation {target: pinTextField; property: "backgroundColor"
                 duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
@@ -160,7 +160,7 @@ Item {
             ParallelAnimation {
               NumberAnimation {
                   target: keywordTextField; properties: "y"
-                  duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+                  duration: 634; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
               ColorAnimation {target: keywordTextField; property: "backgroundColor"
                 duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
@@ -179,7 +179,7 @@ Item {
             ParallelAnimation {
               NumberAnimation {
                   target: passwordTextField; properties: "y"
-                  duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+                  duration: 734; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
               }
               ColorAnimation {target: passwordTextField; property: "backgroundColor"
                 duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
