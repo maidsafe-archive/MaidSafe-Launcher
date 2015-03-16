@@ -28,8 +28,12 @@ Item {
   states: [State {
     name: "VISIBLE"
     PropertyChanges {
-      target: loginForm
+      target: fadeOutItems
       opacity: 1
+    }
+    PropertyChanges {
+      target: sharedBackgroundButton
+      width: customProperties.textFieldWidth
     }
     PropertyChanges {
       target: pinTextField
@@ -38,6 +42,7 @@ Item {
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight*3 -
          customProperties.textFieldVerticalSpacing*3
+      backgroundColor: customBrushes.textFieldBackground
     }
     PropertyChanges {
       target: keywordTextField
@@ -46,6 +51,7 @@ Item {
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight*2 -
          customProperties.textFieldVerticalSpacing*2
+      backgroundColor: customBrushes.textFieldBackground
     }
     PropertyChanges {
       target: passwordTextField
@@ -54,41 +60,41 @@ Item {
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight -
          customProperties.textFieldVerticalSpacing
-    }
-    PropertyChanges {
-      target: sharedBackgroundButton
-      width: customProperties.textFieldWidth
+      backgroundColor: customBrushes.textFieldBackground
     }
   }, State {
     name: "HIDDEN"
     PropertyChanges {
-      target: loginForm
+      target: fadeOutItems
       opacity: 0
-    }
-    PropertyChanges {
-      target: pinTextField
-      width: customProperties.cancelButtonWidth +60
-      y: accountHandlerView.bottomButtonY
-    }
-    PropertyChanges {
-      target: keywordTextField
-      width: customProperties.cancelButtonWidth +40
-      y: accountHandlerView.bottomButtonY
-    }
-    PropertyChanges {
-      target: passwordTextField
-      width: customProperties.cancelButtonWidth +20
-      y: accountHandlerView.bottomButtonY
     }
     PropertyChanges {
       target: sharedBackgroundButton
       width: customProperties.cancelButtonWidth
     }
+    PropertyChanges {
+      target: pinTextField
+      width: customProperties.cancelButtonWidth
+      y: accountHandlerView.bottomButtonY
+      backgroundColor: customBrushes.buttonDefaultBlue
+    }
+    PropertyChanges {
+      target: keywordTextField
+      width: customProperties.cancelButtonWidth
+      y: accountHandlerView.bottomButtonY
+      backgroundColor: customBrushes.buttonDefaultBlue
+    }
+    PropertyChanges {
+      target: passwordTextField
+      width: customProperties.cancelButtonWidth
+      y: accountHandlerView.bottomButtonY
+      backgroundColor: customBrushes.buttonDefaultBlue
+    }
   }]
 
   transitions: [Transition {
       from: "HIDDEN"; to: "VISIBLE"
-      SequentialAnimation {
+//      SequentialAnimation {
 /*        PauseAnimation {
           duration: 500
         }*/
@@ -109,14 +115,52 @@ Item {
            script: {
            }
         }*/
-      }
+//      }
   },Transition {
       from: "VISIBLE"; to: "HIDDEN"
       SequentialAnimation {
-        NumberAnimation {
-            duration: 1000
-            easing.type: Easing.InExpo
-            properties: "width,y,opacity"
+        ParallelAnimation {
+          NumberAnimation {
+              target: fadeOutItems; property: "opacity"
+              duration: 1000; easing.type: Easing.InExpo
+          }
+          NumberAnimation {
+              target: sharedBackgroundButton; property: "width"
+              duration: 1000; easing.type: Easing.InExpo
+          }
+          SequentialAnimation {
+            PauseAnimation { duration: 200 }
+            ParallelAnimation {
+              NumberAnimation {
+                  target: pinTextField; properties: "width,y"
+                  duration: 800; easing.type: Easing.InExpo
+              }
+              ColorAnimation {target: pinTextField; property: "backgroundColor"
+                duration: 800; easing.type: Easing.InExpo
+              }
+            }
+          }
+          SequentialAnimation {
+            PauseAnimation { duration: 100 }
+            ParallelAnimation {
+              NumberAnimation {
+                  target: keywordTextField; properties: "width,y"
+                  duration: 900; easing.type: Easing.InExpo
+              }
+              ColorAnimation {target: keywordTextField; property: "backgroundColor"
+                duration: 900; easing.type: Easing.InExpo
+              }
+            }
+          }
+          ParallelAnimation {
+            NumberAnimation {
+                target: passwordTextField; properties: "width,y"
+                duration: 1000; easing.type: Easing.InExpo
+            }
+            ColorAnimation {target: passwordTextField; property: "backgroundColor"
+              duration: 1000; easing.type: Easing.InExpo
+            }
+          }
         }
         ScriptAction {
            script: {
@@ -148,51 +192,56 @@ Item {
       submitButton: loginButton
   }
 
-  BlueButton {
-    id: loginButton
+  Item {
+    id: fadeOutItems
+    anchors.fill: parent
 
-    y: accountHandlerView.bottomButtonY
+    BlueButton {
+      id: loginButton
 
-    text: qsTr("LOG IN")
+      y: accountHandlerView.bottomButtonY
 
-    onClicked: {
-        if (pinTextField.text === "") {
-          floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))
-        } else if (keywordTextField.text === "") {
-          floatingStatus.showError(keywordTextField, qsTr("Keyword cannot be left blank"))
-        } else if (passwordTextField.text === "") {
-          floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
-        } else {
-          floatingStatus.hide()
-          accountHandlerView.fromState = "LOGIN"
-          accountHandlerView.state = "LOADING"
-          accountHandlerController_.createAccount(pinTextField.text,
-                                                  keywordTextField.text,
-                                                  passwordTextField.text)
-          //accountHandlerController_.LoginCompleted
-        }
+      text: qsTr("LOG IN")
+
+      onClicked: {
+          if (pinTextField.text === "") {
+            floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))
+          } else if (keywordTextField.text === "") {
+            floatingStatus.showError(keywordTextField, qsTr("Keyword cannot be left blank"))
+          } else if (passwordTextField.text === "") {
+            floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
+          } else {
+            floatingStatus.hide()
+            accountHandlerView.fromState = "LOGIN"
+            accountHandlerView.state = "LOADING"
+            accountHandlerController_.createAccount(pinTextField.text,
+                                                    keywordTextField.text,
+                                                    passwordTextField.text)
+            //accountHandlerController_.LoginCompleted
+          }
+      }
     }
-  }
 
-  Rectangle { // white line
-    width: customProperties.textFieldWidth
-    height: 1
-    anchors.horizontalCenter: parent.horizontalCenter
-    y: accountHandlerView.height -
-       registerButton.height -
-       customProperties.clickableTextBottomMargin - 4
-    color: "#ffffff"
-  }
+    Rectangle { // white line
+      width: customProperties.textFieldWidth
+      height: 1
+      anchors.horizontalCenter: parent.horizontalCenter
+      y: accountHandlerView.height -
+         registerButton.height -
+         customProperties.clickableTextBottomMargin - 4
+      color: "#ffffff"
+    }
 
-  ClickableText {
-    id: registerButton
+    ClickableText {
+      id: registerButton
 
-    y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
+      y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
 
-    text: qsTr("Don't have an account yet? Create one")
-    onClicked: {
-      accountHandlerView.fromState = "LOGIN"
-      accountHandlerView.state = "REGISTER"
+      text: qsTr("Don't have an account yet? Create one")
+      onClicked: {
+        accountHandlerView.fromState = "LOGIN"
+        accountHandlerView.state = "REGISTER"
+      }
     }
   }
 }

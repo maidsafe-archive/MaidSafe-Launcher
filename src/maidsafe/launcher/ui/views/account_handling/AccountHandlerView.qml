@@ -120,8 +120,8 @@ Item {
      color: {
        if (accountHandlerView.currentView.bottomButton.pressed) {
          customBrushes.buttonPressedBlue
-       } else if (accountHandlerView.currentView.bottomButton.hovered ||
-                  accountHandlerView.currentView.bottomButton.activeFocus) {
+       } else if (accountHandlerView.currentView.bottomButton.hovered/* ||
+                  accountHandlerView.currentView.bottomButton.activeFocus*/) {
          customBrushes.buttonHoveredBlue
        } else {
          customBrushes.buttonDefaultBlue

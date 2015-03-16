@@ -29,6 +29,7 @@ TextField {
   property bool showTickImage: false
   property bool showErrorImage: false
   property Button submitButton: null
+  property color backgroundColor: "#ffffff"
 
   function clearAllImages() { showTickImage = showErrorImage = false }
 
@@ -80,6 +81,7 @@ TextField {
       implicitHeight: customProperties.textFieldHeight
       implicitWidth: customProperties.textFieldWidth
       radius: customProperties.textFieldRadius
+      color: textField.backgroundColor
 
       Image {
         id: tickImage
