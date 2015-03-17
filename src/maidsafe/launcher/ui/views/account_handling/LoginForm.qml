@@ -182,24 +182,24 @@ Item {
 
 
   CustomTextField {
-      id: pinTextField
-      placeholderText: qsTr("PIN")
-      submitButton: loginButton
-      Component.onCompleted: {
-        forceActiveFocus()
-      }
+    id: pinTextField
+    placeholderText: qsTr("PIN")
+    submitButton: loginButton
+    Component.onCompleted: {
+      forceActiveFocus()
+    }
   }
 
   CustomTextField {
-      id: keywordTextField
-      placeholderText: qsTr("Keyword")
-      submitButton: loginButton
+    id: keywordTextField
+    placeholderText: qsTr("Keyword")
+    submitButton: loginButton
   }
 
   CustomTextField {
-      id: passwordTextField
-      placeholderText: qsTr("Password")
-      submitButton: loginButton
+    id: passwordTextField
+    placeholderText: qsTr("Password")
+    submitButton: loginButton
   }
 
   Item {
@@ -214,21 +214,21 @@ Item {
       text: qsTr("LOG IN")
 
       onClicked: {
-          if (pinTextField.text === "") {
-            floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))
-          } else if (keywordTextField.text === "") {
-            floatingStatus.showError(keywordTextField, qsTr("Keyword cannot be left blank"))
-          } else if (passwordTextField.text === "") {
-            floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
-          } else {
-            floatingStatus.hide()
-            accountHandlerView.fromState = "LOGIN"
-            accountHandlerView.state = "LOADING"
-            accountHandlerController_.createAccount(pinTextField.text,
-                                                    keywordTextField.text,
-                                                    passwordTextField.text)
-           // accountHandlerController_.LoginCompleted = { console.log("LoginCompleted") }
-          }
+        if (pinTextField.text === "") {
+          floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))
+        } else if (keywordTextField.text === "") {
+          floatingStatus.showError(keywordTextField, qsTr("Keyword cannot be left blank"))
+        } else if (passwordTextField.text === "") {
+          floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
+        } else {
+          floatingStatus.hide()
+          accountHandlerView.fromState = "LOGIN"
+          accountHandlerView.state = "LOADING"
+          accountHandlerController_.createAccount(pinTextField.text,
+                                                  keywordTextField.text,
+                                                  passwordTextField.text)
+         // accountHandlerController_.LoginCompleted = { console.log("LoginCompleted") }
+        }
       }
     }
 

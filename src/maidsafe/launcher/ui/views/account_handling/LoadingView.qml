@@ -47,51 +47,38 @@ Item {
   }]
 
   transitions: [Transition {
-      from: "HIDDEN"; to: "VISIBLE"
-      SequentialAnimation {
-        PauseAnimation {
-          duration: 750
+    from: "HIDDEN"; to: "VISIBLE"
+    SequentialAnimation {
+      PauseAnimation { duration: 750 }
+      ScriptAction { script: {
+        errorMessageAnimation.stop()
+        errorMessage.text = 0
+        errorMessage.opacity = 0
+        cancelButton.text = qsTr("CANCEL")
+        loadingView.visible = true
+        accountHandlerView.currentView = loadingView
+        cancelButton.forceActiveFocus()
+        rocket.showLoading()
+        stopRocketTimer.start()
+      }}
+      ParallelAnimation {
+        NumberAnimation {
+          duration: 1000
+          easing.type: Easing.OutExpo
+          properties: "y"
         }
-        ScriptAction {
-            script: {
-              errorMessageAnimation.stop()
-              errorMessage.text = 0
-              errorMessage.opacity = 0
-              cancelButton.text = qsTr("CANCEL")
-              loadingView.visible = true
-              accountHandlerView.currentView = loadingView
-              cancelButton.forceActiveFocus()
-              rocket.showLoading()
-              stopRocketTimer.start()
-            }
-         }
-        ParallelAnimation {
-          NumberAnimation {
-              duration: 1000
-              easing.type: Easing.OutExpo
-              properties: "y"
-          }
-          NumberAnimation {
-              duration: 1000
-//              easing.type: Easing.OutExpo
-              properties: "opacity"
-          }
+        NumberAnimation {
+          duration: 1000
+//          easing.type: Easing.OutExpo
+          properties: "opacity"
         }
       }
+    }
   },Transition {
       from: "VISIBLE"; to: "HIDDEN"
-//      SequentialAnimation {
-/*        NumberAnimation {
-            duration: 1000
-            easing.type: Easing.InQuad
-            properties: "width,y,opacity"
-        }*/
-        ScriptAction {
-           script: {
-             loadingView.visible = false
-           }
-        }
-//      }
+      ScriptAction { script: {
+        loadingView.visible = false
+      }}
   }]
 
 
@@ -115,24 +102,21 @@ Item {
       property: "opacity"
       to: 1
       duration: 700
-      running: true
     }
   }
 
   Item {
     id: rocketContainer
     y: accountHandlerView.bottomButtonY - height
-    x: 20 // center the rocket
     anchors.horizontalCenter: parent.horizontalCenter
     height: 125
-    width: 257 // +7 because png are uncentered 7px on the right to center the rocket
-    clip: true
+    width: 264 // +14 because png are uncentered 7px on the right to center the rocket +7px to center the rocket with the button
+//    clip: true
 
     Rocket {
       id: rocket
-      onFinished: {
-        // TODO Gildas: if (success)
-      }
+      x: 7 // center the rocket with the button
+      //onFinished: {} // TODO Gildas: if (success)
       onStartBreaking: {
         cancelButton.text = qsTr("GO BACK")
         errorMessage.text = qsTr("There was an error creating your account.\nPlease try again.")

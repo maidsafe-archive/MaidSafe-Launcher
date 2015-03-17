@@ -41,22 +41,6 @@ Button {
 //        underline: control.activeFocus ? true : false
       }
     }
-    background: null/*(backgroundDisabled ? null : Rectangle {
-      implicitHeight: customProperties.greyButtonHeight
-      implicitWidth: customProperties.greyButtonWidth
-      radius: customProperties.greyButtonRadius
-      antialiasing: true
-
-      color: {
-        if (buttonBaseRoot.pressed) {
-          globalBrushes.buttonPressedGrey
-        } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
-          globalBrushes.buttonHoveredGrey
-        } else {
-          globalBrushes.buttonDefaultGrey
-        }
-      }
-    })*/
-
+    background: null
   }
 }
