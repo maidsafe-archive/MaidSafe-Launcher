@@ -94,105 +94,90 @@ Item {
   }]
 
   transitions: [Transition {
-      from: "HIDDEN"; to: "VISIBLE"
-//      SequentialAnimation {
-/*        PauseAnimation {
-          duration: 500
-        }*/
-        ScriptAction {
-            script: {
-              loginForm.visible = true
-              accountHandlerView.currentView = loginForm
-              pinTextField.focus = true
-              pinTextField.cursorPosition = pinTextField.text.length
-            }
-         }
-/*        NumberAnimation {
-            duration: 1000
-            easing.type: Easing.OutQuad
-            properties: "width,y,opacity"
-        }
-        ScriptAction {
-           script: {
-           }
-        }*/
-//      }
+
+    from: "HIDDEN"; to: "VISIBLE"
+    ScriptAction { script: {
+      loginForm.visible = true
+      accountHandlerView.currentView = loginForm
+      pinTextField.focus = true
+      pinTextField.cursorPosition = pinTextField.text.length
+    }}
+
   },Transition {
-      from: "VISIBLE"; to: "HIDDEN"
-      SequentialAnimation {
-        ParallelAnimation {
+
+    from: "VISIBLE"; to: "HIDDEN"
+    SequentialAnimation {
+      ParallelAnimation {
+        NumberAnimation {
+            target: fadeOutItems; property: "opacity"
+            duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+        }
+        NumberAnimation {
+            target: sharedBackgroundButton; property: "width"
+            duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 366 }
           NumberAnimation {
-              target: fadeOutItems; property: "opacity"
-              duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+              target: pinTextField; properties: "width"
+              duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
           }
-          NumberAnimation {
-              target: sharedBackgroundButton; property: "width"
-              duration: 1000; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-          }
-          SequentialAnimation {
-            PauseAnimation { duration: 366 }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 300 }
+          ParallelAnimation {
             NumberAnimation {
-                target: pinTextField; properties: "width"
-                duration: 634; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+                target: pinTextField; properties: "y"
+                duration: 600; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
             }
-          }
-          SequentialAnimation {
-            PauseAnimation { duration: 300 }
-            ParallelAnimation {
-              NumberAnimation {
-                  target: pinTextField; properties: "y"
-                  duration: 534; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-              }
-              ColorAnimation {target: pinTextField; property: "backgroundColor"
-                duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-              }
-            }
-          }
-          SequentialAnimation {
-            PauseAnimation { duration: 266 }
-            NumberAnimation {
-                target: keywordTextField; properties: "width"
-                duration: 734; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-            }
-          }
-          SequentialAnimation {
-            PauseAnimation { duration: 200 }
-            ParallelAnimation {
-              NumberAnimation {
-                  target: keywordTextField; properties: "y"
-                  duration: 634; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-              }
-              ColorAnimation {target: keywordTextField; property: "backgroundColor"
-                duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-              }
-            }
-          }
-          SequentialAnimation {
-            PauseAnimation { duration: 166 }
-            NumberAnimation {
-                target: passwordTextField; properties: "width"
-                duration: 834; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-            }
-          }
-          SequentialAnimation {
-            PauseAnimation { duration: 100 }
-            ParallelAnimation {
-              NumberAnimation {
-                  target: passwordTextField; properties: "y"
-                  duration: 734; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-              }
-              ColorAnimation {target: passwordTextField; property: "backgroundColor"
-                duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
-              }
+            ColorAnimation {target: pinTextField; property: "backgroundColor"
+              duration: 760; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
             }
           }
         }
-        ScriptAction {
-           script: {
-             loginForm.visible = false
-           }
+        SequentialAnimation {
+          PauseAnimation { duration: 266 }
+          NumberAnimation {
+              target: keywordTextField; properties: "width"
+              duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 200 }
+          ParallelAnimation {
+            NumberAnimation {
+                target: keywordTextField; properties: "y"
+                duration: 700; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+            }
+            ColorAnimation {target: keywordTextField; property: "backgroundColor"
+              duration: 860; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+            }
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 166 }
+          NumberAnimation {
+              target: passwordTextField; properties: "width"
+              duration: 900; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 100 }
+          ParallelAnimation {
+            NumberAnimation {
+                target: passwordTextField; properties: "y"
+                duration: 800; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+            }
+            ColorAnimation {target: passwordTextField; property: "backgroundColor"
+              duration: 960; easing.type: Easing.Bezier; easing.bezierCurve: easingCurve
+            }
+          }
         }
       }
+      ScriptAction { script: {
+        loginForm.visible = false
+      }}
+    }
   }]
 
 
@@ -242,7 +227,7 @@ Item {
             accountHandlerController_.createAccount(pinTextField.text,
                                                     keywordTextField.text,
                                                     passwordTextField.text)
-            //accountHandlerController_.LoginCompleted
+           // accountHandlerController_.LoginCompleted = { console.log("LoginCompleted") }
           }
       }
     }

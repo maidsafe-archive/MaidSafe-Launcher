@@ -65,10 +65,17 @@ Item {
               stopRocketTimer.start()
             }
          }
-        NumberAnimation {
-            duration: 1000
-            easing.type: Easing.OutExpo
-            properties: "width,y,opacity"
+        ParallelAnimation {
+          NumberAnimation {
+              duration: 1000
+              easing.type: Easing.OutExpo
+              properties: "y"
+          }
+          NumberAnimation {
+              duration: 1000
+//              easing.type: Easing.OutExpo
+              properties: "opacity"
+          }
         }
       }
   },Transition {
@@ -115,7 +122,7 @@ Item {
   Item {
     id: rocketContainer
     y: accountHandlerView.bottomButtonY - height
-    x: 4 // center the rocket
+    x: 20 // center the rocket
     anchors.horizontalCenter: parent.horizontalCenter
     height: 125
     width: 257 // +7 because png are uncentered 7px on the right to center the rocket
