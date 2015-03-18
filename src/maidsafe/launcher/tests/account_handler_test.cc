@@ -69,7 +69,7 @@ TEST_F(AccountHandlerTest, FUNC_EncryptDecryptAccount) {
   }
 }
 
-TEST_F(AccountHandlerTest, FUNC_Login) {
+TEST_F(AccountHandlerTest, NETWORK_Login) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   auto maid_and_signer(passport::CreateMaidAndSigner());
   auto account_getter_future(AccountGetter::CreateAccountGetter());
@@ -97,7 +97,7 @@ TEST_F(AccountHandlerTest, FUNC_Login) {
   }
 }
 
-TEST_F(AccountHandlerTest, FUNC_Save) {
+TEST_F(AccountHandlerTest, NETWORK_Save) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   auto maid_and_signer(passport::CreateMaidAndSigner());
   auto account_getter_future(AccountGetter::CreateAccountGetter());

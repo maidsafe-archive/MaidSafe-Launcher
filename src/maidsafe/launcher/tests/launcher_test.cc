@@ -64,7 +64,7 @@ TEST_F(LauncherTest, FUNC_CreateMultipleAccounts) {
   }
 }
 
-TEST_F(LauncherTest, FUNC_CreateDuplicateAccount) {
+TEST_F(LauncherTest, NETWORK_CreateDuplicateAccount) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   {  // Create first account
     std::unique_ptr<Launcher> launcher;
@@ -84,7 +84,7 @@ TEST_F(LauncherTest, FUNC_CreateDuplicateAccount) {
   }
 }
 
-TEST_F(LauncherTest, FUNC_ValidLogin) {
+TEST_F(LauncherTest, NETWORK_ValidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   // Create account
   Launcher::CreateAccount(std::get<0>(user_credentials_tuple), std::get<1>(user_credentials_tuple),
@@ -98,7 +98,7 @@ TEST_F(LauncherTest, FUNC_ValidLogin) {
   launcher->LogoutAndStop();
 }
 
-TEST_F(LauncherTest, FUNC_InvalidLogin) {
+TEST_F(LauncherTest, NETWORK_InvalidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   // TODO(Prakash): Verify the error code being checked for as accurate
   EXPECT_TRUE(ThrowsAs([&] {
