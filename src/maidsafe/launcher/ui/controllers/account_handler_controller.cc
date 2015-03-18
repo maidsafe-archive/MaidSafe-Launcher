@@ -30,8 +30,8 @@ namespace ui {
 AccountHandlerController::AccountHandlerController(MainWindow& main_window,
                                                    QObject* parent)
     : QObject{parent},
-      main_window_(main_window),
-  account_handler_model_{new AccountHandlerModel(this)} {
+      main_window_{main_window},
+      account_handler_model_{new AccountHandlerModel{this}} {
   Q_ASSERT_X(connect(account_handler_model_, SIGNAL(LoginResultAvailable()), this,
                      SLOT(LoginResultAvailable()), Qt::QueuedConnection),
              "Connection Failure",
