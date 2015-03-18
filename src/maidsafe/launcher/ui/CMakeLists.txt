@@ -143,7 +143,7 @@ target_include_directories(safe_app_launcher PRIVATE "../../../")
 target_link_libraries(safe_app_launcher ${Qt5TargetLibs} maidsafe_common) # maidsafe_launcher
 
 set(QmlProfilingNotification "      Format of command line parameters is: qmljsdebugger=port:<port_from>[,port_to][,host:<ip address>][,block]")
-set(QmlProfilingNotification "${QmlProfilingNotification}\n         Eg., (Linux): $ ./safe_app_launcher -qmljsdebugger=port:32768,block")
+set(QmlProfilingNotification "${QmlProfilingNotification}\n         Eg., safe_app_launcher -qmljsdebugger=port:32768,block")
 set(QmlProfilingNotification "${QmlProfilingNotification}\n         \"block\" will block the app until external profiler/debugger connects to it so that it can attach to it right from the app's start")
 set(QmlProfilingNotification "${QmlProfilingNotification}\n         Attach profiler using suitable IDE or if using command line use: qmlprofiler -p <port> -attach <hostname/ip-address>")
 set(QmlProfilingNotification "${QmlProfilingNotification}\n         Attach debugger via QtCreator->Debug->Start Debugging->Attach to QML Port")
