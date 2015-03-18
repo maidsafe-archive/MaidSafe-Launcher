@@ -30,6 +30,7 @@ TextField {
   property bool showErrorImage: false
   property Button submitButton: null
   property color backgroundColor: "#ffffff"
+  property color textColor:  globalBrushes.textGrey
 
   function clearAllImages() { showTickImage = showErrorImage = false }
 
@@ -67,7 +68,7 @@ TextField {
     id: textFieldStyle
     objectName: "textFieldStyle"
 
-    textColor: globalBrushes.textGrey
+    textColor: textField.textColor
 
     placeholderTextColor: control.activeFocus ?
                             globalBrushes.placeHolderFocusGrey

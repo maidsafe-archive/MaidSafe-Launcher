@@ -17,30 +17,34 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.3
 
-Button {
-  property bool backgroundDisabled: false
-  anchors.horizontalCenter: parent.horizontalCenter
+ButtonBase {
+  id: buttonBaseRoot
+  objectName: "buttonBaseRoot"
 
-  width: customProperties.blueButtonWidth
-  height: customProperties.blueButtonHeight
-  Keys.onEnterPressed:  clicked();
-  Keys.onSpacePressed:  clicked();
-  Keys.onReturnPressed: clicked();
+  backgroundComponent: Rectangle {
+    id: backgroundRect
+    objectName: "backgroundRect"
 
-  style: ButtonStyle {
-    label: CustomLabel {
-      text: control.text
-      verticalAlignment: Qt.AlignVCenter
-      horizontalAlignment: Qt.AlignHCenter
-      font {
-        weight: Font.DemiBold
-//        italic: control.activeFocus ? true : false
-//        underline: control.activeFocus ? true : false
+    /* animating the entire button width make the text to tremble
+     * so wee need to animate only the background Item
+     * anchors.horizontalCenter does not works to change the x value
+     */
+    x: (buttonBaseRoot.width - width) / 2
+    width: buttonBaseRoot.backgroundWidth
+
+    implicitHeight: customProperties.blueButtonHeight
+    radius: customProperties.blueButtonRadius
+    antialiasing: true
+
+    color: {
+      if (buttonBaseRoot.pressed) {
+        customBrushes.buttonPressedBlue
+      } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
+        customBrushes.buttonHoveredBlue
+      } else {
+        customBrushes.buttonDefaultBlue
       }
     }
-    background: null
   }
 }

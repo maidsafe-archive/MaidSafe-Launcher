@@ -17,34 +17,50 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.3
 
-Button {
-  property bool underlineLabelOnFocus: true
-  property bool italiciseLabelOnFocus: false
+FocusScope {
+  id: focusScope
+  objectName: "focusScope"
 
-  Keys.onEnterPressed: clicked();
-  Keys.onSpacePressed: clicked();
-  Keys.onReturnPressed: clicked();
+  signal clicked()
+  property alias label: customLabel
+  property alias mouseArea: mouseArea
+  property alias text: customLabel.text
 
-  anchors.horizontalCenter: parent.horizontalCenter
+  width: childrenRect.width
+  height: childrenRect.height
 
-  style: ButtonStyle {
-    background: null
-    label: CustomLabel {
-      id: buttonLabel
-      objectName: "buttonLabel"
+  activeFocusOnTab: true
 
-      text: control.text
-      verticalAlignment: Qt.AlignVCenter
-      horizontalAlignment: Qt.AlignHCenter
+  MouseArea {
+    id: mouseArea
+    objectName: "mouseArea"
+
+    height: customLabel.implicitHeight
+    width: customLabel.implicitWidth
+
+    hoverEnabled: true
+    acceptedButtons: Qt.LeftButton
+    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+    onClicked: focusScope.clicked()
+
+    CustomLabel {
+      id: customLabel
+      objectName: "customLabel"
 
       font {
         pixelSize: customProperties.customTextPixelSize
-        italic: control.italiciseLabelOnFocus && control.activeFocus ? true : false
-        underline: control.underlineLabelOnFocus && control.activeFocus || control.hovered ? true : false
+        family: globalFontFamily.name
       }
+
+      focus: true
+      anchors.centerIn: parent
+      font.underline: mouseArea.containsMouse || activeFocus
+
+      Keys.onEnterPressed: focusScope.clicked()
+      Keys.onSpacePressed: focusScope.clicked()
+      Keys.onReturnPressed: focusScope.clicked()
     }
   }
 }

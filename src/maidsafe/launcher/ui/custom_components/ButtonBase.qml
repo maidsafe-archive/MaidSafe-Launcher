@@ -17,29 +17,47 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 
-QtObject {
-  id: properties
-  objectName: "properties"
+Button {
+  id: buttonControl
+  objectName: "buttonControl"
 
-  readonly property int defaultFontPixelSize: 18
-  readonly property int customTextPixelSize: 15
+  property Component backgroundComponent: null
 
-  readonly property int cancelButtonWidth: 120
-  readonly property int cancelButtonBottom: 125
-  readonly property int cancelButtonHeight: 35
+  property bool underlineLabelOnFocus: true
+  property bool italiciseLabelOnFocus: false
 
-  readonly property int textFieldWidth: 320
-  readonly property int textFieldHeight: 35
-  readonly property int textFieldRadius: 5
-  readonly property int textFieldVerticalSpacing: 15
+  property int backgroundWidth: width
+  property int textOpacity: opacity
 
-  readonly property int clickableTextBottomMargin: 45
+  Keys.onEnterPressed: clicked();
+  Keys.onSpacePressed: clicked();
+  Keys.onReturnPressed: clicked();
 
-  readonly property int blueButtonWidth: textFieldWidth
-  readonly property int blueButtonHeight: textFieldHeight
-  readonly property int blueButtonRadius: textFieldRadius
-  readonly property int blueButtonMargin: 15
+  style: ButtonStyle {
+    id: buttonStyle
+    objectName: "buttonStyle"
 
-  readonly property var animationColapseEasingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
+    Component.onCompleted: {
+      if (buttonControl.backgroundComponent) { background = buttonControl.backgroundComponent }
+    }
+
+    label: CustomLabel {
+      id: buttonLabel
+      objectName: "buttonLabel"
+
+      opacity: control.textOpacity
+      text: control.text
+      verticalAlignment: Qt.AlignVCenter
+      horizontalAlignment: Qt.AlignHCenter
+
+      font {
+        italic: control.italiciseLabelOnFocus && control.activeFocus ? true : false
+        underline: control.underlineLabelOnFocus && control.activeFocus ? true : false
+      }
+    }
+  }
 }
+

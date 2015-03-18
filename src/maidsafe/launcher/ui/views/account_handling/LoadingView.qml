@@ -21,8 +21,14 @@ import QtQuick 2.4
 import "../../custom_components"
 
 Item {
+  id: loadingView
+
   anchors.horizontalCenter: parent.horizontalCenter
-  property Item bottomButton: cancelButton
+
+  signal loadingCanceled()
+  readonly property Item bottomButton: cancelButton
+
+  opacity: 0
 
   states: [State {
     name: "VISIBLE"
@@ -34,20 +40,10 @@ Item {
       target: rocket
       y: 0
     }
-  }, State {
-    name: "HIDDEN"
-    PropertyChanges {
-      target: loadingView
-      opacity: 0
-    }
-    PropertyChanges {
-      target: rocket
-      y: rocketContainer.height
-    }
   }]
 
   transitions: [Transition {
-    from: "HIDDEN"; to: "VISIBLE"
+    to: "VISIBLE"
     SequentialAnimation {
       PauseAnimation { duration: 750 }
       ScriptAction { script: {
@@ -55,8 +51,6 @@ Item {
         errorMessage.text = 0
         errorMessage.opacity = 0
         cancelButton.text = qsTr("CANCEL")
-        loadingView.visible = true
-        accountHandlerView.currentView = loadingView
         cancelButton.forceActiveFocus()
         rocket.showLoading()
         stopRocketTimer.start()
@@ -69,16 +63,10 @@ Item {
         }
         NumberAnimation {
           duration: 1000
-//          easing.type: Easing.OutExpo
           properties: "opacity"
         }
       }
     }
-  },Transition {
-      from: "VISIBLE"; to: "HIDDEN"
-      ScriptAction { script: {
-        loadingView.visible = false
-      }}
   }]
 
 
@@ -111,11 +99,11 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     height: 125
     width: 264 // +14 because png are uncentered 7px on the right to center the rocket +7px to center the rocket with the button
-//    clip: true
 
     Rocket {
       id: rocket
       x: 7 // center the rocket with the button
+      y: parent.height
       //onFinished: {} // TODO Gildas: if (success)
       onStartBreaking: {
         cancelButton.text = qsTr("GO BACK")
@@ -128,8 +116,8 @@ Item {
   BlueButton {
     id: cancelButton
     y: accountHandlerView.bottomButtonY
-    onClicked: {
-      accountHandlerView.state = accountHandlerView.fromState
-    }
+    width: customProperties.cancelButtonWidth
+    anchors.horizontalCenter: parent.horizontalCenter
+    onClicked: loadingCanceled()
   }
 }

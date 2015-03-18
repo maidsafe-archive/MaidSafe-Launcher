@@ -67,38 +67,52 @@ Item {
 
 
   state: "LOGIN"
-  property string fromState: ""
-  property Item currentView: loginForm
-  property int bottomButtonY: accountHandlerView.height -
-                              customProperties.cancelButtonBottom -
-                              customProperties.blueButtonMargin
+  readonly property int bottomButtonY: accountHandlerView.height -
+                                       customProperties.cancelButtonBottom -
+                                       customProperties.blueButtonMargin
 
   states: [State {
-    name: "LOGIN"
-    PropertyChanges { target: accountHandlerView; currentView: loginForm }
-    PropertyChanges { target: loadingView; state: "HIDDEN" }
-    PropertyChanges { target: registerForm; state: "HIDDEN" }
-    PropertyChanges { target: loginForm; state: "VISIBLE" }
-  }, State {
     name: "REGISTER"
-    PropertyChanges { target: accountHandlerView; currentView: registerForm }
-    PropertyChanges { target: loginForm; state: "HIDDEN" }
-    PropertyChanges { target: loadingView; state: "HIDDEN" }
-    PropertyChanges { target: registerForm; state: "PIN" }
-  }, State {
-    name: "LOADING"
-    PropertyChanges { target: accountHandlerView; currentView: loadingView }
-    PropertyChanges { target: loginForm; state: "HIDDEN" }
-    PropertyChanges { target: registerForm; state: "HIDDEN" }
-    PropertyChanges { target: loadingView; state: "VISIBLE" }
+    PropertyChanges { target: registerForm; x: 0 }
+    PropertyChanges { target: loginForm; x: -mainWindow_.width }
   }]
 
   transitions: [Transition {
-    ScriptAction {
-        script: {
-          floatingStatus.visible = false
+    ScriptAction { script: {
+      floatingStatus.visible = false
+    }}
+  }, Transition {
+      from: "LOGIN"; to: "REGISTER"
+      SequentialAnimation {
+        ScriptAction { script: {
+          registerForm.visible = true
+          registerForm.currentTextFields.primaryTextField.forceActiveFocus()
+        }}
+        NumberAnimation {
+          properties: "x"
+          duration: 300
+          easing.type: Easing.InOutQuad
         }
-     }
+        ScriptAction { script: {
+          loginForm.visible = false
+        }}
+      }
+  }, Transition {
+    from: "REGISTER"; to: "LOGIN"
+    SequentialAnimation {
+      ScriptAction { script: {
+        loginForm.visible = true
+        loginForm.focusTextField.forceActiveFocus()
+      }}
+      NumberAnimation {
+        properties: "x"
+        duration: 300
+        easing.type: Easing.InOutQuad
+      }
+      ScriptAction { script: {
+        registerForm.visible = false
+      }}
+    }
   }]
 
   Image {
@@ -108,29 +122,18 @@ Item {
      anchors.horizontalCenter: parent.horizontalCenter
    }
 
-   Rectangle {
-     id: sharedBackgroundButton
+  LoginForm {
+    id: loginForm
+  }
 
-     y: accountHandlerView.bottomButtonY
-     width: customProperties.textFieldWidth
-     height: customProperties.cancelButtonHeight
-     anchors.horizontalCenter: parent.horizontalCenter
-     radius: customProperties.blueButtonRadius
-     antialiasing: true
-     color: {
-       if (accountHandlerView.currentView.bottomButton.pressed) {
-         customBrushes.buttonPressedBlue
-       } else if (accountHandlerView.currentView.bottomButton.hovered/* ||
-                  accountHandlerView.currentView.bottomButton.activeFocus*/) {
-         customBrushes.buttonHoveredBlue
-       } else {
-         customBrushes.buttonDefaultBlue
-       }
-     }
-   }
+  RegisterForm {
+    id: registerForm
+    visible: false
+    x: mainWindow_.width
+  }
 
-  LoadingView { id: loadingView; visible: false }
-  LoginForm { id: loginForm }
-  RegisterForm { id: registerForm; visible: false }
-  FloatingStatusBox { id: floatingStatus; visible: false }
+  FloatingStatusBox {
+    id: floatingStatus
+    visible: false
+  }
 }
