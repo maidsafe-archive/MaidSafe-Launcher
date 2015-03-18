@@ -23,14 +23,30 @@ Rectangle {
 
   property Item pointToItem: null
 
+  width: Math.min(180,
+                  metaText.implicitWidth   +
+                  infoText.implicitWidth       +
+                  metaText.anchors.leftMargin +
+                  infoText.anchors.leftMargin +  infoText.anchors.rightMargin)
+
+  height: Math.max(infoText.implicitHeight + infoText.implicitHeight *
+                   infoText.implicitWidth / (infoText.width ? infoText.width : 1),
+                   metaText.implicitHeight + metaText.implicitHeight *
+                   metaText.implicitWidth / (metaText.width ? metaText.width : 1),
+                   customProperties.textFieldHeight)
+
+  x: pointToItem.x + pointToItem.width + 15
+  y: pointToItem.y + pointToItem.height / 2 - height / 2
+  radius: customProperties.textFieldRadius
+  visible: false
   opacity: 0
+
   transitions: [Transition {
       to: "VISIBLE"
       SequentialAnimation {
         ScriptAction {
             script: {
               statusDisplayRect.visible = true
-              resetPostitionAndSize()
             }
          }
         NumberAnimation {
@@ -61,7 +77,6 @@ Rectangle {
     state = ""
     if (pointToItem && pointToItem.clearAllImages) {
       pointToItem.clearAllImages()
-      pointToItem = null
     }
   }
 
@@ -79,25 +94,6 @@ Rectangle {
     state = "VISIBLE"
     pointToItem.focus = true
   }
-
-  function resetPostitionAndSize() {
-    width = Math.min(180,
-                    metaText.implicitWidth   +
-                    infoText.implicitWidth       +
-                    metaText.anchors.leftMargin +
-                    infoText.anchors.leftMargin +  infoText.anchors.rightMargin)
-
-    height = Math.max(infoText.implicitHeight + infoText.implicitHeight *
-                     infoText.implicitWidth / (infoText.width ? infoText.width : 1),
-                     metaText.implicitHeight + metaText.implicitHeight *
-                     metaText.implicitWidth / (metaText.width ? metaText.width : 1),
-                     customProperties.textFieldHeight)
-
-    x = pointToItem.x + pointToItem.width + 15
-    y = pointToItem.y + pointToItem.height / 2 - height / 2
-  }
-
-  radius: customProperties.textFieldRadius
 
   Rectangle {
     id: pointerRect

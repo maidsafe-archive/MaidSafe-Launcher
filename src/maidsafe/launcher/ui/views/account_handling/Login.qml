@@ -274,4 +274,6 @@ Item {
       }
     }
   }
+
+  FloatingStatusBox { id: floatingStatus }
 }

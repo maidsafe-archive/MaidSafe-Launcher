@@ -78,10 +78,6 @@ FocusScope {
   }]
 
   transitions: [Transition {
-    ScriptAction { script: {
-      floatingStatus.visible = false
-    }}
-  }, Transition {
       from: "LOGIN"; to: "REGISTER"
       SequentialAnimation {
         ScriptAction { script: {
@@ -130,10 +126,5 @@ FocusScope {
     id: registerView
     visible: false
     x: mainWindow_.width
-  }
-
-  FloatingStatusBox {
-    id: floatingStatus
-    visible: false
   }
 }
