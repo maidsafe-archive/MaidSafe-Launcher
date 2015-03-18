@@ -240,6 +240,16 @@ Item {
     }
   }]
 
+  function resetFields() {
+    primaryPinTextField.text = ""
+    confirmationPinTextField.text = ""
+    primaryKeywordTextField.text = ""
+    confirmationKeywordTextField.text = ""
+    primaryPasswordTextField.text = ""
+    confirmationPasswordTextField.text = ""
+    floatingStatus.hide()
+  }
+
   onStateChanged: {
     focusAfterStateChange.start()
   }

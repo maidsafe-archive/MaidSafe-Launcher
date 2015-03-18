@@ -69,7 +69,6 @@ Item {
     }
   }]
 
-
   Timer {
     id: stopRocketTimer
     interval: 1200

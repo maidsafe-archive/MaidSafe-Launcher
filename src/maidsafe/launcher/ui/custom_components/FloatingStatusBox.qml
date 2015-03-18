@@ -23,9 +23,12 @@ Rectangle {
 
   property Item pointToItem: null
 
+  x: pointToItem ? pointToItem.x + pointToItem.width + 15 : 0
+  y: pointToItem ? pointToItem.y + pointToItem.height / 2 - height / 2 : 0
+
   width: Math.min(180,
-                  metaText.implicitWidth   +
-                  infoText.implicitWidth       +
+                  metaText.implicitWidth +
+                  infoText.implicitWidth +
                   metaText.anchors.leftMargin +
                   infoText.anchors.leftMargin +  infoText.anchors.rightMargin)
 
@@ -35,46 +38,11 @@ Rectangle {
                    metaText.implicitWidth / (metaText.width ? metaText.width : 1),
                    customProperties.textFieldHeight)
 
-  x: pointToItem.x + pointToItem.width + 15
-  y: pointToItem.y + pointToItem.height / 2 - height / 2
   radius: customProperties.textFieldRadius
   visible: false
-  opacity: 0
-
-  transitions: [Transition {
-      to: "VISIBLE"
-      SequentialAnimation {
-        ScriptAction {
-            script: {
-              statusDisplayRect.visible = true
-            }
-         }
-        NumberAnimation {
-            duration: 400
-            target: statusDisplayRect
-            properties: "opacity"
-            to: 1
-        }
-      }
-  },Transition {
-      to: ""
-      SequentialAnimation {
-        NumberAnimation {
-            duration: 400
-            target: statusDisplayRect
-            properties: "opacity"
-            to: 0
-        }
-        ScriptAction {
-            script: {
-              statusDisplayRect.visible = false
-            }
-         }
-      }
-  }]
 
   function hide() {
-    state = ""
+    visible = false
     if (pointToItem && pointToItem.clearAllImages) {
       pointToItem.clearAllImages()
     }
@@ -93,6 +61,7 @@ Rectangle {
     infoText.color = color
     state = "VISIBLE"
     pointToItem.focus = true
+    visible = true
   }
 
   Rectangle {

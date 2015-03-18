@@ -81,6 +81,7 @@ FocusScope {
       from: "LOGIN"; to: "REGISTER"
       SequentialAnimation {
         ScriptAction { script: {
+          registerView.resetFields()
           registerView.visible = true
           registerView.currentTextFields.primaryTextField.focus = true
         }}
@@ -97,6 +98,7 @@ FocusScope {
     from: "REGISTER"; to: "LOGIN"
     SequentialAnimation {
       ScriptAction { script: {
+        loginView.resetFields()
         loginView.visible = true
         loginView.focusTextField.focus = true
       }}

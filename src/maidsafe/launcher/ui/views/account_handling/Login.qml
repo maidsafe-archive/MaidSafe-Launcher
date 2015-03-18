@@ -173,6 +173,13 @@ Item {
     }
   }]
 
+  function resetFields() {
+    pinTextField.text = ""
+    keywordTextField.text = ""
+    passwordTextField.text = ""
+    floatingStatus.hide()
+  }
+
   LoadingView {
     id: loadingView
     visible: false
