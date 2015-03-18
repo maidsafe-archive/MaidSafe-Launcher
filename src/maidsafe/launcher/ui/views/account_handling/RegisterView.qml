@@ -24,7 +24,7 @@ import "../../custom_components"
 import "../../resources/js/password_strength.js" as PasswordStrength
 
 Item {
-  id: registerForm
+  id: registerView
 
   width: parent.width
   height: parent.height
@@ -87,7 +87,7 @@ Item {
       visible: true
     }
     PropertyChanges {
-      target: registerForm
+      target: registerView
       currentTextFields: pinTextFields
     }
 
@@ -98,7 +98,7 @@ Item {
       visible: true
     }
     PropertyChanges {
-      target: registerForm
+      target: registerView
       currentTextFields: keywordTextFields
     }
 
@@ -109,7 +109,7 @@ Item {
       visible: true
     }
     PropertyChanges {
-      target: registerForm
+      target: registerView
       currentTextFields: passwordTextFields
     }
 
@@ -117,7 +117,7 @@ Item {
       name: "LOADING"
 
       PropertyChanges {
-        target: registerForm
+        target: registerView
         bottomButton: loadingView.bottomButton
       }
       PropertyChanges {
@@ -247,8 +247,8 @@ Item {
     id: focusAfterStateChange
     interval: 0
     onTriggered: {
-      if (accountHandlerView.state === "REGISTER" && registerForm.state !== "LOADING") {
-        currentTextFields.primaryTextField.forceActiveFocus()
+      if (accountHandlerView.state === "REGISTER" && registerView.state !== "LOADING") {
+        currentTextFields.primaryTextField.focus = true
         currentTextFields.primaryTextField.cursorPosition = currentTextFields.primaryTextField.text.length
       }
     }
@@ -257,7 +257,7 @@ Item {
   LoadingView {
     id: loadingView
     visible: false
-    onLoadingCanceled: registerForm.state = "PIN"
+    onLoadingCanceled: registerView.state = "PIN"
   }
 
   Item {
@@ -278,18 +278,18 @@ Item {
       Repeater {
         id: tabRepeater
 
-        model: registerForm.registerModel
+        model: registerView.registerModel
         delegate:
           CustomLabel {
             text: modelData.text
-            color: modelData.state === registerForm.state ||
-                   (modelData.state === "PASSWORD" && registerForm.state === "LOADING") ?
+            color: modelData.state === registerView.state ||
+                   (modelData.state === "PASSWORD" && registerView.state === "LOADING") ?
                      customBrushes.labelSelected
                    :
                      customBrushes.labelNotSelected
             MouseArea {
               anchors.fill: parent
-              onClicked: registerForm.state = modelData.state
+              onClicked: registerView.state = modelData.state
             }
           }
       }
@@ -432,16 +432,16 @@ Item {
         onClicked: {
           floatingStatus.hide()
           if ( ! pinTextFields.validateValues()) {
-            registerForm.state = "PIN"
+            registerView.state = "PIN"
 
-          } else if (registerForm.state === "PIN" || ! keywordTextFields.validateValues()) {
-            registerForm.state = "KEYWORD"
+          } else if (registerView.state === "PIN" || ! keywordTextFields.validateValues()) {
+            registerView.state = "KEYWORD"
 
-          } else if (registerForm.state === "KEYWORD" || ! passwordTextFields.validateValues()) {
-            registerForm.state = "PASSWORD"
+          } else if (registerView.state === "KEYWORD" || ! passwordTextFields.validateValues()) {
+            registerView.state = "PASSWORD"
 
           } else {
-            registerForm.state = "LOADING"
+            registerView.state = "LOADING"
             accountHandlerController_.createAccount(primaryPinTextField.text,
                                                     primaryKeywordTextField.text,
                                                     primaryPasswordTextField.text)

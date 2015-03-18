@@ -73,8 +73,8 @@ Item {
 
   states: [State {
     name: "REGISTER"
-    PropertyChanges { target: registerForm; x: 0 }
-    PropertyChanges { target: loginForm; x: -mainWindow_.width }
+    PropertyChanges { target: registerView; x: 0 }
+    PropertyChanges { target: loginView; x: -mainWindow_.width }
   }]
 
   transitions: [Transition {
@@ -85,8 +85,8 @@ Item {
       from: "LOGIN"; to: "REGISTER"
       SequentialAnimation {
         ScriptAction { script: {
-          registerForm.visible = true
-          registerForm.currentTextFields.primaryTextField.forceActiveFocus()
+          registerView.visible = true
+          registerView.currentTextFields.primaryTextField.focus = true
         }}
         NumberAnimation {
           properties: "x"
@@ -94,15 +94,15 @@ Item {
           easing.type: Easing.InOutQuad
         }
         ScriptAction { script: {
-          loginForm.visible = false
+          loginView.visible = false
         }}
       }
   }, Transition {
     from: "REGISTER"; to: "LOGIN"
     SequentialAnimation {
       ScriptAction { script: {
-        loginForm.visible = true
-        loginForm.focusTextField.forceActiveFocus()
+        loginView.visible = true
+        loginView.focusTextField.focus = true
       }}
       NumberAnimation {
         properties: "x"
@@ -110,7 +110,7 @@ Item {
         easing.type: Easing.InOutQuad
       }
       ScriptAction { script: {
-        registerForm.visible = false
+        registerView.visible = false
       }}
     }
   }]
@@ -122,12 +122,12 @@ Item {
      anchors.horizontalCenter: parent.horizontalCenter
    }
 
-  LoginForm {
-    id: loginForm
+  LoginView {
+    id: loginView
   }
 
-  RegisterForm {
-    id: registerForm
+  RegisterView {
+    id: registerView
     visible: false
     x: mainWindow_.width
   }

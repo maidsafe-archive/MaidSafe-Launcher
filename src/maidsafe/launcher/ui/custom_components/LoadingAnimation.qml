@@ -29,7 +29,7 @@ Item {
     if (running)
       stopAnimations()
     rocketCanvas.visible = true
-    rocketLoadingImage.visible = false
+    rocketBreaking.visible = false
     rocketCanvas.startLoadingWithColor("#ffffffff");
     running = true
   }
@@ -215,9 +215,9 @@ Item {
       onStopped: {
         if (rocket.running) {
           if (rocket.breakAtTheEnd) {
-            rocketLoadingImage.visible = true
+            rocketBreaking.visible = true
             rocketCanvas.visible = false
-            rocketLoadingImage.frameNumber = rocketLoadingImage.fromFrame
+            rocketBreaking.frameNumber = 0
             frameNumberTimer.start()
           } else {
             rocket.finished(true)
@@ -227,25 +227,32 @@ Item {
     }
   }
 
-  Image {
-    id: rocketLoadingImage
-    visible: false
+  Item {
+    id: rocketBreaking
+
+    // alignment with the loading rocket
     x: 7
     y: -7
-    height: 100
-    width: 250
-    source: "/resources/images/rocket_breaking/Comp\ 2_" + frameNumber + ".png"
-    readonly property int fromFrame: 1048
-    readonly property int toFrame: 1119
-    property int frameNumber: fromFrame
+
+    readonly property int fromFrame: 101
+    readonly property int numberOfFrames: 72
+    property int frameNumber: 0
+
+    Repeater {
+      model: rocketBreaking.numberOfFrames
+      Image {
+        visible: rocketBreaking.frameNumber === modelData
+        source: "/resources/images/rocket_breaking/frame_" + (rocketBreaking.fromFrame + modelData) + ".png"
+      }
+    }
 
     Timer {
       id: frameNumberTimer
-      interval: 633
+      interval: 633 // the rocket is full red during this time
       onTriggered: {
         if (rocket.running) {
           console.time("animation duration")
-          frameNumberAnimation.start()
+          frameNumberAnimation.restart()
           rocket.startBreaking() // signal emited to start error message fade in
         }
       }
@@ -254,16 +261,16 @@ Item {
     NumberAnimation on frameNumber {
       id: frameNumberAnimation
       running: false
-      from: rocketLoadingImage.fromFrame
-      to: rocketLoadingImage.toFrame
+      from: 0
+      to: rocketBreaking.numberOfFrames - 1
 
-      // Gildas: should be 30 instead of 22 for 30fps, but ... don't understand why it's not working
-      duration: (rocketLoadingImage.toFrame - rocketLoadingImage.fromFrame) * 1000 / 21
+      // TODO(Gildas) find why 30 does not work for 30 fps
+      duration: rocketBreaking.numberOfFrames * 1000 / 21 // 30
       onStopped: {
         if (rocket.running) {
           rocket.finished(false)
           console.timeEnd("animation duration")
-          console.log("animation duration should be " + frameNumberAnimation.duration + "ms")
+          console.log("should be " + frameNumberAnimation.duration + "ms")
         }
       }
     }

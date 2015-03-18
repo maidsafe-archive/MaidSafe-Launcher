@@ -21,7 +21,7 @@ import QtQuick 2.4
 import "../../custom_components"
 
 Item {
-  id: loginForm
+  id: loginView
 
   property Item bottomButton: loginButton
   readonly property Item focusTextField: pinTextField
@@ -33,7 +33,7 @@ Item {
       name: "LOADING"
 
       PropertyChanges {
-        target: loginForm
+        target: loginView
         bottomButton: loadingView.bottomButton
       }
       PropertyChanges {
@@ -78,7 +78,7 @@ Item {
     ScriptAction { script: {
       loginElements.visible = true
       loadingView.visible = false
-      pinTextField.forceActiveFocus()
+      pinTextField.focus = true
       pinTextField.cursorPosition = pinTextField.text.length
     }}
 
@@ -176,7 +176,7 @@ Item {
   LoadingView {
     id: loadingView
     visible: false
-    onLoadingCanceled: loginForm.state = ""
+    onLoadingCanceled: loginView.state = ""
   }
 
   Item {
@@ -193,9 +193,7 @@ Item {
          customProperties.textFieldHeight*3 -
          customProperties.textFieldVerticalSpacing*3
       backgroundColor: customBrushes.textFieldBackground
-      Component.onCompleted: {
-        forceActiveFocus()
-      }
+      focus: true
     }
 
     CustomTextField {
@@ -240,7 +238,7 @@ Item {
           floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
         } else {
           floatingStatus.hide()
-          loginForm.state = "LOADING"
+          loginView.state = "LOADING"
           accountHandlerController_.createAccount(pinTextField.text,
                                                   keywordTextField.text,
                                                   passwordTextField.text)

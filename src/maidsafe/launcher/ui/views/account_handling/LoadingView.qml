@@ -37,7 +37,7 @@ Item {
       opacity: 1
     }
     PropertyChanges {
-      target: rocket
+      target: loadingAnimation
       y: 0
     }
   }]
@@ -51,8 +51,8 @@ Item {
         errorMessage.text = 0
         errorMessage.opacity = 0
         cancelButton.text = qsTr("CANCEL")
-        cancelButton.forceActiveFocus()
-        rocket.showLoading()
+        cancelButton.focus = true
+        loadingAnimation.showLoading()
         stopRocketTimer.start()
       }}
       ParallelAnimation {
@@ -75,13 +75,13 @@ Item {
     interval: 1200
     running: false
     repeat: false
-    onTriggered: rocket.showFailed()
+    onTriggered: loadingAnimation.showFailed()
   }
 
   CustomText {
     id: errorMessage
     opacity: 0
-    y: accountHandlerView.bottomButtonY - rocketContainer.height - height + 10
+    y: accountHandlerView.bottomButtonY - loadingAnimation.parent.height - height + 10
     anchors.horizontalCenter: parent.horizontalCenter
 
     NumberAnimation {
@@ -94,15 +94,16 @@ Item {
   }
 
   Item {
-    id: rocketContainer
     y: accountHandlerView.bottomButtonY - height
     anchors.horizontalCenter: parent.horizontalCenter
     height: 125
-    width: 264 // +14 because png are uncentered 7px on the right to center the rocket +7px to center the rocket with the button
+     // +7px on the right to center the loadingAnimation
+     // +7px to center the loadingAnimation with the button
+    width: 250 + 7 + 7
 
-    Rocket {
-      id: rocket
-      x: 7 // center the rocket with the button
+    LoadingAnimation {
+      id: loadingAnimation
+      x: 7 // center the loadingAnimation with the button
       y: parent.height
       //onFinished: {} // TODO Gildas: if (success)
       onStartBreaking: {

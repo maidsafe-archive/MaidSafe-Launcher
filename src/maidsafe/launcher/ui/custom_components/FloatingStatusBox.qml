@@ -77,7 +77,7 @@ Rectangle {
     infoText.text = info
     infoText.color = color
     state = "VISIBLE"
-    pointToItem.forceActiveFocus()
+    pointToItem.focus = true
   }
 
   function resetPostitionAndSize() {
