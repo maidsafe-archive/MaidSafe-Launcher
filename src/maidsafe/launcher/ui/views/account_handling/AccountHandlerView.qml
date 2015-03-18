@@ -22,7 +22,7 @@ import SAFEAppLauncher.AccountHandler 1.0
 import "./detail"
 import "../../custom_components"
 
-Item {
+FocusScope {
   id: accountHandlerView
 
   AccountHandlerBrushes {
@@ -122,11 +122,11 @@ Item {
      anchors.horizontalCenter: parent.horizontalCenter
    }
 
-  LoginView {
+  Login {
     id: loginView
   }
 
-  RegisterView {
+  CreateAccount {
     id: registerView
     visible: false
     x: mainWindow_.width
