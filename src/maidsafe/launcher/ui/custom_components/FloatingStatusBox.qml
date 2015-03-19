@@ -21,22 +21,7 @@ import QtQuick 2.4
 Rectangle {
   id: statusDisplayRect
 
-  property Item pointToItem: null
-
-  x: pointToItem ? pointToItem.x + pointToItem.width + 15 : 0
-  y: pointToItem ? pointToItem.y + pointToItem.height / 2 - height / 2 : 0
-
-  width: Math.min(180,
-                  metaText.implicitWidth +
-                  infoText.implicitWidth +
-                  metaText.anchors.leftMargin +
-                  infoText.anchors.leftMargin +  infoText.anchors.rightMargin)
-
-  height: Math.max(infoText.implicitHeight + infoText.implicitHeight *
-                   infoText.implicitWidth / (infoText.width ? infoText.width : 1),
-                   metaText.implicitHeight + metaText.implicitHeight *
-                   metaText.implicitWidth / (metaText.width ? metaText.width : 1),
-                   customProperties.textFieldHeight)
+  property Item pointToItem
 
   radius: customProperties.textFieldRadius
   visible: false
@@ -46,6 +31,7 @@ Rectangle {
     if (pointToItem && pointToItem.clearAllImages) {
       pointToItem.clearAllImages()
     }
+    pointToItem = null
   }
 
   function showError(item, info) {
@@ -53,6 +39,8 @@ Rectangle {
   }
   function show(item, meta, info, color, showError) {
     hide()
+    if ( ! item) return
+
     pointToItem = item
     if (pointToItem && pointToItem.showErrorImage)
       pointToItem.showErrorImage = showError
@@ -61,7 +49,28 @@ Rectangle {
     infoText.color = color
     state = "VISIBLE"
     pointToItem.focus = true
+    resetSizeAndPosition()
     visible = true
+  }
+
+  // reset size and then position because y is dependant of height
+  // and compute these values only once the pointToItem and text has changed is more optimized
+  function resetSizeAndPosition() {
+    width = Math.min(180,
+                     metaText.implicitWidth +
+                     infoText.implicitWidth +
+                     metaText.anchors.leftMargin +
+                     infoText.anchors.leftMargin + infoText.anchors.rightMargin)
+
+    height = Math.max(infoText.implicitHeight + infoText.implicitHeight *
+                      infoText.implicitWidth / (infoText.width ? infoText.width : 1),
+                      metaText.implicitHeight + metaText.implicitHeight *
+                      metaText.implicitWidth / (metaText.width ? metaText.width : 1),
+                      customProperties.textFieldHeight)
+
+    x = pointToItem.x + pointToItem.width + 15
+
+    y = pointToItem.y + pointToItem.height / 2 - height / 2
   }
 
   Rectangle {

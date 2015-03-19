@@ -72,7 +72,8 @@ Item {
 
     property color currentColor
     property color toColor
-    property real  angle // angle between 0 and 6
+    // this angle property go from 0 to 6 while loading, and 6 to 12 to finish the rotation
+    property real  angle
 
     function getFillColor(polygon) {
       if (angle - 6 > polygon) { // mean animation ending
