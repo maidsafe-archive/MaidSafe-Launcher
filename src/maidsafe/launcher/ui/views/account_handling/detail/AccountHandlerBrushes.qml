@@ -27,7 +27,8 @@ QtObject {
   readonly property color textStrongPassword: "#39b54a"
 
   readonly property color labelSelected: "#1d6499"
-  readonly property color labelNotSelected: "#ceebf4"
+  readonly property color labelHovered: "#ffffff"
+  readonly property color labelDefault: "#ceebf4"
 
   readonly property color buttonDefaultBlue: "#7ecaf1"
   readonly property color buttonHoveredBlue: "#89d8f7"

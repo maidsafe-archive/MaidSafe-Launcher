@@ -293,13 +293,20 @@ Item {
           CustomLabel {
             text: modelData.text
             color: modelData.state === registerView.state ||
-                   (modelData.state === "PASSWORD" && registerView.state === "LOADING") ?
+                   (modelData.state === "PASSWORD" && registerView.state === "LOADING") ||
+                   tabItemMouseArea.pressed ?
                      customBrushes.labelSelected
+                   : tabItemMouseArea.containsMouse ?
+                     customBrushes.labelHovered
                    :
-                     customBrushes.labelNotSelected
+                     customBrushes.labelDefault
+
             MouseArea {
+              id: tabItemMouseArea
               anchors.fill: parent
+              hoverEnabled: true
               onClicked: registerView.state = modelData.state
+              cursorShape: Qt.PointingHandCursor
             }
           }
       }
