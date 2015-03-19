@@ -83,20 +83,19 @@ authentication::UserCredentials MakeUserCredentials(
 }
 
 DirectoryInfo CreateRandomDirectoryInfo() {
-  return DirectoryInfo(RandomAlphaNumericString(10, 20), MakeIdentity(), MakeIdentity(),
+  return DirectoryInfo(RandomAlphaNumericString(27, 40), MakeIdentity(), MakeIdentity(),
                        static_cast<DirectoryInfo::AccessRights>((RandomUint32() % 2) + 1));
 }
 
 AppDetails CreateRandomAppDetails() {
   AppDetails app;
-  app.name = RandomAlphaNumericString(1, 40);
-  app.path = RandomAlphaNumericString(10, 255);
-  app.args = RandomAlphaNumericString(0, 100);
+  app.name = RandomAlphaNumericString(27, 40);
+  app.path = RandomAlphaNumericString(27, 255);
+  app.args = RandomAlphaNumericString(27, 100);
   int count = (RandomUint32() % 10) + 1;
   for (int i = 0; i < count; ++i)
     app.permitted_dirs.insert(CreateRandomDirectoryInfo());
-  std::string icon(RandomString(10, 1000));
-  app.icon.assign(icon.begin(), icon.end());
+  app.icon = RandomBytes(20, 1000);
   app.auto_start = (count % 2 == 1);
   return app;
 }
