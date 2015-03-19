@@ -264,7 +264,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.height -
            registerButton.height -
-           customProperties.clickableTextBottomMargin - 4
+           customProperties.clickableTextBottomMargin - 12
         color: "#ffffff"
       }
 

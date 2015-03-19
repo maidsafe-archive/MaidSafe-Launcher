@@ -40,8 +40,10 @@ ButtonBase {
     color: {
       if (buttonBaseRoot.pressed) {
         customBrushes.buttonPressedBlue
-      } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
+      } else if (buttonBaseRoot.hovered) {
         customBrushes.buttonHoveredBlue
+      } else if (buttonBaseRoot.activeFocus) {
+        customBrushes.buttonFocusedBlue
       } else {
         customBrushes.buttonDefaultBlue
       }

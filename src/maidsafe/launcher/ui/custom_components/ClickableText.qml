@@ -56,7 +56,7 @@ FocusScope {
 
       focus: true
       anchors.centerIn: parent
-      font.underline: mouseArea.containsMouse || activeFocus
+      font.underline: activeFocus
 
       Keys.onEnterPressed: focusScope.clicked()
       Keys.onSpacePressed: focusScope.clicked()
