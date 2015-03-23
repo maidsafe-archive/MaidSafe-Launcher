@@ -24,7 +24,7 @@ Item {
   height: 100
 
   signal finished(bool success)
-  signal startBreaking() // start showing error message
+  signal startFailing() // start showing error message
   function showLoading() {
     if (running)
       stopAnimations()
@@ -254,7 +254,7 @@ Item {
         if (rocket.running) {
           console.time("animation duration")
           frameNumberAnimation.restart()
-          rocket.startBreaking() // signal emited to start error message fade in
+          rocket.startFailing() // signal emited to start error message fade in
         }
       }
     }

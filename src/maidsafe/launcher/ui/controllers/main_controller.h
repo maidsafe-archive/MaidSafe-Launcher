@@ -46,6 +46,7 @@ class MainController : public QObject {
  public:
   enum MainViews {
     HandleAccount,
+    HomePage
   };
 
   explicit MainController(QObject* parent = nullptr);

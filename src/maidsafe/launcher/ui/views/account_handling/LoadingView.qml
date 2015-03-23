@@ -26,6 +26,14 @@ Item {
   anchors.horizontalCenter: parent.horizontalCenter
 
   signal loadingCanceled()
+  signal loadingFinished()
+
+  function showFailed() { loadingAnimation.showFailed() }
+  function showSuccess() {
+    cancelButton.opacity = 0
+    loadingAnimation.showSuccess()
+  }
+
   readonly property Item bottomButton: cancelButton
 
   opacity: 0
@@ -47,13 +55,11 @@ Item {
     SequentialAnimation {
       PauseAnimation { duration: 750 }
       ScriptAction { script: {
-        errorMessageAnimation.stop()
         errorMessage.text = 0
         errorMessage.opacity = 0
         cancelButton.text = qsTr("CANCEL")
         cancelButton.focus = true
         loadingAnimation.showLoading()
-        stopRocketTimer.start()
       }}
       ParallelAnimation {
         NumberAnimation {
@@ -69,27 +75,12 @@ Item {
     }
   }]
 
-  Timer {
-    id: stopRocketTimer
-    interval: 1200
-    running: false
-    repeat: false
-    onTriggered: loadingAnimation.showFailed()
-  }
-
   CustomText {
     id: errorMessage
     opacity: 0
     y: accountHandlerView.bottomButtonY - loadingAnimation.parent.height - height + 10
     anchors.horizontalCenter: parent.horizontalCenter
-
-    NumberAnimation {
-      id: errorMessageAnimation
-      target: errorMessage
-      property: "opacity"
-      to: 1
-      duration: 700
-    }
+    Behavior on opacity { NumberAnimation { duration: 700 } }
   }
 
   Item {
@@ -104,11 +95,11 @@ Item {
       id: loadingAnimation
       x: 7 // center the loadingAnimation with the button
       y: parent.height
-      //onFinished: {} // TODO Gildas: if (success)
-      onStartBreaking: {
+      onFinished: if (success) loadingFinished()
+      onStartFailing: {
         cancelButton.text = qsTr("GO BACK")
         errorMessage.text = qsTr("There was an error creating your account.\nPlease try again.")
-        errorMessageAnimation.start()
+        errorMessage.opacity = 1
       }
     }
   }
@@ -118,6 +109,7 @@ Item {
     y: accountHandlerView.bottomButtonY
     width: customProperties.cancelButtonWidth
     anchors.horizontalCenter: parent.horizontalCenter
-    onClicked: loadingCanceled()
+    onClicked: if (opacity === 1) loadingCanceled()
+    Behavior on opacity { NumberAnimation { duration: 1000 } }
   }
 }

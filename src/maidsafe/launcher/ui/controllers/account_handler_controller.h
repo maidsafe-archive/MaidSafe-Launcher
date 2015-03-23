@@ -68,6 +68,7 @@ class AccountHandlerController : public QObject {
 
  signals: // NOLINT - Spandan
   void LoginCompleted(Launcher* launcher);
+  void loginError();
   void currentViewChanged(AccountHandlingViews arg);
 
  private slots:  // NOLINT - Spandan

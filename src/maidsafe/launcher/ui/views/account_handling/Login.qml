@@ -23,11 +23,9 @@ import "../../custom_components"
 Item {
   id: loginView
 
+  readonly property LoadingView loadingView: loadingView
   property Item bottomButton: loginButton
   readonly property Item focusTextField: pinTextField
-
-  width: parent.width
-  height: parent.height
 
   states: [State {
       name: "LOADING"
@@ -185,6 +183,10 @@ Item {
     visible: false
     onLoadingCanceled: loginView.state = ""
   }
+  Connections {
+    target: accountHandlerController_
+    onLoginError: loadingView.showFailed()
+  }
 
   Item {
     id: loginElements
@@ -246,10 +248,9 @@ Item {
         } else {
           floatingStatus.hide()
           loginView.state = "LOADING"
-          accountHandlerController_.createAccount(pinTextField.text,
-                                                  keywordTextField.text,
-                                                  passwordTextField.text)
-         // accountHandlerController_.LoginCompleted = { console.log("LoginCompleted") }
+          accountHandlerController_.login(pinTextField.text,
+                                          keywordTextField.text,
+                                          passwordTextField.text)
         }
       }
     }
@@ -276,7 +277,7 @@ Item {
 
         text: qsTr("Don't have an account yet? Create one")
         onClicked: {
-          accountHandlerView.state = "REGISTER"
+          accountHandlerController_.showCreateAccountView()
         }
       }
     }

@@ -25,6 +25,8 @@ import "../../custom_components"
 FocusScope {
   id: accountHandlerView
 
+  readonly property LoadingView loadingView: currentView.loadingView
+
   AccountHandlerBrushes {
     id: customBrushes
     objectName: "customBrushes"
@@ -66,36 +68,40 @@ FocusScope {
   }
 
 
-  state: "LOGIN"
+  state: "state" + accountHandlerController_.currentView
   readonly property int bottomButtonY: accountHandlerView.height -
                                        customProperties.cancelButtonBottom -
                                        customProperties.blueButtonMargin
+  property Item currentView: loginView
 
   states: [State {
-    name: "REGISTER"
-    PropertyChanges { target: registerView; x: 0 }
+    name: "state" + AccountHandlerController.CreateAccountView
+    PropertyChanges { target: createAccountView; x: 0 }
     PropertyChanges { target: loginView; x: -mainWindow_.width }
+    PropertyChanges { target: accountHandlerView; currentView: createAccountView }
   }]
 
   transitions: [Transition {
-      from: "LOGIN"; to: "REGISTER"
-      SequentialAnimation {
-        ScriptAction { script: {
-          registerView.resetFields()
-          registerView.visible = true
-          registerView.currentTextFields.primaryTextField.focus = true
-        }}
-        NumberAnimation {
-          properties: "x"
-          duration: 300
-          easing.type: Easing.InOutQuad
-        }
-        ScriptAction { script: {
-          loginView.visible = false
-        }}
+    from: "state" + AccountHandlerController.LoginView
+    to: "state" + AccountHandlerController.CreateAccountView
+    SequentialAnimation {
+      ScriptAction { script: {
+        createAccountView.resetFields()
+        createAccountView.visible = true
+        createAccountView.currentTextFields.primaryTextField.focus = true
+      }}
+      NumberAnimation {
+        properties: "x"
+        duration: 300
+        easing.type: Easing.InOutQuad
       }
+      ScriptAction { script: {
+        loginView.visible = false
+      }}
+    }
   }, Transition {
-    from: "REGISTER"; to: "LOGIN"
+    from: "state" + AccountHandlerController.CreateAccountView
+    to: "state" + AccountHandlerController.LoginView
     SequentialAnimation {
       ScriptAction { script: {
         loginView.resetFields()
@@ -108,7 +114,7 @@ FocusScope {
         easing.type: Easing.InOutQuad
       }
       ScriptAction { script: {
-        registerView.visible = false
+        createAccountView.visible = false
       }}
     }
   }]
@@ -122,10 +128,14 @@ FocusScope {
 
   Login {
     id: loginView
+    width: parent.width
+    height: parent.height
   }
 
   CreateAccount {
-    id: registerView
+    id: createAccountView
+    width: parent.width
+    height: parent.height
     visible: false
     x: mainWindow_.width
   }

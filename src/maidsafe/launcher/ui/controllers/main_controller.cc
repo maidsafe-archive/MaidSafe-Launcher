@@ -68,6 +68,7 @@ void MainController::LoginCompleted(Launcher* launcherPtr) {
   std::unique_ptr<Launcher> launcher{launcherPtr};
   static_cast<void>(launcher);
   qDebug() << "main controller:" << launcher->a_;
+  SetCurrentView(HomePage);
 }
 
 bool MainController::eventFilter(QObject* object, QEvent* event) {

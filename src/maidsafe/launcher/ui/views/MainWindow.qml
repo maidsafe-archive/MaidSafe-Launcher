@@ -49,18 +49,37 @@ Item {
     enabled: mainWindowTitleBar.visible
   }
 
+  Connections {
+    target: mainController_
+    onCurrentViewChanged: {
+      if (mainController_.currentView === MainController.HomePage) {
+        mainWindowLoader.item.loadingView.showSuccess();
+      }
+    }
+  }
+
+  Connections {
+    target: mainWindowLoader.item.loadingView
+    onLoadingFinished: mainWindowLoader.y = - mainWindowLoader.height
+  }
+
   Loader {
     id: mainWindowLoader
     objectName: "mainWindowLoader"
 
-    anchors.fill: parent
-    source: mainController_.currentView === MainController.HandleAccount ?
-              "account_handling/AccountHandlerView.qml"
-            :
-              ""
+    width: parent.width
+    height: parent.height
+    source: "account_handling/AccountHandlerView.qml"
 
     focus: true
     onLoaded: item.focus = true
+
+    Behavior on y {
+      NumberAnimation {
+        duration: 1000; easing.type: Easing.OutQuad
+        onStopped: mainWindowLoader.source = ""
+      }
+    }
   }
 
   ResizeMainWindowHelper {

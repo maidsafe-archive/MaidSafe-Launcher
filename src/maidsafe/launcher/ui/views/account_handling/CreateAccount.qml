@@ -20,15 +20,15 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Controls.Styles 1.3
 
+import SAFEAppLauncher.AccountHandler 1.0
+
 import "../../custom_components"
 import "../../resources/js/password_strength.js" as PasswordStrength
 
 Item {
-  id: registerView
+  id: createAccountView
 
-  width: parent.width
-  height: parent.height
-
+  readonly property LoadingView loadingView: loadingView
   property var passwordStrength: new PasswordStrength.StrengthChecker()
   property var easingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 
@@ -87,7 +87,7 @@ Item {
       visible: true
     }
     PropertyChanges {
-      target: registerView
+      target: createAccountView
       currentTextFields: pinTextFields
     }
 
@@ -98,7 +98,7 @@ Item {
       visible: true
     }
     PropertyChanges {
-      target: registerView
+      target: createAccountView
       currentTextFields: keywordTextFields
     }
 
@@ -109,7 +109,7 @@ Item {
       visible: true
     }
     PropertyChanges {
-      target: registerView
+      target: createAccountView
       currentTextFields: passwordTextFields
     }
 
@@ -117,7 +117,7 @@ Item {
       name: "LOADING"
 
       PropertyChanges {
-        target: registerView
+        target: createAccountView
         bottomButton: loadingView.bottomButton
       }
       PropertyChanges {
@@ -255,9 +255,10 @@ Item {
   }
   Timer {
     id: focusAfterStateChange
-    interval: 0
+    interval: 1
     onTriggered: {
-      if (accountHandlerView.state === "REGISTER" && registerView.state !== "LOADING") {
+      if (accountHandlerController_.currentView === AccountHandlerController.CreateAccountView &&
+          createAccountView.state !== "LOADING") {
         currentTextFields.primaryTextField.focus = true
         currentTextFields.primaryTextField.cursorPosition = currentTextFields.primaryTextField.text.length
       }
@@ -267,7 +268,11 @@ Item {
   LoadingView {
     id: loadingView
     visible: false
-    onLoadingCanceled: registerView.state = "PIN"
+    onLoadingCanceled: createAccountView.state = "PIN"
+  }
+  Connections {
+    target: accountHandlerController_
+    onLoginError: loadingView.showFailed()
   }
 
   Item {
@@ -288,12 +293,12 @@ Item {
       Repeater {
         id: tabRepeater
 
-        model: registerView.registerModel
+        model: createAccountView.registerModel
         delegate:
           CustomLabel {
             text: modelData.text
-            color: modelData.state === registerView.state ||
-                   (modelData.state === "PASSWORD" && registerView.state === "LOADING") ||
+            color: modelData.state === createAccountView.state ||
+                   (modelData.state === "PASSWORD" && createAccountView.state === "LOADING") ||
                    tabItemMouseArea.pressed ?
                      customBrushes.labelSelected
                    : tabItemMouseArea.containsMouse ?
@@ -305,7 +310,7 @@ Item {
               id: tabItemMouseArea
               anchors.fill: parent
               hoverEnabled: true
-              onClicked: registerView.state = modelData.state
+              onClicked: createAccountView.state = modelData.state
               cursorShape: Qt.PointingHandCursor
             }
           }
@@ -449,16 +454,16 @@ Item {
         onClicked: {
           floatingStatus.hide()
           if ( ! pinTextFields.validateValues()) {
-            registerView.state = "PIN"
+            createAccountView.state = "PIN"
 
-          } else if (registerView.state === "PIN" || ! keywordTextFields.validateValues()) {
-            registerView.state = "KEYWORD"
+          } else if (createAccountView.state === "PIN" || ! keywordTextFields.validateValues()) {
+            createAccountView.state = "KEYWORD"
 
-          } else if (registerView.state === "KEYWORD" || ! passwordTextFields.validateValues()) {
-            registerView.state = "PASSWORD"
+          } else if (createAccountView.state === "KEYWORD" || ! passwordTextFields.validateValues()) {
+            createAccountView.state = "PASSWORD"
 
           } else {
-            registerView.state = "LOADING"
+            createAccountView.state = "LOADING"
             accountHandlerController_.createAccount(primaryPinTextField.text,
                                                     primaryKeywordTextField.text,
                                                     primaryPasswordTextField.text)
@@ -483,7 +488,7 @@ Item {
         y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
         text: qsTr("Already have an account? Log In")
         onClicked: {
-          accountHandlerView.state = "LOGIN"
+          accountHandlerController_.showLoginView()
         }
       }
     }
