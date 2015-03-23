@@ -73,20 +73,22 @@ Item {
   transitions: [Transition {
 
     from: "LOADING"
-    ScriptAction { script: {
-      loginElements.visible = true
-      loadingView.visible = false
-      pinTextField.focus = true
-      pinTextField.cursorPosition = pinTextField.text.length
-    }}
+    ScriptAction {
+      script: {
+        loginElements.visible = true
+        loadingView.visible = false
+        pinTextField.focus = true
+        pinTextField.cursorPosition = pinTextField.text.length
+      }
+    }
 
   },Transition {
 
     to: "LOADING"
     SequentialAnimation {
-      ScriptAction { script: {
-        loadingView.visible = true
-      }}
+      ScriptAction {
+        script: loadingView.visible = true
+      }
       ParallelAnimation {
         NumberAnimation {
           target: fadeOutItems; property: "opacity"
@@ -165,9 +167,9 @@ Item {
           }
         }
       }
-      ScriptAction { script: {
-        loginElements.visible = false
-      }}
+      ScriptAction {
+        script: loginElements.visible = false
+      }
     }
   }]
 

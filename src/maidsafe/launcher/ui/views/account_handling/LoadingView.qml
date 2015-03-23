@@ -54,13 +54,15 @@ Item {
     to: "VISIBLE"
     SequentialAnimation {
       PauseAnimation { duration: 750 }
-      ScriptAction { script: {
-        errorMessage.text = 0
-        errorMessage.opacity = 0
-        cancelButton.text = qsTr("CANCEL")
-        cancelButton.focus = true
-        loadingAnimation.showLoading()
-      }}
+      ScriptAction {
+        script: {
+          errorMessage.text = 0
+          errorMessage.opacity = 0
+          cancelButton.text = qsTr("CANCEL")
+          cancelButton.focus = true
+          loadingAnimation.showLoading()
+        }
+      }
       ParallelAnimation {
         NumberAnimation {
           duration: 1000

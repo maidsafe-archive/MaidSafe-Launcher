@@ -22,6 +22,8 @@ import SAFEAppLauncher.AccountHandler 1.0
 import "./detail"
 import "../../custom_components"
 
+import "../../resources/js/password_strength.js" as PasswordStrength
+
 FocusScope {
   id: accountHandlerView
 
@@ -85,37 +87,41 @@ FocusScope {
     from: "state" + AccountHandlerController.LoginView
     to: "state" + AccountHandlerController.CreateAccountView
     SequentialAnimation {
-      ScriptAction { script: {
-        createAccountView.resetFields()
-        createAccountView.visible = true
-        createAccountView.currentTextFields.primaryTextField.focus = true
-      }}
+      ScriptAction {
+        script: {
+          createAccountView.resetFields()
+          createAccountView.visible = true
+          createAccountView.currentTextFields.primaryTextField.focus = true
+        }
+      }
       NumberAnimation {
         properties: "x"
         duration: 300
         easing.type: Easing.InOutQuad
       }
-      ScriptAction { script: {
-        loginView.visible = false
-      }}
+      ScriptAction {
+        script: loginView.visible = false
+      }
     }
   }, Transition {
     from: "state" + AccountHandlerController.CreateAccountView
     to: "state" + AccountHandlerController.LoginView
     SequentialAnimation {
-      ScriptAction { script: {
-        loginView.resetFields()
-        loginView.visible = true
-        loginView.focusTextField.focus = true
-      }}
+      ScriptAction {
+        script: {
+          loginView.resetFields()
+          loginView.visible = true
+          loginView.focusTextField.focus = true
+        }
+      }
       NumberAnimation {
         properties: "x"
         duration: 300
         easing.type: Easing.InOutQuad
       }
-      ScriptAction { script: {
-        createAccountView.visible = false
-      }}
+      ScriptAction {
+        script: createAccountView.visible = false
+      }
     }
   }]
 
@@ -128,6 +134,7 @@ FocusScope {
 
   Login {
     id: loginView
+    // if anchors is used here instead of width/height, the move animation does not works
     width: parent.width
     height: parent.height
   }

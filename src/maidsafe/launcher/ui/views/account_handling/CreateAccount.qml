@@ -23,14 +23,12 @@ import QtQuick.Controls.Styles 1.3
 import SAFEAppLauncher.AccountHandler 1.0
 
 import "../../custom_components"
-import "../../resources/js/password_strength.js" as PasswordStrength
 
 Item {
   id: createAccountView
 
   readonly property LoadingView loadingView: loadingView
   property var passwordStrength: new PasswordStrength.StrengthChecker()
-  property var easingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 
   property Item bottomButton: nextButton
   property Item currentTextFields: pinTextFields
@@ -158,18 +156,20 @@ Item {
   transitions: [Transition {
 
     from: "LOADING"
-    ScriptAction { script: {
-      createAccountElements.visible = true
-      loadingView.visible = false
-    }}
+    ScriptAction {
+      script: {
+        createAccountElements.visible = true
+        loadingView.visible = false
+      }
+    }
 
   },Transition {
 
     to: "LOADING"
     SequentialAnimation {
-      ScriptAction { script: {
-        loadingView.visible = true
-      }}
+      ScriptAction {
+        script: loadingView.visible = true
+      }
       ParallelAnimation {
         NumberAnimation {
           target: fadeOutItems; property: "opacity"
@@ -234,9 +234,9 @@ Item {
           }
         }
       }
-      ScriptAction { script: {
-        createAccountElements.visible = false
-      }}
+      ScriptAction {
+        script: createAccountElements.visible = false
+      }
     }
   }]
 
