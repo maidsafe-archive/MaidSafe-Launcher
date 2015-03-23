@@ -27,8 +27,8 @@ ButtonBase {
     objectName: "backgroundRect"
 
     /* animating the entire button width make the text to tremble
-     * so wee need to animate only the background Item
-     * anchors.horizontalCenter does not works to change the x value
+     * so only the background should be animated
+     * and anchors.horizontalCenter does not works to automaticaly change the x value
      */
     x: (buttonBaseRoot.width - width) / 2
     width: buttonBaseRoot.backgroundWidth
