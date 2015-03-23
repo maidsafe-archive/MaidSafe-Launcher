@@ -348,7 +348,7 @@ Item {
       }
 
       function validateValues() {
-        if ( ! primaryPinTextField.text.match(/^\d{4}$/)) {
+        if (!primaryPinTextField.text.match(/^\d{4}$/)) {
           floatingStatus.showError(primaryPinTextField,
                                    qsTr("PIN must be only and exactly 4 digits"))
           return false
@@ -453,13 +453,13 @@ Item {
         text: qsTr("NEXT")
         onClicked: {
           floatingStatus.hide()
-          if ( ! pinTextFields.validateValues()) {
+          if (!pinTextFields.validateValues()) {
             createAccountView.state = "PIN"
 
-          } else if (createAccountView.state === "PIN" || ! keywordTextFields.validateValues()) {
+          } else if (createAccountView.state === "PIN" || !keywordTextFields.validateValues()) {
             createAccountView.state = "KEYWORD"
 
-          } else if (createAccountView.state === "KEYWORD" || ! passwordTextFields.validateValues()) {
+          } else if (createAccountView.state === "KEYWORD" || !passwordTextFields.validateValues()) {
             createAccountView.state = "PASSWORD"
 
           } else {

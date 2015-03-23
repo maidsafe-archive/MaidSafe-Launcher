@@ -39,7 +39,7 @@ Rectangle {
   }
   function show(item, meta, info, color, showError) {
     hide()
-    if ( ! item) return
+    if (!item) return
 
     pointToItem = item
     if (pointToItem && pointToItem.showErrorImage)
