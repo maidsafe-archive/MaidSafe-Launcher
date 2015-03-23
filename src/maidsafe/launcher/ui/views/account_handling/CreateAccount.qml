@@ -72,7 +72,7 @@ Item {
     return false
   }
 
-  readonly property var registerModel: [
+  readonly property var createAccountModel: [
     {text: qsTr("PIN")     , state: "PIN"},
     {text: qsTr("Keyword") , state: "KEYWORD"},
     {text: qsTr("Password"), state: "PASSWORD"}
@@ -159,7 +159,7 @@ Item {
 
     from: "LOADING"
     ScriptAction { script: {
-      registerElements.visible = true
+      createAccountElements.visible = true
       loadingView.visible = false
     }}
 
@@ -235,7 +235,7 @@ Item {
         }
       }
       ScriptAction { script: {
-        registerElements.visible = false
+        createAccountElements.visible = false
       }}
     }
   }]
@@ -276,7 +276,7 @@ Item {
   }
 
   Item {
-    id: registerElements
+    id: createAccountElements
     anchors.fill: parent
 
     Row {
@@ -293,7 +293,7 @@ Item {
       Repeater {
         id: tabRepeater
 
-        model: createAccountView.registerModel
+        model: createAccountView.createAccountModel
         delegate:
           CustomLabel {
             text: modelData.text
@@ -476,14 +476,12 @@ Item {
         height: 1
         anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.height -
-           registerButton.height -
+           createAccountButton.height -
            customProperties.clickableTextBottomMargin - 12
         color: customBrushes.bottomLineColor
       }
 
       ClickableText {
-        id: registerButton
-
         anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
         text: qsTr("Already have an account? Log In")
