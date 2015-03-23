@@ -266,7 +266,7 @@ Item {
         y: accountHandlerView.height -
            registerButton.height -
            customProperties.clickableTextBottomMargin - 12
-        color: "#ffffff"
+        color: customBrushes.bottomLineColor
       }
 
       ClickableText {

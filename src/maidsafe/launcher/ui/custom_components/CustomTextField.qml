@@ -29,7 +29,7 @@ TextField {
   property bool showTickImage: false
   property bool showErrorImage: false
   property Button submitButton: null
-  property color backgroundColor: "#ffffff"
+  property color backgroundColor: globalBrushes.textFieldBackground
   property color textColor:  globalBrushes.textGrey
 
   function clearAllImages() { showTickImage = showErrorImage = false }

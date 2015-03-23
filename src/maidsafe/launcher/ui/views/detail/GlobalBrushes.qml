@@ -28,6 +28,8 @@ QtObject {
   readonly property color textDefault: "#ffffff"
   readonly property color labelDefault: textDefault
 
+  readonly property color textFieldBackground: "#ffffff"
+
   readonly property color placeHolderFocusGrey: "#70b3b3b3"
   readonly property color placeHolderDefaultGrey: textGrey
 }
