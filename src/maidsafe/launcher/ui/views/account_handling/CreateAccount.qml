@@ -259,7 +259,8 @@ Item {
       if (accountHandlerController_.currentView === AccountHandlerController.CreateAccountView &&
           createAccountView.state !== "LOADING") {
         currentTextFields.primaryTextField.focus = true
-        currentTextFields.primaryTextField.cursorPosition = currentTextFields.primaryTextField.text.length
+        currentTextFields.primaryTextField.cursorPosition =
+            currentTextFields.primaryTextField.text.length
       }
     }
   }
@@ -443,16 +444,20 @@ Item {
         id: nextButton
 
         y: accountHandlerView.bottomButtonY
+        width: customProperties.blueButtonWidth
+        anchors.horizontalCenter: parent.horizontalCenter
         text: qsTr("NEXT")
         onClicked: {
           floatingStatus.hide()
           if (!pinTextFields.validateValues()) {
             createAccountView.state = "PIN"
 
-          } else if (createAccountView.state === "PIN" || !keywordTextFields.validateValues()) {
+          } else if (createAccountView.state === "PIN" ||
+                     !keywordTextFields.validateValues()) {
             createAccountView.state = "KEYWORD"
 
-          } else if (createAccountView.state === "KEYWORD" || !passwordTextFields.validateValues()) {
+          } else if (createAccountView.state === "KEYWORD" ||
+                     !passwordTextFields.validateValues()) {
             createAccountView.state = "PASSWORD"
 
           } else {

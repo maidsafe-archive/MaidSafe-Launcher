@@ -226,6 +226,8 @@ Item {
       id: loginButton
 
       y: accountHandlerView.bottomButtonY
+      width: customProperties.blueButtonWidth
+      anchors.horizontalCenter: parent.horizontalCenter
       text: qsTr("LOG IN")
       onClicked: {
         if (pinTextField.text === "") {
