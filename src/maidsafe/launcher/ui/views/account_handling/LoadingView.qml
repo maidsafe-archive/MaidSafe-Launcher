@@ -56,7 +56,7 @@ Item {
       PauseAnimation { duration: 750 }
       ScriptAction {
         script: {
-          errorMessage.text = 0
+          errorMessage.text = ""
           errorMessage.opacity = 0
           cancelButton.text = qsTr("CANCEL")
           cancelButton.focus = true
@@ -88,14 +88,11 @@ Item {
   Item {
     y: accountHandlerView.bottomButtonY - height
     anchors.horizontalCenter: parent.horizontalCenter
-    height: 125
-     // +7px on the right to center the loadingAnimation
-     // +7px to center the loadingAnimation with the button
-    width: 250 + 7 + 7
+    height: 130
+    width: loadingAnimation.width
 
     LoadingAnimation {
       id: loadingAnimation
-      x: 7 // center the loadingAnimation with the button
       y: parent.height
       onFinished: if (success) loadingFinished()
       onStartFailing: {
@@ -111,7 +108,12 @@ Item {
     y: accountHandlerView.bottomButtonY
     width: customProperties.cancelButtonWidth
     anchors.horizontalCenter: parent.horizontalCenter
-    onClicked: if (opacity === 1) loadingCanceled()
+    onClicked: {
+      if (opacity === 1) {
+        loadingAnimation.stopAnimations()
+        loadingCanceled()
+      }
+    }
     Behavior on opacity { NumberAnimation { duration: 1000 } }
   }
 }

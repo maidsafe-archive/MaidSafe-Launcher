@@ -185,10 +185,6 @@ Item {
     visible: false
     onLoadingCanceled: loginView.state = ""
   }
-  Connections {
-    target: accountHandlerController_
-    onLoginError: loadingView.showFailed()
-  }
 
   Item {
     id: loginElements

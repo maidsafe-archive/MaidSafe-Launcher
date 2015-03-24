@@ -28,7 +28,6 @@ Item {
   id: createAccountView
 
   readonly property LoadingView loadingView: loadingView
-  property var passwordStrength: new PasswordStrength.StrengthChecker()
 
   property Item bottomButton: nextButton
   property Item currentTextFields: pinTextFields
@@ -270,10 +269,6 @@ Item {
     visible: false
     onLoadingCanceled: createAccountView.state = "PIN"
   }
-  Connections {
-    target: accountHandlerController_
-    onLoginError: loadingView.showFailed()
-  }
 
   Item {
     id: createAccountElements
@@ -476,12 +471,13 @@ Item {
         height: 1
         anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.height -
-           createAccountButton.height -
+           loginButton.height -
            customProperties.clickableTextBottomMargin - 12
         color: customBrushes.bottomLineColor
       }
 
       ClickableText {
+        id: loginButton
         anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
         text: qsTr("Already have an account? Log In")

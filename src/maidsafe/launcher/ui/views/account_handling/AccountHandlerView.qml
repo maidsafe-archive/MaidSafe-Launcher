@@ -27,6 +27,7 @@ import "../../resources/js/password_strength.js" as PasswordStrength
 FocusScope {
   id: accountHandlerView
 
+  readonly property var passwordStrength: new PasswordStrength.StrengthChecker()
   readonly property LoadingView loadingView: currentView.loadingView
 
   AccountHandlerBrushes {
@@ -37,6 +38,11 @@ FocusScope {
   AccountHandlerProperties {
     id: customProperties
     objectName: "customProperties"
+  }
+
+  Connections {
+    target: accountHandlerController_
+    onLoginError: loadingView.showFailed()
   }
 
   Image {
