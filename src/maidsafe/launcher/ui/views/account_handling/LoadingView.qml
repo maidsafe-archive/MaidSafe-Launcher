@@ -24,6 +24,7 @@ Item {
   id: loadingView
 
   anchors.horizontalCenter: parent.horizontalCenter
+  property string errorMessage: ""
 
   signal loadingCanceled()
   signal loadingFinished()
@@ -97,7 +98,7 @@ Item {
       onFinished: if (success) loadingFinished()
       onStartFailing: {
         cancelButton.text = qsTr("GO BACK")
-        errorMessage.text = qsTr("There was an error creating your account.\nPlease try again.")
+        errorMessage.text = loadingView.errorMessage
         errorMessage.opacity = 1
       }
     }

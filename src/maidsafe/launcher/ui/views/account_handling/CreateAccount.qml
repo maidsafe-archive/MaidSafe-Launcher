@@ -268,6 +268,7 @@ Item {
     id: loadingView
     visible: false
     onLoadingCanceled: createAccountView.state = "PIN"
+    errorMessage: qsTr("There was an error creating your account.\nPlease try again.")
   }
 
   Item {

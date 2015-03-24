@@ -184,6 +184,7 @@ Item {
     id: loadingView
     visible: false
     onLoadingCanceled: loginView.state = ""
+    errorMessage: qsTr("There was an error logging you in.\nPlease try again.")
   }
 
   Item {
