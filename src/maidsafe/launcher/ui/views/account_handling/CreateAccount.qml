@@ -443,9 +443,6 @@ Item {
         id: nextButton
 
         y: accountHandlerView.bottomButtonY
-        width: customProperties.blueButtonWidth
-        anchors.horizontalCenter: parent.horizontalCenter
-
         text: qsTr("NEXT")
         onClicked: {
           floatingStatus.hide()

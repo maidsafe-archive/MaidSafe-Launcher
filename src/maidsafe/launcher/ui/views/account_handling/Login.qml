@@ -195,12 +195,10 @@ Item {
       id: pinTextField
       placeholderText: qsTr("PIN")
       submitButton: loginButton
-      width: customProperties.textFieldWidth
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight*3 -
          customProperties.textFieldVerticalSpacing*3
-      backgroundColor: customBrushes.textFieldBackground
       focus: true
     }
 
@@ -208,35 +206,27 @@ Item {
       id: keywordTextField
       placeholderText: qsTr("Keyword")
       submitButton: loginButton
-      width: customProperties.textFieldWidth
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight*2 -
          customProperties.textFieldVerticalSpacing*2
-      backgroundColor: customBrushes.textFieldBackground
     }
 
     CustomTextField {
       id: passwordTextField
       placeholderText: qsTr("Password")
       submitButton: loginButton
-      width: customProperties.textFieldWidth
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight -
          customProperties.textFieldVerticalSpacing
-      backgroundColor: customBrushes.textFieldBackground
     }
 
     BlueButton {
       id: loginButton
 
       y: accountHandlerView.bottomButtonY
-      width: customProperties.blueButtonWidth
-      anchors.horizontalCenter: parent.horizontalCenter
-
       text: qsTr("LOG IN")
-
       onClicked: {
         if (pinTextField.text === "") {
           floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))

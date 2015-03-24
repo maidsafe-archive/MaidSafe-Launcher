@@ -35,7 +35,5 @@ QtObject {
   readonly property color buttonPressedBlue: "#4e99be"
   readonly property color buttonFocusedBlue: "#7ecaf1"
 
-  readonly property color textFieldBackground: "#ffffff"
-
   readonly property color bottomLineColor: "#ffffff"
 }
