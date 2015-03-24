@@ -94,7 +94,6 @@ void AccountHandlerController::LoginResultAvailable() {
   try {
     auto launcher(future_.get());
     emit LoginCompleted(launcher.release());
-//    emit loginError();
   }
   catch (...) {
   }
@@ -103,7 +102,6 @@ void AccountHandlerController::LoginResultAvailable() {
 void AccountHandlerController::CreateAccountResultAvailable() {
   try {
     auto launcher(future_.get());
-    //emit LoginCompleted(launcher.release());
     emit loginError();
   }
   catch (...) {
