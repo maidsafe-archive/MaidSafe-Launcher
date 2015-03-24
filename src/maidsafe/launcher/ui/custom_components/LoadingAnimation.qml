@@ -20,11 +20,12 @@ import QtQuick 2.4
 
 Item {
   id: loadingAnimation
-  width: 290
-  height: 100
+  width: breakingSpriteSequence.width
+  height: breakingSpriteSequence.height
 
   signal finished(bool success)
   signal startFailing() // start showing error message
+  readonly property int frameRate: 30
 
   function showLoading() {
     stopAnimations()
@@ -47,15 +48,15 @@ Item {
   SpriteSequence {
     id: loadingSpriteSequence
     x: 111
-    y: 8
-    width: 70
+    y: 10
+    width: 60
     height: 90
     visible: false
     running: visible
     onCurrentSpriteChanged: {
       if (!visible) return;
 
-      if (currentSprite === "success") {
+      if (currentSprite === "postSuccess") {
         finished(true)
       } else if (currentSprite === "failed") {
         loadingSpriteSequence.visible = false
@@ -69,57 +70,68 @@ Item {
       name: "loading"
       source: "/resources/images/loading_sprites.png"
       frameCount: 29
-      frameWidth: 70
-      frameHeight: 90
-      frameRate: 30
+      frameWidth: loadingSpriteSequence.width
+      frameHeight: loadingSpriteSequence.height
+      frameRate: loadingAnimation.frameRate
     }
 
     Sprite {
       name: "loadingFail"
       source: "/resources/images/loading_sprites.png"
-      frameY: 1 * frameHeight
+      frameX: 9 * frameWidth
+      frameY: 2 * frameHeight
       frameCount: 29
-      frameWidth: 70
-      frameHeight: 90
-      frameRate: 30
+      frameWidth: loadingSpriteSequence.width
+      frameHeight: loadingSpriteSequence.height
+      frameRate: loadingAnimation.frameRate
       to: {"failed":1}
     }
 
     Sprite {
       name: "failed"
       source: "/resources/images/loading_sprites.png"
-      frameX: 28 * frameWidth
-      frameY: 1 * frameHeight
-      frameCount: 1
-      frameWidth: 70
-      frameHeight: 90
+      frameX: 7 * frameWidth
+      frameY: 5 * frameHeight
+      frameWidth: loadingSpriteSequence.width
+      frameHeight: loadingSpriteSequence.height
     }
 
     Sprite {
       name: "loadingSuccess"
       source: "/resources/images/loading_sprites.png"
-      frameY: 2 * frameHeight
+      frameX: 8 * frameWidth
+      frameY: 5 * frameHeight
       frameCount: 29
-      frameWidth: 70
-      frameHeight: 90
-      frameRate: 30
+      frameWidth: loadingSpriteSequence.width
+      frameHeight: loadingSpriteSequence.height
+      frameRate: loadingAnimation.frameRate
       to: {"success":1}
     }
 
     Sprite {
       name: "success"
       source: "/resources/images/loading_sprites.png"
-      frameX: 28 * frameWidth
-      frameY: 2 * frameHeight
-      frameCount: 1
-      frameWidth: 70
-      frameHeight: 90
+      frameX: 6 * frameWidth
+      frameY: 8 * frameHeight
+      frameWidth: loadingSpriteSequence.width
+      frameHeight: loadingSpriteSequence.height
+      frameDuration: 400
+      to: {"postSuccess":1}
+    }
+
+    Sprite {
+      name: "postSuccess"
+      source: "/resources/images/loading_sprites.png"
+      frameX: 6 * frameWidth
+      frameY: 8 * frameHeight
+      frameWidth: loadingSpriteSequence.width
+      frameHeight: loadingSpriteSequence.height
     }
   }
 
   SpriteSequence {
     id: breakingSpriteSequence
-    width: 290
+    width: 280
     height: 100
     visible: false
     running: visible
@@ -136,28 +148,26 @@ Item {
     Sprite {
       name: "postBreaking"
       source: "/resources/images/loading_error_sprites.png"
-      frameX: 6 * frameWidth
-      frameY: 9 * frameHeight
-      frameCount: 1
-      frameWidth: 290
-      frameHeight: 100
+      frameX: 8 * frameWidth
+      frameY: 7 * frameHeight
+      frameWidth: breakingSpriteSequence.width
+      frameHeight: breakingSpriteSequence.height
     }
     Sprite {
       name: "preBreaking"
       source: "/resources/images/loading_error_sprites.png"
-      frameCount: 1
-      frameWidth: 290
-      frameHeight: 100
-      frameDuration: 633
+      frameWidth: breakingSpriteSequence.width
+      frameHeight: breakingSpriteSequence.height
+      frameDuration: 600
       to: {"breaking":1}
     }
     Sprite {
       name: "breaking"
       source: "/resources/images/loading_error_sprites.png"
       frameCount: 70
-      frameWidth: 290
-      frameHeight: 100
-      frameRate: 30
+      frameWidth: breakingSpriteSequence.width
+      frameHeight: breakingSpriteSequence.height
+      frameRate: loadingAnimation.frameRate
       to: {"postBreaking":1}
     }
   }

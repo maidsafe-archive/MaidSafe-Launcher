@@ -76,7 +76,7 @@ Item {
 
     Behavior on y {
       NumberAnimation {
-        duration: 1000; easing.type: Easing.OutQuad
+        duration: 1000; easing.type: Easing.InQuart
         onStopped: mainWindowLoader.source = ""
       }
     }
