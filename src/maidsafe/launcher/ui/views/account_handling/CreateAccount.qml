@@ -307,7 +307,7 @@ Item {
               anchors.fill: parent
               hoverEnabled: true
               onClicked: createAccountView.state = modelData.state
-              cursorShape: containsMouse ? Qt.ClosedHandCursor : Qt.ArrowCursor
+              cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
             }
           }
       }

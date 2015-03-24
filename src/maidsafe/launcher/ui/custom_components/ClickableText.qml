@@ -41,7 +41,7 @@ FocusScope {
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
-    cursorShape: containsMouse ? Qt.ClosedHandCursor : Qt.ArrowCursor
+    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
 
     onClicked: focusScope.clicked()
 
