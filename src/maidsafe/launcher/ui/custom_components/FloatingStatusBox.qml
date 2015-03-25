@@ -42,7 +42,7 @@ Rectangle {
     if (!item) return
 
     pointToItem = item
-    if (pointToItem && pointToItem.showErrorImage)
+    if (pointToItem)
       pointToItem.showErrorImage = showError
     metaText.text = meta
     infoText.text = info
