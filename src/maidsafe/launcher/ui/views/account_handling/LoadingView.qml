@@ -36,6 +36,7 @@ Item {
   }
 
   readonly property Item bottomButton: cancelButton
+  property bool loading: false
 
   opacity: 0
 
@@ -60,7 +61,7 @@ Item {
           errorMessage.text = ""
           errorMessage.opacity = 0
           cancelButton.text = qsTr("CANCEL")
-          cancelButton.focus = true
+          loadingView.loading = true
           loadingAnimation.showLoading()
         }
       }
@@ -101,6 +102,7 @@ Item {
         cancelButton.text = qsTr("GO BACK")
         errorMessage.text = loadingView.errorMessage
         errorMessage.opacity = 1
+        loadingView.loading = false
       }
     }
   }
@@ -110,8 +112,10 @@ Item {
     y: accountHandlerView.bottomButtonY
     width: customProperties.cancelButtonWidth
     anchors.horizontalCenter: parent.horizontalCenter
+    // TODO(Gildas) to avoid multiple login attempt at the same time
+    // when canceling during logging in, cancel functionality is disabled for now
     onClicked: {
-      if (opacity === 1) {
+      if (opacity === 1 && !loadingView.loading) {
         loadingAnimation.stopAnimations()
         loadingCanceled()
       }
