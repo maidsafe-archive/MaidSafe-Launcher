@@ -92,19 +92,19 @@ Item {
       ParallelAnimation {
         NumberAnimation {
           target: fadeOutItems; property: "opacity"
-          duration: 1000; easing.type: Easing.Bezier
+          duration: 800; easing.type: Easing.Bezier
           easing.bezierCurve: customProperties.animationColapseEasingCurve
         }
         NumberAnimation {
           target: loginButton; properties: "backgroundWidth,textOpacity"
-          duration: 1000; easing.type: Easing.Bezier
+          duration: 800; easing.type: Easing.Bezier
           easing.bezierCurve: customProperties.animationColapseEasingCurve
         }
         SequentialAnimation {
           PauseAnimation { duration: 366 }
           NumberAnimation {
             target: pinTextField; property: "width"
-            duration: 700; easing.type: Easing.Bezier
+            duration: 500; easing.type: Easing.Bezier
             easing.bezierCurve: customProperties.animationColapseEasingCurve
           }
         }
@@ -113,11 +113,11 @@ Item {
           ParallelAnimation {
             NumberAnimation {
               target: pinTextField; property: "y"
-              duration: 600; easing.type: Easing.Bezier
+              duration: 500; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
             ColorAnimation {target: pinTextField; properties: "backgroundColor,textColor"
-              duration: 760; easing.type: Easing.Bezier
+              duration: 560; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
           }
@@ -126,7 +126,7 @@ Item {
           PauseAnimation { duration: 266 }
           NumberAnimation {
             target: keywordTextField; property: "width"
-            duration: 800; easing.type: Easing.Bezier
+            duration: 600; easing.type: Easing.Bezier
             easing.bezierCurve: customProperties.animationColapseEasingCurve
           }
         }
@@ -135,11 +135,11 @@ Item {
           ParallelAnimation {
             NumberAnimation {
               target: keywordTextField; property: "y"
-              duration: 700; easing.type: Easing.Bezier
+              duration: 600; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
             ColorAnimation {target: keywordTextField; properties: "backgroundColor,textColor"
-              duration: 860; easing.type: Easing.Bezier
+              duration: 660; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
           }
@@ -148,7 +148,7 @@ Item {
           PauseAnimation { duration: 166 }
           NumberAnimation {
             target: passwordTextField; property: "width"
-            duration: 900; easing.type: Easing.Bezier
+            duration: 700; easing.type: Easing.Bezier
             easing.bezierCurve: customProperties.animationColapseEasingCurve
           }
         }
@@ -157,11 +157,11 @@ Item {
           ParallelAnimation {
             NumberAnimation {
               target: passwordTextField; property: "y"
-              duration: 800; easing.type: Easing.Bezier
+              duration: 700; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
             ColorAnimation {target: passwordTextField; properties: "backgroundColor,textColor"
-              duration: 960; easing.type: Easing.Bezier
+              duration: 760; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
           }

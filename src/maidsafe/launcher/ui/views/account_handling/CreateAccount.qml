@@ -122,12 +122,14 @@ Item {
         y: accountHandlerView.bottomButtonY
         width: customProperties.cancelButtonWidth
         backgroundColor: customBrushes.buttonDefaultBlue
+        textColor: customBrushes.buttonDefaultBlue
       }
       PropertyChanges {
         target: confirmationPasswordTextField
         y: accountHandlerView.bottomButtonY
         width: customProperties.cancelButtonWidth
         backgroundColor: customBrushes.buttonDefaultBlue
+        textColor: customBrushes.buttonDefaultBlue
       }
       PropertyChanges {
         target: loadingView
@@ -172,19 +174,19 @@ Item {
       ParallelAnimation {
         NumberAnimation {
           target: fadeOutItems; property: "opacity"
-          duration: 1000; easing.type: Easing.Bezier
+          duration: 800; easing.type: Easing.Bezier
           easing.bezierCurve: customProperties.animationColapseEasingCurve
         }
         NumberAnimation {
           target: nextButton; property: "backgroundWidth"
-          duration: 1000; easing.type: Easing.Bezier
+          duration: 800; easing.type: Easing.Bezier
           easing.bezierCurve: customProperties.animationColapseEasingCurve
         }
         SequentialAnimation {
           PauseAnimation { duration: 300 }
           NumberAnimation {
             target: createAccountTabRow; properties: "y,opacity"
-            duration: 600; easing.type: Easing.Bezier
+            duration: 500; easing.type: Easing.Bezier
             easing.bezierCurve: customProperties.animationColapseEasingCurve
           }
         }
@@ -192,7 +194,7 @@ Item {
           PauseAnimation { duration: 266 }
           NumberAnimation {
             target: primaryPasswordTextField; properties: "width"
-            duration: 800; easing.type: Easing.Bezier
+            duration: 600; easing.type: Easing.Bezier
             easing.bezierCurve: customProperties.animationColapseEasingCurve
           }
         }
@@ -201,11 +203,11 @@ Item {
           ParallelAnimation {
             NumberAnimation {
               target: primaryPasswordTextField; properties: "y"
-              duration: 700; easing.type: Easing.Bezier
+              duration: 600; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
-            ColorAnimation {target: primaryPasswordTextField; property: "backgroundColor"
-              duration: 860; easing.type: Easing.Bezier
+            ColorAnimation {target: primaryPasswordTextField; properties: "backgroundColor,textColor"
+              duration: 660; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
           }
@@ -214,7 +216,7 @@ Item {
           PauseAnimation { duration: 166 }
           NumberAnimation {
             target: confirmationPasswordTextField; properties: "width"
-            duration: 900; easing.type: Easing.Bezier
+            duration: 700; easing.type: Easing.Bezier
             easing.bezierCurve: customProperties.animationColapseEasingCurve
           }
         }
@@ -223,11 +225,11 @@ Item {
           ParallelAnimation {
             NumberAnimation {
               target: confirmationPasswordTextField; properties: "y"
-              duration: 800; easing.type: Easing.Bezier
+              duration: 700; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
-            ColorAnimation {target: confirmationPasswordTextField; property: "backgroundColor"
-              duration: 960; easing.type: Easing.Bezier
+            ColorAnimation {target: confirmationPasswordTextField; properties: "backgroundColor,textColor"
+              duration: 760; easing.type: Easing.Bezier
               easing.bezierCurve: customProperties.animationColapseEasingCurve
             }
           }

@@ -55,7 +55,7 @@ Item {
   transitions: [Transition {
     to: "VISIBLE"
     SequentialAnimation {
-      PauseAnimation { duration: 750 }
+      PauseAnimation { duration: 550 }
       ScriptAction {
         script: {
           errorMessage.text = ""

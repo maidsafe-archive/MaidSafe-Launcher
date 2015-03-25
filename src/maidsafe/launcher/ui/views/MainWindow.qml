@@ -76,7 +76,8 @@ Item {
 
     Behavior on y {
       NumberAnimation {
-        duration: 1000; easing.type: Easing.InQuart
+        duration: 800; easing.type: Easing.Bezier
+        easing.bezierCurve: [ 1, 0, 0.64, 1, 1, 1 ]
         onStopped: mainWindowLoader.source = ""
       }
     }
