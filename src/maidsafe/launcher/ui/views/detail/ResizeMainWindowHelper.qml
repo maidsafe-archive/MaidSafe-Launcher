@@ -153,7 +153,7 @@ Item {
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
-    onPressed: { prevMouseX = mouseX ; console.log(mainWindow_.x, mainWindow_.y)}
+    onPressed: { prevMouseX = mouseX ; }
     onPositionChanged: {
       if(pressed) {
         var deltaX = mouseX - prevMouseX

@@ -22,8 +22,6 @@ QtObject {
   id: properties
   objectName: "properties"
 
-  readonly property int defaultFontPixelSize: 18
-  readonly property int customTextPixelSize: 13
   readonly property int clickableTextPixelSize: 15
   readonly property int errorTextPixelSize: 20
 

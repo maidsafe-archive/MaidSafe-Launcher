@@ -17,16 +17,52 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Controls.Styles 1.3
 
-Text {
-  id: customText
-  objectName: "customText"
+TextField {
+  id: searchTextField
 
-  color: globalBrushes.textDefault
+  property bool showSearchImage: true
+  property int radius: 5
+/*  onActiveFocusChanged: {
+    if (activeFocus) {
+      selectAll()
+    }
+  }
+  onTextChanged: {
+  }
+  Keys.onEnterPressed: if (submitButton) submitButton.clicked()
+  Keys.onReturnPressed: if (submitButton) submitButton.clicked()
+*/
   font {
-    pixelSize: globalProperties.customTextPixelSize
+    pixelSize: 12
     family: globalFontFamily.name
   }
-  horizontalAlignment: TextInput.AlignHCenter
+  horizontalAlignment: TextInput.AlignLeft
   verticalAlignment: TextInput.AlignVCenter
+
+  style: TextFieldStyle {
+
+    background: Rectangle {
+      id: backgroundRect
+
+      radius: searchTextField.radius
+      color: "#ffffff"
+
+      Image {
+        id: searchImage
+
+        visible: searchTextField.showSearchImage
+        anchors {
+          left: parent.left
+          top: parent.top
+          bottom: parent.bottom
+          margins: 3
+        }
+        source: "/resources/images/window_details/search_icon.png"
+        fillMode: Image.PreserveAspectFit
+      }
+    }
+  }
 }

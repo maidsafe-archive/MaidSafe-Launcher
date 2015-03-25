@@ -23,4 +23,7 @@ QtObject {
   objectName: "globalProperties"
 
   readonly property int windowResizerThickness: 5
+
+  readonly property int defaultFontPixelSize: 18
+  readonly property int customTextPixelSize: 13
 }

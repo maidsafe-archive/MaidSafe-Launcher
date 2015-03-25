@@ -17,13 +17,10 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.3
 
 import SAFEAppLauncher.MainController 1.0
 
 import "./detail"
-import "../custom_components"
 
 Item {
   id: mainWindowItem
@@ -33,20 +30,34 @@ Item {
   GlobalBrushes    { id: globalBrushes;    objectName: "globalBrushes"    }
   GlobalProperties { id: globalProperties; objectName: "globalProperties" }
 
-  DragMainWindowHelper {
-    id: dragMainWindowHelper
-    objectName: "dragMainWindowHelper"
+  Image {
+    // TODO(Spandan) Check this for other flavours of linux and for stability
+    readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
 
-    anchors {
-      top: parent.top
-      right: parent.right
-      left: parent.left
-      bottom: mainWindowTitleBar.bottom
-      leftMargin: Qt.platform.os === "linux" || Qt.platform.os === "osx" ?
-                    mainWindowTitleBar.buttonLoaderwidth + 10 : 0
-      rightMargin: Qt.platform.os === "windows" ? mainWindowTitleBar.buttonLoaderwidth + 10 : 0
+    Component.onCompleted: {
+      mainWindow_.width = implicitWidth
+      mainWindow_.minimumWidth = implicitWidth
+      mainWindow_.maximumWidth = implicitWidth
+
+      mainWindow_.height = implicitHeight
+      mainWindow_.minimumHeight = implicitHeight
+      mainWindow_.maximumHeight = implicitHeight + correctionFactor
+
+      if (Qt.platform.os !== "linux") {
+        mainWindowTitleBar.maximiseRestoreEnabled = false
+        globalWindowResizeHelper.enabled = false
+      }
     }
-    enabled: mainWindowTitleBar.visible
+
+    Component.onDestruction: {
+      if (Qt.platform.os !== "linux") {
+        mainWindowTitleBar.maximiseRestoreEnabled = true
+        globalWindowResizeHelper.enabled = true
+      }
+    }
+
+    source: "/resources/images/login_bg.png"
+    anchors.fill: parent
   }
 
   Connections {
@@ -83,26 +94,17 @@ Item {
     }
   }
 
-  ResizeMainWindowHelper {
-    id: globalWindowResizeHelper
-    objectName: "globalWindowResizeHelper"
-
+  Loader {
+    id: customTitleBar
     anchors.fill: parent
-    enabled: Qt.platform.os !== "linux"
-  }
-
-  CustomTitleBar {
-    id: mainWindowTitleBar
-    objectName: "mainWindowTitleBar"
-
-    anchors {
-      top: parent.top
-      left: parent.left
-      right: parent.right
-      margins: 5
+    source: {
+//      if (Qt.platform.os === "windows") {
+        "../custom_components/CustomTitleBarWindows.qml"
+//      } else if (Qt.platform.os === "osx") {
+//        "../custom_components/CustomTitleBarMacOs.qml"
+//      } else {
+//        "../custom_components/CustomTitleBarLinux.qml"
+//      }
     }
-
-    visible: Qt.platform.os !== "linux"
-    enabled: visible
   }
 }

@@ -57,7 +57,7 @@ TextField {
   Keys.onReturnPressed: if (submitButton) submitButton.clicked()
 
   font {
-    pixelSize: customProperties.defaultFontPixelSize
+    pixelSize: globalProperties.defaultFontPixelSize
     family: globalFontFamily.name
   }
   horizontalAlignment: TextInput.AlignHCenter
