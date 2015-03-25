@@ -31,6 +31,8 @@ Rectangle {
     if (pointToItem && pointToItem.clearAllImages) {
       pointToItem.clearAllImages()
     }
+    // fix a strange bug with sometimes a wrong infoText.implicitWidth
+    width = 0
     pointToItem = null
   }
 

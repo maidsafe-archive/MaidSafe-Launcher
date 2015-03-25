@@ -65,7 +65,7 @@ Item {
   function checkIdenticalField(fieldName, textField1, textField2) {
     if (textField1.text === textField2.text) return true
 
-    floatingStatus.showError(textField2, qsTr("Entries don't match"))
+    floatingStatus.showError(textField2, qsTr("Entries do not match. Please try again"))
     return false
   }
 
