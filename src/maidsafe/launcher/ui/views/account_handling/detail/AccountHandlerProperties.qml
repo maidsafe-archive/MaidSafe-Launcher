@@ -28,20 +28,20 @@ QtObject {
   readonly property int errorTextPixelSize: 20
 
   readonly property int cancelButtonWidth: 120
-  readonly property int cancelButtonBottom: 125
+  readonly property int cancelButtonBottom: 130
   readonly property int cancelButtonHeight: 35
 
   readonly property int textFieldWidth: 320
   readonly property int textFieldHeight: 35
   readonly property int textFieldRadius: 5
-  readonly property int textFieldVerticalSpacing: 15
+  readonly property int textFieldVerticalSpacing: 16
 
-  readonly property int clickableTextBottomMargin: 45
+  readonly property int clickableTextBottomMargin: 38
 
   readonly property int blueButtonWidth: textFieldWidth
   readonly property int blueButtonHeight: textFieldHeight
   readonly property int blueButtonRadius: textFieldRadius
-  readonly property int blueButtonMargin: 15
+  readonly property int blueButtonMargin: 16
 
   readonly property var animationColapseEasingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 }
