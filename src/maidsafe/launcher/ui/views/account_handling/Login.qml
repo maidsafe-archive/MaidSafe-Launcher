@@ -195,6 +195,7 @@ Item {
       id: pinTextField
       placeholderText: qsTr("PIN")
       submitButton: loginButton
+      anchors.horizontalCenter: parent.horizontalCenter
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight*3 -
@@ -206,6 +207,7 @@ Item {
       id: keywordTextField
       placeholderText: qsTr("Keyword")
       submitButton: loginButton
+      anchors.horizontalCenter: parent.horizontalCenter
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight*2 -
@@ -216,6 +218,7 @@ Item {
       id: passwordTextField
       placeholderText: qsTr("Password")
       submitButton: loginButton
+      anchors.horizontalCenter: parent.horizontalCenter
       y: accountHandlerView.bottomButtonY -
          customProperties.blueButtonMargin -
          customProperties.textFieldHeight -

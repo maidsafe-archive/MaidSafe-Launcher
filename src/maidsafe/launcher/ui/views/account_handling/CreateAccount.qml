@@ -327,6 +327,7 @@ Item {
 
         placeholderText: qsTr("Choose a 4 digit PIN")
         submitButton: nextButton
+        anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.bottomButtonY -
            customProperties.blueButtonMargin -
            customProperties.textFieldHeight*2 -
@@ -338,6 +339,7 @@ Item {
 
         placeholderText: qsTr("Confirm PIN")
         submitButton: nextButton
+        anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.bottomButtonY -
            customProperties.blueButtonMargin -
            customProperties.textFieldHeight -
@@ -369,6 +371,7 @@ Item {
 
         placeholderText: qsTr("Choose a Keyword")
         submitButton: nextButton
+        anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.bottomButtonY -
            customProperties.blueButtonMargin -
            customProperties.textFieldHeight*2 -
@@ -382,6 +385,7 @@ Item {
 
         placeholderText: qsTr("Confirm Keyword")
         submitButton: nextButton
+        anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.bottomButtonY -
            customProperties.blueButtonMargin -
            customProperties.textFieldHeight -
@@ -409,6 +413,7 @@ Item {
 
         placeholderText: qsTr("Choose a Password")
         submitButton: nextButton
+        anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.bottomButtonY -
            customProperties.blueButtonMargin -
            customProperties.textFieldHeight*2 -
@@ -422,6 +427,7 @@ Item {
 
         placeholderText: qsTr("Confirm Password")
         submitButton: nextButton
+        anchors.horizontalCenter: parent.horizontalCenter
         y: accountHandlerView.bottomButtonY -
            customProperties.blueButtonMargin -
            customProperties.textFieldHeight -

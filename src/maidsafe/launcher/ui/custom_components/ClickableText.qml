@@ -50,7 +50,7 @@ FocusScope {
       objectName: "customLabel"
 
       font {
-        pixelSize: customProperties.customTextPixelSize
+        pixelSize: customProperties.clickableTextPixelSize
         family: globalFontFamily.name
       }
 

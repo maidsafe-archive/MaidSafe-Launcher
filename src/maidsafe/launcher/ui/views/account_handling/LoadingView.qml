@@ -83,6 +83,7 @@ Item {
     opacity: 0
     y: accountHandlerView.bottomButtonY - loadingAnimation.parent.height - height + 10
     anchors.horizontalCenter: parent.horizontalCenter
+    font.pixelSize: customProperties.errorTextPixelSize
     Behavior on opacity { NumberAnimation { duration: 700 } }
   }
 

@@ -23,7 +23,9 @@ QtObject {
   objectName: "properties"
 
   readonly property int defaultFontPixelSize: 18
-  readonly property int customTextPixelSize: 15
+  readonly property int customTextPixelSize: 13
+  readonly property int clickableTextPixelSize: 15
+  readonly property int errorTextPixelSize: 21
 
   readonly property int cancelButtonWidth: 120
   readonly property int cancelButtonBottom: 125

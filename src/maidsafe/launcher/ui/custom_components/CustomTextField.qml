@@ -23,7 +23,6 @@ import QtQuick.Controls.Styles 1.3
 TextField {
   id: textField
 
-  anchors.horizontalCenter: parent.horizontalCenter
   echoMode: TextInput.Password
 
   property bool showTickImage: false

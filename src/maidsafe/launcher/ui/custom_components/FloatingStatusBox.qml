@@ -97,7 +97,6 @@ Rectangle {
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
     color: globalBrushes.textGrey
-    font.pixelSize: 12
   }
 
   CustomText {
@@ -116,6 +115,5 @@ Rectangle {
 
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
     color: globalBrushes.textGrey
-    font.pixelSize: 12
   }
 }
