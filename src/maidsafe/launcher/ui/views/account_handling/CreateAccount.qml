@@ -309,7 +309,26 @@ Item {
               id: tabItemMouseArea
               anchors.fill: parent
               hoverEnabled: true
-              onClicked: createAccountView.state = modelData.state
+              onClicked: {
+                floatingStatus.hide()
+
+                if (modelData.state === createAccountView.state)
+                  return
+
+                if ((modelData.state === "KEYWORD" || modelData.state === "PASSWORD") &&
+                    !pinTextFields.validateValues()) {
+                  createAccountView.state = "PIN"
+                  return
+                }
+
+                if (modelData.state === "PASSWORD" &&
+                    !keywordTextFields.validateValues()) {
+                  createAccountView.state = "KEYWORD"
+                  return
+                }
+
+                createAccountView.state = modelData.state
+              }
               cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
             }
           }
