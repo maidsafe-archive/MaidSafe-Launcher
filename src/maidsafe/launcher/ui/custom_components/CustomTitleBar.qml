@@ -19,15 +19,6 @@
 import QtQuick 2.4
 
 Item {
-  property bool closeVisble: true
-  property bool closeEnabled: true
-
-  property bool minimiseVisble: true
-  property bool minimiseEnabled: true
-
-  property bool maximiseRestoreVisble: true
-  property bool maximiseRestoreEnabled: true
-
   property real homePageControlsOpacity: 0
   Behavior on homePageControlsOpacity { NumberAnimation { duration: 800 } }
   function showHomePageControls() { homePageControlsOpacity = 1 }

@@ -24,17 +24,13 @@ TextField {
   id: searchTextField
 
   property bool showSearchImage: true
-  property int radius: 5
 
   onActiveFocusChanged: if (activeFocus) selectAll()
 //  onTextChanged: {}
 //  Keys.onEnterPressed: if (submitButton) submitButton.clicked()
 //  Keys.onReturnPressed: if (submitButton) submitButton.clicked()
 
-  font {
-    pixelSize: 12
-    family: globalFontFamily.name
-  }
+  font.family: globalFontFamily.name
   horizontalAlignment: TextInput.AlignLeft
   verticalAlignment: TextInput.AlignVCenter
 
@@ -43,7 +39,7 @@ TextField {
     background: Rectangle {
       id: backgroundRect
 
-      radius: searchTextField.radius
+      radius: 3
       color: "#ffffff"
 
       Image {

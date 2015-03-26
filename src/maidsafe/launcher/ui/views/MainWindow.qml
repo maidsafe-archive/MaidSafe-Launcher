@@ -95,9 +95,9 @@ Item {
     anchors.fill: parent
     source: {
 //      if (Qt.platform.os === "windows") {
-        "../custom_components/CustomTitleBarWindows.qml"
+//        "../custom_components/CustomTitleBarWindows.qml"
 //      } else if (Qt.platform.os === "osx") {
-//        "../custom_components/CustomTitleBarMacOs.qml"
+        "../custom_components/CustomTitleBarMacOs.qml"
 //      } else {
 //        "../custom_components/CustomTitleBarLinux.qml"
 //      }

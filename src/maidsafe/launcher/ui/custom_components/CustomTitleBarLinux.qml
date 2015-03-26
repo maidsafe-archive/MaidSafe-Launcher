@@ -17,51 +17,62 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtGraphicalEffects 1.0
+import QtQuick.Window 2.2
 
-MouseArea {
-  id: profileMenu
-  implicitHeight: 22
-  implicitWidth: height + dropIcon.implicitWidth + dropIcon.anchors.leftMargin
+import SAFEAppLauncher.MainController 1.0
 
-  Rectangle {
-    id: mask
-    width: profileMenu.height
-    height: profileMenu.height
-    radius: profileMenu.height / 2
-    color: "#000000"
-    visible: false
-  }
-  Image {
-    id: image
-    anchors.fill: mask
-    source: "/resources/images/david-irvine.jpg"
-    fillMode: Image.PreserveAspectCrop
-    visible: false
-  }
-  OpacityMask {
-    anchors.fill: mask
-    source: image
-    maskSource: mask
-  }
-  Rectangle {
-    anchors.fill: mask
-    radius: mask.radius
-    color: "#00000000"
-    border {
-      color: "#ffffff"
-      width: 1
-    }
-  }
+import "../views/detail"
 
-  Image {
-    id: dropIcon
+CustomTitleBar {
+  id: customTitleBar
+
+  viewTypeSelector: viewTypeSelector
+  searchField: searchField
+
+  Item {
+    id: titleBarComponents
+    visible: opacity !== 0
+    opacity: customTitleBar.homePageControlsOpacity
     anchors {
-      verticalCenter: parent.verticalCenter
-      left: mask.right
-      leftMargin: 3
+      left: parent.left
+      top: parent.top
+      right: parent.right
     }
-    source: "/resources/images/window_details/profile_drop_icon.png"
+    height: 40
+
+    ViewTypeSelector {
+      id: viewTypeSelector
+
+      height: 21
+      anchors {
+        verticalCenter: parent.verticalCenter
+        left: parent.left
+        leftMargin: 10
+      }
+    }
+
+    ProfileMenu {
+      id: profileMenu
+
+      height: 22
+      anchors {
+        verticalCenter: parent.verticalCenter
+        right: parent.right
+        rightMargin: 12
+      }
+    }
+
+    SearchTextField {
+      id: searchField
+
+      height: 19
+      width: 154
+      font.pixelSize: 10
+      anchors {
+        verticalCenter: parent.verticalCenter
+        right: profileMenu.left
+        rightMargin: 12
+      }
+    }
   }
 }

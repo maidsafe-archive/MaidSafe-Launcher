@@ -63,12 +63,9 @@ CustomTitleBar {
 
       color: minimiseMouseArea.containsMouse ? "#2e050708" : "#00000000"
 
-      visible: customTitleBar.minimiseVisble
-      enabled: customTitleBar.minimiseEnabled
-
       Image {
         id: minimiseImage
-        source: "/resources/images/window_details/minimise.png"
+        source: "/resources/images/window_details/windows_minimise.png"
       }
 
       MouseArea {
@@ -87,15 +84,12 @@ CustomTitleBar {
 
       color: maximiseMouseArea.containsMouse ? "#2e050708" : "#00000000"
 
-      visible: customTitleBar.maximiseRestoreVisble
-      enabled: customTitleBar.maximiseRestoreEnabled
-
       Image {
         id: maximiseImage
         source: mainWindow_.visibility === Window.Maximized ?
-                  "/resources/images/window_details/restore.png"
+                  "/resources/images/window_details/windows_restore.png"
                 :
-                  "/resources/images/window_details/maximise.png"
+                  "/resources/images/window_details/windows_maximise.png"
       }
 
       MouseArea {
@@ -120,12 +114,9 @@ CustomTitleBar {
 
       color: closeMouseArea.containsMouse ? "#99e63725" : "#00000000"
 
-      visible: customTitleBar.closeVisble
-      enabled: customTitleBar.closeEnabled
-
       Image {
         id: closeImage
-        source: "/resources/images/window_details/close.png"
+        source: "/resources/images/window_details/windows_close.png"
       }
 
       MouseArea {
@@ -160,11 +151,12 @@ CustomTitleBar {
 
     ProfileMenu {
       id: profileMenu
-      height: 18
+
+      height: 20
       anchors {
         top: parent.top
         right: searchField.left
-        rightMargin: 12
+        rightMargin: 10
       }
     }
 
@@ -173,7 +165,6 @@ CustomTitleBar {
 
       height: 16
       width: 132
-      radius: 2
       font.pixelSize: 8
       anchors {
         top: parent.top
@@ -208,7 +199,7 @@ CustomTitleBar {
         leftMargin: 10
         verticalCenter: appIcon.verticalCenter
       }
-
+      font.pixelSize: 14
       text: "Productivity - Safe App Launcher"
       color: "#f1f1f1"
     }
