@@ -22,9 +22,13 @@ import SAFEAppLauncher.AccountHandler 1.0
 import "./detail"
 import "../../custom_components"
 
+import "../../resources/js/password_strength.js" as PasswordStrength
+
 FocusScope {
-  id: accountHandlerviewRoot
-  objectName: "accountHandlerviewRoot"
+  id: accountHandlerView
+
+  readonly property var passwordStrength: new PasswordStrength.StrengthChecker()
+  readonly property LoadingView loadingView: currentView.loadingView
 
   AccountHandlerBrushes {
     id: customBrushes
@@ -36,10 +40,12 @@ FocusScope {
     objectName: "customProperties"
   }
 
-  Image {
-    id: accountHandlerView
-    objectName: "accountHandlerView"
+  Connections {
+    target: accountHandlerController_
+    onLoginError: loadingView.showFailed()
+  }
 
+  Image {
     // TODO(Spandan) Check this for other flavours of linux and for stability
     readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
 
@@ -66,56 +72,84 @@ FocusScope {
     }
 
     source: "/resources/images/login_bg.png"
+    anchors.fill: parent
+  }
 
-    CustomText {
-      id: placeHolderTextFirstLine
-      objectName: "placeHolderTextFirstLine"
 
-      anchors {
-        horizontalCenter: parent.horizontalCenter
-        bottom: placeHolderTextSecondLine.top
-        bottomMargin: 5
-      }
+  state: "state" + accountHandlerController_.currentView
+  readonly property int bottomButtonY: accountHandlerView.height -
+                                       customProperties.cancelButtonBottom -
+                                       customProperties.blueButtonMargin
+  property Item currentView: loginView
 
-      font { pixelSize: 45 }
-      text: qsTr("SAFE")
-    }
+  states: [State {
+    name: "state" + AccountHandlerController.CreateAccountView
+    PropertyChanges { target: createAccountView; x: 0 }
+    PropertyChanges { target: loginView; x: -mainWindow_.width }
+    PropertyChanges { target: accountHandlerView; currentView: createAccountView }
+  }]
 
-    CustomText {
-      id: placeHolderTextSecondLine
-      objectName: "placeHolderTextSecondLine"
-
-      anchors {
-        horizontalCenter: parent.horizontalCenter
-        bottom: parent.bottom
-        bottomMargin: 375
-      }
-
-      font {
-        pixelSize: 45
-        family: globalFontFamily.name
-      }
-      text: qsTr("App Launcher")
-    }
-
-    Loader {
-      id: accountHandlerLoader
-      objectName: "accountHandlerLoader"
-
-      anchors.fill: parent
-
-      source: {
-        if (accountHandlerController_.currentView === AccountHandlerController.CreateAccountView) {
-          "CreateAccount.qml"
-        } else if (accountHandlerController_.currentView === AccountHandlerController.LoginView) {
-          "Login.qml"
-        } else {
-          ""
+  transitions: [Transition {
+    from: "state" + AccountHandlerController.LoginView
+    to: "state" + AccountHandlerController.CreateAccountView
+    SequentialAnimation {
+      ScriptAction {
+        script: {
+          createAccountView.resetFields()
+          createAccountView.visible = true
+          createAccountView.currentTextFields.primaryTextField.focus = true
         }
       }
-
-      focus: true
-      onLoaded: item.focus = true
+      NumberAnimation {
+        properties: "x"
+        duration: 300
+        easing.type: Easing.InOutQuad
+      }
+      ScriptAction {
+        script: loginView.visible = false
+      }
     }
+  }, Transition {
+    from: "state" + AccountHandlerController.CreateAccountView
+    to: "state" + AccountHandlerController.LoginView
+    SequentialAnimation {
+      ScriptAction {
+        script: {
+          loginView.resetFields()
+          loginView.visible = true
+          loginView.focusTextField.focus = true
+        }
+      }
+      NumberAnimation {
+        properties: "x"
+        duration: 300
+        easing.type: Easing.InOutQuad
+      }
+      ScriptAction {
+        script: createAccountView.visible = false
+      }
+    }
+  }]
+
+  Image {
+     id: logo
+     source: "/resources/images/launcher_logo.png"
+     y: 50
+     anchors.horizontalCenter: parent.horizontalCenter
+   }
+
+  Login {
+    id: loginView
+    // if anchors is used here instead of width/height, the move animation does not works
+    width: parent.width
+    height: parent.height
+  }
+
+  CreateAccount {
+    id: createAccountView
+    width: parent.width
+    height: parent.height
+    visible: false
+    x: mainWindow_.width
   }
 }

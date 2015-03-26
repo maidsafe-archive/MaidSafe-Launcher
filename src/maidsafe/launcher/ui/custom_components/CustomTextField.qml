@@ -22,11 +22,14 @@ import QtQuick.Controls.Styles 1.3
 
 TextField {
   id: textField
-  objectName: "textField"
+
+  echoMode: TextInput.Password
 
   property bool showTickImage: false
   property bool showErrorImage: false
-  property bool clearAllImagesOnTextChange: true
+  property Button submitButton: null
+  property color backgroundColor: globalBrushes.textFieldBackground
+  property color textColor:  globalBrushes.textGrey
 
   function clearAllImages() { showTickImage = showErrorImage = false }
 
@@ -46,8 +49,12 @@ TextField {
     }
   }
   onTextChanged: {
-    if (clearAllImagesOnTextChange) { clearAllImages() }
+    if (floatingStatus.pointToItem === this) {
+      floatingStatus.hide()
+    }
   }
+  Keys.onEnterPressed: if (submitButton) submitButton.clicked()
+  Keys.onReturnPressed: if (submitButton) submitButton.clicked()
 
   font {
     pixelSize: customProperties.defaultFontPixelSize
@@ -60,7 +67,7 @@ TextField {
     id: textFieldStyle
     objectName: "textFieldStyle"
 
-    textColor: globalBrushes.textGrey
+    textColor: textField.textColor
 
     placeholderTextColor: control.activeFocus ?
                             globalBrushes.placeHolderFocusGrey
@@ -74,6 +81,7 @@ TextField {
       implicitHeight: customProperties.textFieldHeight
       implicitWidth: customProperties.textFieldWidth
       radius: customProperties.textFieldRadius
+      color: textField.backgroundColor
 
       Image {
         id: tickImage

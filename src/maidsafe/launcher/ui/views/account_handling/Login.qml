@@ -17,112 +17,265 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.3
 
-import "./detail"
 import "../../custom_components"
 
-FocusScope {
-  id: createAccountRoot
-  objectName: "createAccountRoot"
+Item {
+  id: loginView
 
-  FloatingStatusBox {
-    id: floatingStatus
-    objectName: "floatingStatus"
+  readonly property LoadingView loadingView: loadingView
+  property Item bottomButton: loginButton
+  readonly property Item focusTextField: pinTextField
 
-    anchors {
-      left: textFieldsAndButtonColumn.right
-      leftMargin: 15
+  states: [State {
+      name: "LOADING"
+
+      PropertyChanges {
+        target: loginView
+        bottomButton: loadingView.bottomButton
+      }
+      PropertyChanges {
+        target: loadingView
+        state: "VISIBLE"
+      }
+      PropertyChanges {
+        target: fadeOutItems
+        opacity: 0
+      }
+      PropertyChanges {
+        target: loginButton
+        backgroundWidth: customProperties.cancelButtonWidth
+        textOpacity: 0
+      }
+      PropertyChanges {
+        target: pinTextField
+        width: customProperties.cancelButtonWidth
+        y: accountHandlerView.bottomButtonY
+        backgroundColor: customBrushes.buttonDefaultBlue
+        textColor: customBrushes.buttonDefaultBlue
+      }
+      PropertyChanges {
+        target: keywordTextField
+        width: customProperties.cancelButtonWidth
+        y: accountHandlerView.bottomButtonY
+        backgroundColor: customBrushes.buttonDefaultBlue
+        textColor: customBrushes.buttonDefaultBlue
+      }
+      PropertyChanges {
+        target: passwordTextField
+        width: customProperties.cancelButtonWidth
+        y: accountHandlerView.bottomButtonY
+        backgroundColor: customBrushes.buttonDefaultBlue
+        textColor: customBrushes.buttonDefaultBlue
+      }
+    }]
+
+  transitions: [Transition {
+
+    from: "LOADING"
+    ScriptAction {
+      script: {
+        loginElements.visible = true
+        loadingView.visible = false
+        pinTextField.focus = true
+        pinTextField.cursorPosition = pinTextField.text.length
+      }
     }
-    pointToItem: textFieldRepeater.itemAt(0)
-    infoText.color: globalBrushes.textError
-    yOffset: textFieldsAndButtonColumn.y
-  }
 
-  Column {
-    id: textFieldsAndButtonColumn
-    objectName: "textFieldsAndButtonColumn"
+  },Transition {
 
-    anchors {
-      horizontalCenter: parent.horizontalCenter
-      bottom: parent.bottom
-      bottomMargin: customProperties.loginButtonBottomMargin
-    }
-
-    spacing: customProperties.textFieldVerticalSpacing
-
-    Repeater {
-      id: textFieldRepeater
-      objectName: "textFieldRepeater"
-
-      model: [qsTr("PIN"), qsTr("Keyword"), qsTr("Password")]
-
-      delegate: CustomTextField {
-        id: textField
-        objectName: "textField"
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        placeholderText: modelData
-        echoMode: TextInput.Password
-        focus: !model.index
-        Keys.onEnterPressed: loginButton.clicked()
-        Keys.onReturnPressed: loginButton.clicked()
-        onTextChanged: {
-          if (floatingStatus.pointToItem === textField && floatingStatus.visible) {
-            floatingStatus.visible = false
+    to: "LOADING"
+    SequentialAnimation {
+      ScriptAction {
+        script: loadingView.visible = true
+      }
+      ParallelAnimation {
+        NumberAnimation {
+          target: fadeOutItems; property: "opacity"
+          duration: 800; easing.type: Easing.Bezier
+          easing.bezierCurve: customProperties.animationColapseEasingCurve
+        }
+        NumberAnimation {
+          target: loginButton; properties: "backgroundWidth,textOpacity"
+          duration: 800; easing.type: Easing.Bezier
+          easing.bezierCurve: customProperties.animationColapseEasingCurve
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 366 }
+          NumberAnimation {
+            target: pinTextField; property: "width"
+            duration: 500; easing.type: Easing.Bezier
+            easing.bezierCurve: customProperties.animationColapseEasingCurve
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 300 }
+          ParallelAnimation {
+            NumberAnimation {
+              target: pinTextField; property: "y"
+              duration: 500; easing.type: Easing.Bezier
+              easing.bezierCurve: customProperties.animationColapseEasingCurve
+            }
+            ColorAnimation {target: pinTextField; properties: "backgroundColor,textColor"
+              duration: 560; easing.type: Easing.Bezier
+              easing.bezierCurve: customProperties.animationColapseEasingCurve
+            }
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 266 }
+          NumberAnimation {
+            target: keywordTextField; property: "width"
+            duration: 600; easing.type: Easing.Bezier
+            easing.bezierCurve: customProperties.animationColapseEasingCurve
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 200 }
+          ParallelAnimation {
+            NumberAnimation {
+              target: keywordTextField; property: "y"
+              duration: 600; easing.type: Easing.Bezier
+              easing.bezierCurve: customProperties.animationColapseEasingCurve
+            }
+            ColorAnimation {target: keywordTextField; properties: "backgroundColor,textColor"
+              duration: 660; easing.type: Easing.Bezier
+              easing.bezierCurve: customProperties.animationColapseEasingCurve
+            }
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 166 }
+          NumberAnimation {
+            target: passwordTextField; property: "width"
+            duration: 700; easing.type: Easing.Bezier
+            easing.bezierCurve: customProperties.animationColapseEasingCurve
+          }
+        }
+        SequentialAnimation {
+          PauseAnimation { duration: 100 }
+          ParallelAnimation {
+            NumberAnimation {
+              target: passwordTextField; property: "y"
+              duration: 700; easing.type: Easing.Bezier
+              easing.bezierCurve: customProperties.animationColapseEasingCurve
+            }
+            ColorAnimation {target: passwordTextField; properties: "backgroundColor,textColor"
+              duration: 760; easing.type: Easing.Bezier
+              easing.bezierCurve: customProperties.animationColapseEasingCurve
+            }
           }
         }
       }
+      ScriptAction {
+        script: loginElements.visible = false
+      }
+    }
+  }]
+
+  function resetFields() {
+    pinTextField.text = ""
+    keywordTextField.text = ""
+    passwordTextField.text = ""
+    floatingStatus.hide()
+  }
+
+  LoadingView {
+    id: loadingView
+    visible: false
+    onLoadingCanceled: loginView.state = ""
+    errorMessage: qsTr("There was an error logging you in.\nPlease try again.")
+  }
+
+  Item {
+    id: loginElements
+    anchors.fill: parent
+
+    CustomTextField {
+      id: pinTextField
+      placeholderText: qsTr("PIN")
+      submitButton: loginButton
+      anchors.horizontalCenter: parent.horizontalCenter
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*3 -
+         customProperties.textFieldVerticalSpacing*3
+      focus: true
+    }
+
+    CustomTextField {
+      id: keywordTextField
+      placeholderText: qsTr("Keyword")
+      submitButton: loginButton
+      anchors.horizontalCenter: parent.horizontalCenter
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight*2 -
+         customProperties.textFieldVerticalSpacing*2
+    }
+
+    CustomTextField {
+      id: passwordTextField
+      placeholderText: qsTr("Password")
+      submitButton: loginButton
+      anchors.horizontalCenter: parent.horizontalCenter
+      y: accountHandlerView.bottomButtonY -
+         customProperties.blueButtonMargin -
+         customProperties.textFieldHeight -
+         customProperties.textFieldVerticalSpacing
     }
 
     BlueButton {
       id: loginButton
-      objectName: "loginButton"
 
-      text: qsTr("Log In")
-      KeyNavigation.tab: showCreateAccountPageLabel
+      y: accountHandlerView.bottomButtonY
+      width: customProperties.blueButtonWidth
+      anchors.horizontalCenter: parent.horizontalCenter
+      text: qsTr("LOG IN")
       onClicked: {
-        floatingStatus.visible = false
-        textFieldRepeater.itemAt(0).clearAllImages()
-        textFieldRepeater.itemAt(1).clearAllImages()
-        textFieldRepeater.itemAt(2).clearAllImages()
-
-        if (textFieldRepeater.itemAt(0).text === "") {
-          textFieldRepeater.itemAt(0).showErrorImage = true
-          floatingStatus.pointToItem = textFieldRepeater.itemAt(0)
-          floatingStatus.infoText.text = qsTr("PIN cannot be left blank")
-          floatingStatus.visible = true
-        } else if (textFieldRepeater.itemAt(1).text === "") {
-          textFieldRepeater.itemAt(1).showErrorImage = true
-          floatingStatus.pointToItem = textFieldRepeater.itemAt(1)
-          floatingStatus.infoText.text = qsTr("Keyword cannot be left blank")
-          floatingStatus.visible = true
-        } else if (textFieldRepeater.itemAt(2).text === "") {
-          textFieldRepeater.itemAt(2).showErrorImage = true
-          floatingStatus.pointToItem = textFieldRepeater.itemAt(2)
-          floatingStatus.infoText.text = qsTr("Password cannot be left blank")
-          floatingStatus.visible = true
+        if (pinTextField.text === "") {
+          floatingStatus.showError(pinTextField, qsTr("PIN cannot be left blank"))
+        } else if (keywordTextField.text === "") {
+          floatingStatus.showError(keywordTextField, qsTr("Keyword cannot be left blank"))
+        } else if (passwordTextField.text === "") {
+          floatingStatus.showError(passwordTextField, qsTr("Password cannot be left blank"))
         } else {
-          accountHandlerController_.login(textFieldRepeater.itemAt(0).text,
-                                          textFieldRepeater.itemAt(1).text,
-                                          textFieldRepeater.itemAt(2).text)
+          floatingStatus.hide()
+          loginView.state = "LOADING"
+          accountHandlerController_.login(pinTextField.text,
+                                          keywordTextField.text,
+                                          passwordTextField.text)
+        }
+      }
+    }
+
+    Item {
+      id: fadeOutItems
+      anchors.fill: parent
+
+      Rectangle { // 1px white line
+        width: customProperties.textFieldWidth
+        height: 1
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: accountHandlerView.height -
+           createAccountButton.height -
+           customProperties.clickableTextBottomMargin - 12
+        color: customBrushes.bottomLineColor
+      }
+
+      ClickableText {
+        id: createAccountButton
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: accountHandlerView.height - height - customProperties.clickableTextBottomMargin
+
+        text: qsTr("Don't have an account yet? Create one")
+        onClicked: {
+          accountHandlerController_.showCreateAccountView()
         }
       }
     }
   }
 
-  ClickableText {
-    id: showCreateAccountPageLabel
-    objectName: "showCreateAccountPageLabel"
-
-    anchors {
-      horizontalCenter: parent.horizontalCenter
-      bottom: parent.bottom
-      bottomMargin: customProperties.clickableTextBottomMargin
-    }
-
-    label.text: qsTr("Create Account")
-    onClicked: accountHandlerController_.showCreateAccountView()
-  }
+  FloatingStatusBox { id: floatingStatus }
 }

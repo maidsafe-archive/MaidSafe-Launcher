@@ -26,16 +26,24 @@ ButtonBase {
     id: backgroundRect
     objectName: "backgroundRect"
 
+    /* animating the entire button width make the text to tremble
+     * so only the background should be animated
+     * and anchors.horizontalCenter does not works to automaticaly change the x value
+     */
+    x: (buttonBaseRoot.width - width) / 2
+    width: buttonBaseRoot.backgroundWidth
+
     implicitHeight: customProperties.blueButtonHeight
-    implicitWidth: customProperties.blueButtonWidth
     radius: customProperties.blueButtonRadius
     antialiasing: true
 
     color: {
       if (buttonBaseRoot.pressed) {
         customBrushes.buttonPressedBlue
-      } else if (buttonBaseRoot.hovered || buttonBaseRoot.activeFocus) {
+      } else if (buttonBaseRoot.hovered) {
         customBrushes.buttonHoveredBlue
+      } else if (buttonBaseRoot.activeFocus) {
+        customBrushes.buttonFocusedBlue
       } else {
         customBrushes.buttonDefaultBlue
       }

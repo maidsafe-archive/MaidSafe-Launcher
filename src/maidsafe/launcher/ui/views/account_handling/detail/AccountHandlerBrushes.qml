@@ -27,9 +27,13 @@ QtObject {
   readonly property color textStrongPassword: "#39b54a"
 
   readonly property color labelSelected: "#1d6499"
-  readonly property color labelNotSelected: "#ceebf4"
+  readonly property color labelHovered: "#ffffff"
+  readonly property color labelDefault: "#ceebf4"
 
-  readonly property color buttonDefaultBlue: "#1d6499"
-  readonly property color buttonHoveredBlue: "#2a81b7"
-  readonly property color buttonPressedBlue: "#124360"
+  readonly property color buttonDefaultBlue: "#7ecaf1"
+  readonly property color buttonHoveredBlue: "#89d8f7"
+  readonly property color buttonPressedBlue: "#4e99be"
+  readonly property color buttonFocusedBlue: "#7ecaf1"
+
+  readonly property color bottomLineColor: "#ffffff"
 }

@@ -20,42 +20,63 @@ import QtQuick 2.4
 
 Rectangle {
   id: statusDisplayRect
-  objectName: "statusDisplayRect"
 
-  property Item pointToItem: null
-  property alias metaText: metaInformationText
-  property alias infoText: informationText
-  property real yOffset: 0
-  property bool wipeTextsOnNoVisibility: true
-
-  y: pointToItem ? pointToItem.y + pointToItem.height / 2 - height / 2 + yOffset : 0
-
-  width: Math.min(180,
-                  metaInformationText.implicitWidth   +
-                  informationText.implicitWidth       +
-                  metaInformationText.anchors.leftMargin +
-                  informationText.anchors.leftMargin +  informationText.anchors.rightMargin)
-
-  height: Math.max(informationText.implicitHeight + informationText.implicitHeight *
-                   informationText.implicitWidth / (informationText.width ?
-                                                      informationText.width : 1),
-                   metaInformationText.implicitHeight + metaInformationText.implicitHeight *
-                   metaInformationText.implicitWidth / (metaInformationText.width ?
-                                                          metaInformationText.width : 1),
-                   customProperties.textFieldHeight)
+  property Item pointToItem
 
   radius: customProperties.textFieldRadius
   visible: false
 
-  onVisibleChanged: {
-    if (!visible && wipeTextsOnNoVisibility) {
-      metaInformationText.text = informationText.text = ""
+  function hide() {
+    visible = false
+    if (pointToItem && pointToItem.clearAllImages) {
+      pointToItem.clearAllImages()
     }
+    // fix a strange bug with sometimes a wrong infoText.implicitWidth
+    width = 0
+    pointToItem = null
+  }
+
+  function showError(item, info) {
+    show(item, "", info, customBrushes.textWeakPassword, true)
+  }
+  function show(item, meta, info, color, showError) {
+    hide()
+    if (!item) return
+
+    pointToItem = item
+    if (pointToItem)
+      pointToItem.showErrorImage = showError
+    metaText.text = meta
+    infoText.text = info
+    infoText.color = color
+    state = "VISIBLE"
+    pointToItem.focus = true
+    resetSizeAndPosition()
+    visible = true
+  }
+
+  // reset size and then position because y is dependant of height
+  // and compute these values only once the pointToItem and text has changed is more optimized
+  function resetSizeAndPosition() {
+    width = Math.min(180,
+                     metaText.implicitWidth +
+                     infoText.implicitWidth +
+                     metaText.anchors.leftMargin +
+                     infoText.anchors.leftMargin + infoText.anchors.rightMargin)
+
+    height = Math.max(infoText.implicitHeight + infoText.implicitHeight *
+                      infoText.implicitWidth / (infoText.width ? infoText.width : 1),
+                      metaText.implicitHeight + metaText.implicitHeight *
+                      metaText.implicitWidth / (metaText.width ? metaText.width : 1),
+                      customProperties.textFieldHeight)
+
+    x = pointToItem.x + pointToItem.width + 15
+
+    y = pointToItem.y + pointToItem.height / 2 - height / 2
   }
 
   Rectangle {
     id: pointerRect
-    objectName: "pointerRect"
 
     anchors {
       verticalCenter: parent.verticalCenter
@@ -68,8 +89,7 @@ Rectangle {
   }
 
   CustomText {
-    id: metaInformationText
-    objectName: "metaInformationText"
+    id: metaText
 
     anchors {
       left: parent.left
@@ -79,15 +99,13 @@ Rectangle {
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
     color: globalBrushes.textGrey
-    font.pixelSize: 12
   }
 
   CustomText {
-    id: informationText
-    objectName: "informationText"
+    id: infoText
 
     anchors {
-      left: metaInformationText.right
+      left: metaText.right
       right: parent.right
       rightMargin: 10
       verticalCenter: parent.verticalCenter
@@ -99,6 +117,5 @@ Rectangle {
 
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
     color: globalBrushes.textGrey
-    font.pixelSize: 12
   }
 }

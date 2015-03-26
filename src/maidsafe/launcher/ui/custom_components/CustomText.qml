@@ -24,7 +24,9 @@ Text {
 
   color: globalBrushes.textDefault
   font {
-    pixelSize: customProperties.defaultFontPixelSize
+    pixelSize: customProperties.customTextPixelSize
     family: globalFontFamily.name
   }
+  horizontalAlignment: TextInput.AlignHCenter
+  verticalAlignment: TextInput.AlignVCenter
 }

@@ -25,11 +25,12 @@ FocusScope {
   signal clicked()
   property alias label: customLabel
   property alias mouseArea: mouseArea
+  property alias text: customLabel.text
 
   width: childrenRect.width
   height: childrenRect.height
 
-  clip: true
+  activeFocusOnTab: true
 
   MouseArea {
     id: mouseArea
@@ -48,9 +49,14 @@ FocusScope {
       id: customLabel
       objectName: "customLabel"
 
+      font {
+        pixelSize: customProperties.clickableTextPixelSize
+        family: globalFontFamily.name
+      }
+
       focus: true
       anchors.centerIn: parent
-      font.underline: mouseArea.containsMouse || activeFocus
+      font.underline: activeFocus
 
       Keys.onEnterPressed: focusScope.clicked()
       Keys.onSpacePressed: focusScope.clicked()

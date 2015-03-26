@@ -29,6 +29,9 @@ Button {
   property bool underlineLabelOnFocus: true
   property bool italiciseLabelOnFocus: false
 
+  property int backgroundWidth: width
+  property int textOpacity: opacity
+
   Keys.onEnterPressed: clicked();
   Keys.onSpacePressed: clicked();
   Keys.onReturnPressed: clicked();
@@ -45,6 +48,7 @@ Button {
       id: buttonLabel
       objectName: "buttonLabel"
 
+      opacity: control.textOpacity
       text: control.text
       verticalAlignment: Qt.AlignVCenter
       horizontalAlignment: Qt.AlignHCenter

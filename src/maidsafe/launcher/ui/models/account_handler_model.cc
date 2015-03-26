@@ -18,6 +18,7 @@
 
 #include "maidsafe/launcher/ui/models/account_handler_model.h"
 #include "maidsafe/common/on_scope_exit.h"
+#include "maidsafe/common/utils.h"
 
 namespace maidsafe {
 
@@ -32,6 +33,7 @@ AccountHandlerModel::~AccountHandlerModel() = default;
 std::unique_ptr<Launcher> AccountHandlerModel::Login(const QString& /*pin*/,
                                                      const QString& /*keyword*/,
                                                      const QString& /*password*/) {
+  Sleep(std::chrono::seconds(3));
   on_scope_exit sig{[this] { emit LoginResultAvailable(); }};
   //  return Launcher::Login(pin.toStdString(), keyword.toStdString(), password.toStdString());
   std::unique_ptr<Launcher> launcher{new Launcher};
@@ -41,6 +43,7 @@ std::unique_ptr<Launcher> AccountHandlerModel::Login(const QString& /*pin*/,
 std::unique_ptr<Launcher> AccountHandlerModel::CreateAccount(const QString& /*pin*/,
                                                              const QString& /*keyword*/,
                                                              const QString& /*password*/) {
+  Sleep(std::chrono::seconds(3));
   on_scope_exit sig{[this] { emit CreateAccountResultAvailable(); }};
   //  return Launcher::CreateAccount(pin.toStdString(), keyword.toStdString(),
   // password.toStdString());
