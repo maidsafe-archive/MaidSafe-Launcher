@@ -94,13 +94,13 @@ Item {
     id: customTitleBarLoader
     anchors.fill: parent
     source: {
-//      if (Qt.platform.os === "windows") {
-//        "../custom_components/CustomTitleBarWindows.qml"
-//      } else if (Qt.platform.os === "osx") {
+      if (Qt.platform.os === "windows") {
+        "../custom_components/CustomTitleBarWindows.qml"
+      } else if (Qt.platform.os === "osx") {
         "../custom_components/CustomTitleBarMacOs.qml"
-//      } else {
-//        "../custom_components/CustomTitleBarLinux.qml"
-//      }
+      } else {
+        "../custom_components/CustomTitleBarLinux.qml"
+      }
     }
   }
 }
