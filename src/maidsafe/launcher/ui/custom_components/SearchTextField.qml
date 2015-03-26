@@ -25,16 +25,12 @@ TextField {
 
   property bool showSearchImage: true
   property int radius: 5
-/*  onActiveFocusChanged: {
-    if (activeFocus) {
-      selectAll()
-    }
-  }
-  onTextChanged: {
-  }
-  Keys.onEnterPressed: if (submitButton) submitButton.clicked()
-  Keys.onReturnPressed: if (submitButton) submitButton.clicked()
-*/
+
+  onActiveFocusChanged: if (activeFocus) selectAll()
+//  onTextChanged: {}
+//  Keys.onEnterPressed: if (submitButton) submitButton.clicked()
+//  Keys.onReturnPressed: if (submitButton) submitButton.clicked()
+
   font {
     pixelSize: 12
     family: globalFontFamily.name
@@ -53,7 +49,8 @@ TextField {
       Image {
         id: searchImage
 
-        visible: searchTextField.showSearchImage
+        visible: searchTextField.showSearchImage &&
+                 (!searchTextField.activeFocus && searchTextField.text === "")
         anchors {
           left: parent.left
           top: parent.top

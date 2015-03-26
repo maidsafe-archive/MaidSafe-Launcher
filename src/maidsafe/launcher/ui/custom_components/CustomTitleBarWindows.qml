@@ -139,7 +139,8 @@ CustomTitleBar {
 
   Item {
     id: titleBarComponents
-    visible: mainController_.currentView === MainController.HomePage
+    visible: opacity !== 0
+    opacity: customTitleBar.homePageControlsOpacity
     anchors {
       top: controlsRow.bottom
       right: parent.right
@@ -185,7 +186,8 @@ CustomTitleBar {
 
   Item {
     id: titleBarTitle
-    visible: mainController_.currentView === MainController.HomePage
+    visible: opacity !== 0
+    opacity: customTitleBar.homePageControlsOpacity
     height: 50
 
     Image {

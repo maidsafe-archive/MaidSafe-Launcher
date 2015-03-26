@@ -60,42 +60,38 @@ Item {
     anchors.fill: parent
   }
 
+  // when the controller say login success and go to HomePage
   Connections {
     target: mainController_
     onCurrentViewChanged: {
       if (mainController_.currentView === MainController.HomePage) {
-        mainWindowLoader.item.loadingView.showSuccess();
+        // hide buttons/logo and launch the rocket
+        accountHandlerLoader.item.showSuccess();
       }
     }
   }
 
+  // when the rocket finished going up
   Connections {
-    target: mainWindowLoader.item.loadingView
-    onLoadingFinished: mainWindowLoader.y = - mainWindowLoader.height
+    target: accountHandlerLoader.item
+    onShowSuccessFinished: {
+      // unload accountHandler view and show
+      accountHandlerLoader.source = ""
+      customTitleBarLoader.item.showHomePageControls()
+    }
   }
 
   Loader {
-    id: mainWindowLoader
-    objectName: "mainWindowLoader"
+    id: accountHandlerLoader
 
     width: parent.width
     height: parent.height
     source: "account_handling/AccountHandlerView.qml"
-
     focus: true
-    onLoaded: item.focus = true
-
-    Behavior on y {
-      NumberAnimation {
-        duration: 800; easing.type: Easing.Bezier
-        easing.bezierCurve: [ 1, 0, 0.64, 1, 1, 1 ]
-        onStopped: mainWindowLoader.source = ""
-      }
-    }
   }
 
   Loader {
-    id: customTitleBar
+    id: customTitleBarLoader
     anchors.fill: parent
     source: {
 //      if (Qt.platform.os === "windows") {

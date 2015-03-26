@@ -28,6 +28,10 @@ Item {
   property bool maximiseRestoreVisble: true
   property bool maximiseRestoreEnabled: true
 
+  property real homePageControlsOpacity: 0
+  Behavior on homePageControlsOpacity { NumberAnimation { duration: 800 } }
+  function showHomePageControls() { homePageControlsOpacity = 1 }
+
   property ViewTypeSelector viewTypeSelector
   property SearchTextField searchField
 }
