@@ -28,13 +28,17 @@ CustomTitleBar {
 
   viewTypeSelector: viewTypeSelector
   searchField: searchField
+  titleBarHeight: titleBarComponents.height
 
   ResizeMainWindowHelper {
     id: globalWindowResizeHelper
     anchors.fill: parent
+    visible: mainWindowItem.resizeable
   }
 
   Item {
+    id: titleBarControls
+
     height: 40
     anchors {
       left: parent.left
@@ -162,8 +166,7 @@ CustomTitleBar {
 
     Item {
       id: titleBarComponents
-      visible: opacity !== 0
-      opacity: customTitleBar.homePageControlsOpacity
+      visible: customTitleBar.homePageControlsVisible
       anchors {
         left: controlsRow.right
         top: parent.top

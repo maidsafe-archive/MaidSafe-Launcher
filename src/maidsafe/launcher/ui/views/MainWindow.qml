@@ -24,7 +24,8 @@ import "./detail"
 
 Item {
   id: mainWindowItem
-  objectName: "mainWindowItem"
+
+  property bool resizeable: false
 
   FontLoader       { id: globalFontFamily; name      : "OpenSans"         }
   GlobalBrushes    { id: globalBrushes;    objectName: "globalBrushes"    }
@@ -42,11 +43,6 @@ Item {
       mainWindow_.height = implicitHeight
       mainWindow_.minimumHeight = implicitHeight
       mainWindow_.maximumHeight = implicitHeight + correctionFactor
-
-      if (Qt.platform.os !== "linux") {
-        mainWindowTitleBar.maximiseRestoreEnabled = false
-        globalWindowResizeHelper.enabled = false
-      }
     }
 
     Component.onDestruction: {
@@ -71,16 +67,6 @@ Item {
     }
   }
 
-  // when the rocket finished going up
-  Connections {
-    target: accountHandlerLoader.item
-    onShowSuccessFinished: {
-      // unload accountHandler view and show
-      accountHandlerLoader.source = ""
-      customTitleBarLoader.item.showHomePageControls()
-    }
-  }
-
   Loader {
     id: accountHandlerLoader
 
@@ -88,6 +74,44 @@ Item {
     height: parent.height
     source: "account_handling/AccountHandlerView.qml"
     focus: true
+  }
+
+  Connections {
+    target: accountHandlerLoader.item
+    onShowSuccessFinished: {
+      homePage.y = mainWindow_.height
+      homePage.visible = true
+      rocketLaunchAnimation.start()
+      mainWindowItem.resizeable = true
+    }
+  }
+  ParallelAnimation {
+    id: rocketLaunchAnimation
+    NumberAnimation {
+      target: accountHandlerLoader.item; property: "y"
+      to: -mainWindow_.height
+      duration: 800; easing.type: Easing.Bezier
+      easing.bezierCurve: globalProperties.animationColapseEasingCurve
+    }
+    NumberAnimation {
+      target: homePage; property: "y"
+      to: customTitleBarLoader.item.titleBarHeight
+      duration: 800; easing.type: Easing.Bezier
+      easing.bezierCurve: globalProperties.animationColapseEasingCurve
+    }
+    onStopped: {
+      customTitleBarLoader.item.showHomePageControls()
+      accountHandlerLoader.source = ""
+    }
+  }
+
+  Rectangle {
+    id: homePage
+    visible: false
+    y: customTitleBarLoader.item.titleBarHeight
+    width: parent.width
+    height: parent.height - customTitleBarLoader.item.titleBarHeight
+    color: "#aacfcfcf"
   }
 
   Loader {

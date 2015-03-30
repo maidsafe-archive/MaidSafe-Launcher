@@ -50,21 +50,7 @@ FocusScope {
 
   Connections {
     target: loadingView
-    onLoadingFinished: rocketLaunchAnimation.start()
-  }
-  NumberAnimation {
-    id: rocketLaunchAnimation
-    target: accountHandlerView
-    property: "y"
-    to: -accountHandlerView.height
-    duration: 800; easing.type: Easing.Bezier
-    easing.bezierCurve: customProperties.animationColapseEasingCurve
-    onStopped: showSuccessFinished()
-  }
-
-  Connections {
-    target: accountHandlerController_
-    onLoginError: loadingView.showFailed()
+    onLoadingFinished: showSuccessFinished()
   }
   Connections {
     target: accountHandlerController_

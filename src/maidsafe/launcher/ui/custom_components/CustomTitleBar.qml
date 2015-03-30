@@ -19,10 +19,10 @@
 import QtQuick 2.4
 
 Item {
-  property real homePageControlsOpacity: 0
-  Behavior on homePageControlsOpacity { NumberAnimation { duration: 800 } }
-  function showHomePageControls() { homePageControlsOpacity = 1 }
+  property real homePageControlsVisible: 0
+  function showHomePageControls() { homePageControlsVisible = 1 }
 
   property ViewTypeSelector viewTypeSelector
   property SearchTextField searchField
+  property int titleBarHeight: 0
 }

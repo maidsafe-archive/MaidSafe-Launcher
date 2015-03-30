@@ -40,6 +40,4 @@ QtObject {
   readonly property int blueButtonHeight: textFieldHeight
   readonly property int blueButtonRadius: textFieldRadius
   readonly property int blueButtonMargin: 16
-
-  readonly property var animationColapseEasingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 }

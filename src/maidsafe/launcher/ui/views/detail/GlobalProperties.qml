@@ -26,4 +26,6 @@ QtObject {
 
   readonly property int defaultFontPixelSize: 18
   readonly property int customTextPixelSize: 13
+
+  readonly property var animationColapseEasingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 }

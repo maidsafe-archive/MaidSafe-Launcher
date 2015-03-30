@@ -28,11 +28,11 @@ CustomTitleBar {
 
   viewTypeSelector: viewTypeSelector
   searchField: searchField
+  titleBarHeight: titleBarComponents.height
 
   Item {
     id: titleBarComponents
-    visible: opacity !== 0
-    opacity: customTitleBar.homePageControlsOpacity
+    visible: customTitleBar.homePageControlsVisible
     anchors {
       left: parent.left
       top: parent.top
