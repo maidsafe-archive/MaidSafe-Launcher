@@ -20,12 +20,19 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 
 Image {
-  property string viewMode: "GRID"
+  state: "GRID"
 
-  source: viewMode === "GRID" ?
-            "/resources/images/window_details/view_controls-grid.png"
+  source: state === "GRID" ?
+            Qt.platform.os === "windows" ?
+              "/resources/images/window_details/windows_view_type-grid.png"
+            :
+              "/resources/images/window_details/view_type-grid.png"
           :
-            "/resources/images/window_details/view_controls-list.png"
+            Qt.platform.os === "windows" ?
+              "/resources/images/window_details/windows_view_type-list.png"
+            :
+              "/resources/images/window_details/view_type-list.png"
+
   fillMode: Image.PreserveAspectFit
 
   MouseArea {
@@ -35,7 +42,7 @@ Image {
       right: parent.horizontalCenter
       bottom: parent.bottom
     }
-    onClicked: parent.viewMode = "GRID"
+    onClicked: parent.state = "GRID"
   }
 
   MouseArea {
@@ -45,6 +52,6 @@ Image {
       right: parent.right
       bottom: parent.bottom
     }
-    onClicked: parent.viewMode = "LIST"
+    onClicked: parent.state = "LIST"
   }
 }

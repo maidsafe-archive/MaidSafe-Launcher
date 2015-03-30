@@ -62,6 +62,9 @@ MouseArea {
       left: mask.right
       leftMargin: 3
     }
-    source: "/resources/images/window_details/profile_drop_icon.png"
+    source: Qt.platform.os === "windows" ?
+              "/resources/images/window_details/windows_profile_drop_icon.png"
+            :
+              "/resources/images/window_details/profile_drop_icon.png"
   }
 }
