@@ -95,7 +95,7 @@ CustomTitleBar {
 
         MouseArea {
           anchors.fill: parent
-          onClicked: { mainWindow_.showMinimized(); console.log("min") }
+          onClicked: mainWindow_.showMinimized()
         }
       }
 
@@ -109,7 +109,7 @@ CustomTitleBar {
 
         MouseArea {
           anchors.fill: parent
-          onClicked: { mainWindow_.showMaximized(); console.log("max") }
+          onClicked: mainWindow_.showMaximized()
         }
       }
     }
