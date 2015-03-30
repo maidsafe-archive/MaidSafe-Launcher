@@ -68,98 +68,48 @@ CustomTitleBar {
     Row {
       id: controlsRow
 
-      spacing: 9
+      spacing: 5
 
       anchors {
         verticalCenter: parent.verticalCenter
         left: parent.left
-        leftMargin: 9
+        leftMargin: 5
       }
 
-      Rectangle {
-        id: closeButton
-
-        height: 13
-        width: 13
-        radius: 6.5
-        color: "#f05f55"
-        border {
-          width: 1
-          color: "#e13e32"
-        }
-
-        Image {
-          id: closeImage
-          x: 2
-          y: 2
-          visible: hoverMouseArea.containsMouse
-          source: "/resources/images/window_details/osx_close.png"
-        }
-
+      Image {
+        source: hoverMouseArea.containsMouse ?
+                  "/resources/images/window_details/osx_close_hover.png"
+                :
+                  "/resources/images/window_details/osx_close.png"
         MouseArea {
-          id: closeMouseArea
           anchors.fill: parent
           onClicked: Qt.quit()
         }
       }
 
-      Rectangle {
-        id: hideButton
-
-        height: 13
-        width: 13
-        radius: 6.5
-        color: "#fdbd10"
-        border {
-          width: 1
-          color: "#e1a126"
-        }
-
-        Image {
-          id: hideImage
-          x: 1
-          y: 1
-          visible: hoverMouseArea.containsMouse
-          source: "/resources/images/window_details/osx_hide.png"
-        }
+      Image {
+        source: hoverMouseArea.containsMouse ?
+                  "/resources/images/window_details/osx_hide_hover.png"
+                :
+                  "/resources/images/window_details/osx_hide.png"
 
         MouseArea {
-          id: hideMouseArea
           anchors.fill: parent
-          onClicked: mainWindow_.showMinimized()
+          onClicked: { mainWindow_.showMinimized(); console.log("min") }
         }
       }
 
-      Rectangle {
-        id: fullscreenButton
-
-        height: 13
-        width: 13
-        radius: 6.5
-        color: "#47b549"
-        border {
-          width: 1
-          color: "#1db14b"
-        }
-
-        Image {
-          id: fullscreenImage
-          x: 2
-          y: 2
-          visible: hoverMouseArea.containsMouse
-          source: "/resources/images/window_details/osx_fullscreen.png"
-        }
+      Image {
+        source: !mainWindowItem.resizeable ?
+                  "/resources/images/window_details/osx_disabled.png"
+                : hoverMouseArea.containsMouse ?
+                  "/resources/images/window_details/osx_fullscreen_hover.png"
+                :
+                  "/resources/images/window_details/osx_fullscreen.png"
 
         MouseArea {
-          id: fullscreenMouseArea
           anchors.fill: parent
-          onClicked: {
-            if (mainWindow_.visibility === Window.Maximized) {
-              mainWindow_.showNormal()
-            } else {
-              mainWindow_.showMaximized()
-            }
-          }
+          onClicked: { mainWindow_.showMaximized(); console.log("max") }
         }
       }
     }

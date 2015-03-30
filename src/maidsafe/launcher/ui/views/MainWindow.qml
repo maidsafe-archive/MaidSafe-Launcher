@@ -17,6 +17,7 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Window 2.2
 
 import SAFEAppLauncher.MainController 1.0
 
@@ -25,33 +26,34 @@ import "./detail"
 Item {
   id: mainWindowItem
 
-  property bool resizeable: false
+  width: 800
+  height: 570
+
+  // TODO(Spandan) Check this for other flavours of linux and for stability
+  readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
+
+  property bool resizeable: true
+  onResizeableChanged: {
+    if (resizeable) {
+      mainWindow_.minimumWidth = 640
+      mainWindow_.maximumWidth = Screen.desktopAvailableWidth
+      mainWindow_.minimumHeight = 480
+      mainWindow_.maximumHeight = Screen.desktopAvailableHeight
+    } else {
+      mainWindow_.minimumWidth = width
+      mainWindow_.maximumWidth = width
+      mainWindow_.minimumHeight = height
+      mainWindow_.maximumHeight = height + correctionFactor
+    }
+  }
+
+//  minimumWidth:
 
   FontLoader       { id: globalFontFamily; name      : "OpenSans"         }
   GlobalBrushes    { id: globalBrushes;    objectName: "globalBrushes"    }
   GlobalProperties { id: globalProperties; objectName: "globalProperties" }
 
   Image {
-    // TODO(Spandan) Check this for other flavours of linux and for stability
-    readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
-
-    Component.onCompleted: {
-      mainWindow_.width = implicitWidth
-      mainWindow_.minimumWidth = implicitWidth
-      mainWindow_.maximumWidth = implicitWidth
-
-      mainWindow_.height = implicitHeight
-      mainWindow_.minimumHeight = implicitHeight
-      mainWindow_.maximumHeight = implicitHeight + correctionFactor
-    }
-
-    Component.onDestruction: {
-      if (Qt.platform.os !== "linux") {
-        mainWindowTitleBar.maximiseRestoreEnabled = true
-        globalWindowResizeHelper.enabled = true
-      }
-    }
-
     source: "/resources/images/login_bg.png"
     anchors.fill: parent
   }
@@ -74,6 +76,7 @@ Item {
     height: parent.height
     source: "account_handling/AccountHandlerView.qml"
     focus: true
+    onLoaded: mainWindowItem.resizeable = false
   }
 
   Connections {

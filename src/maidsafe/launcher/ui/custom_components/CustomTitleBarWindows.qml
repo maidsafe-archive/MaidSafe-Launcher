@@ -81,6 +81,7 @@ CustomTitleBar {
     Rectangle {
       id: maximiseHighlighter
 
+      enabled: mainWindowItem.resizeable
       implicitWidth: maximiseImage.implicitWidth
       implicitHeight: maximiseImage.implicitHeight
 
