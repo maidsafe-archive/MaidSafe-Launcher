@@ -36,7 +36,8 @@ MouseArea {
   Image {
     id: image
     anchors.fill: mask
-    source: "/resources/images/david-irvine.jpg"
+    // TODO(Gildas) Use the real image from the profile
+    source: "/resources/mock/david-irvine.jpg"
     fillMode: Image.PreserveAspectCrop
     visible: false
   }
