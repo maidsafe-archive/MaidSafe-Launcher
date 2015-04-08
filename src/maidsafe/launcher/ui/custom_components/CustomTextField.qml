@@ -24,6 +24,7 @@ TextField {
   id: textField
 
   echoMode: TextInput.Password
+  maximumLength: 100
 
   property bool showTickImage: false
   property bool showErrorImage: false

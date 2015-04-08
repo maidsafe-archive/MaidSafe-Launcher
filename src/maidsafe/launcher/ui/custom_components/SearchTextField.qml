@@ -39,6 +39,7 @@ TextField {
     background: Rectangle {
       id: backgroundRect
 
+      y: -2
       radius: 3
       color: "#ffffff"
 

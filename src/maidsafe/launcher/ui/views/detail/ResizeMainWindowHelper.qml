@@ -17,10 +17,28 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Window 2.2
 
 Item {
-  id: resizeMainWindowItem
-  objectName: "resizeMainWindowItem"
+  id: resizeItem
+
+  visible: mainWindowItem.resizeable && mainWindow_.visibility !== Window.Maximized
+
+  function setWidth(width) {
+    if (width >= mainWindow_.minimumWidth && width <= mainWindow_.maximumWidth) {
+      mainWindow_.width = width;
+      return true
+    }
+    return false
+  }
+
+  function setHeight(height) {
+    if (height >= mainWindow_.minimumHeight && height <= mainWindow_.maximumHeight) {
+      mainWindow_.height = height;
+      return true
+    }
+    return false
+  }
 
   MouseArea {
     id: resizeRightMouseArea
@@ -42,7 +60,7 @@ Item {
     onPressed: { prevMouseX = mouseX }
     onPositionChanged: {
       if(pressed) {
-        mainWindow_.width += mouseX - prevMouseX
+        resizeItem.setWidth(mainWindow_.width + (mouseX - prevMouseX))
       }
     }
   }
@@ -61,7 +79,7 @@ Item {
     width: globalProperties.windowResizerThickness
     height: globalProperties.windowResizerThickness
 
-    cursorShape: containsMouse ? Qt.SizeAllCursor : Qt.ArrowCursor
+    cursorShape: containsMouse ? Qt.SizeFDiagCursor : Qt.ArrowCursor
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
@@ -71,8 +89,8 @@ Item {
     }
     onPositionChanged: {
       if(pressed) {
-        mainWindow_.width += mouseX - prevMouseX
-        mainWindow_.height += mouseY - prevMouseY
+        resizeItem.setWidth(mainWindow_.width + (mouseX - prevMouseX))
+        resizeItem.setHeight(mainWindow_.height + (mouseY - prevMouseY))
       }
     }
   }
@@ -97,7 +115,7 @@ Item {
     onPressed: { prevMouseY = mouseY }
     onPositionChanged: {
       if(pressed) {
-        mainWindow_.height += mouseY - prevMouseY
+        resizeItem.setHeight(mainWindow_.height + (mouseY - prevMouseY))
       }
     }
   }
@@ -116,7 +134,7 @@ Item {
     width: globalProperties.windowResizerThickness
     height: globalProperties.windowResizerThickness
 
-    cursorShape: containsMouse ? Qt.SizeAllCursor : Qt.ArrowCursor
+    cursorShape: containsMouse ? Qt.SizeBDiagCursor : Qt.ArrowCursor
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
@@ -129,9 +147,9 @@ Item {
         var deltaX = mouseX - prevMouseX
         var deltaY = mouseY - prevMouseY
 
-        mainWindow_.x += deltaX
-        mainWindow_.width -= deltaX
-        mainWindow_.height += deltaY
+        if (resizeItem.setWidth(mainWindow_.width - deltaX))
+          mainWindow_.x += deltaX
+        resizeItem.setHeight(mainWindow_.height + deltaY)
       }
     }
   }
@@ -158,8 +176,8 @@ Item {
       if(pressed) {
         var deltaX = mouseX - prevMouseX
 
-        mainWindow_.x += deltaX
-        mainWindow_.width -= deltaX
+        if (resizeItem.setWidth(mainWindow_.width - deltaX))
+          mainWindow_.x += deltaX
       }
     }
   }
@@ -178,7 +196,7 @@ Item {
     width: globalProperties.windowResizerThickness
     height: globalProperties.windowResizerThickness
 
-    cursorShape: containsMouse ? Qt.SizeAllCursor : Qt.ArrowCursor
+    cursorShape: containsMouse ? Qt.SizeFDiagCursor : Qt.ArrowCursor
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
@@ -191,10 +209,10 @@ Item {
         var deltaX = mouseX - prevMouseX
         var deltaY = mouseY - prevMouseY
 
-        mainWindow_.x += deltaX
-        mainWindow_.width -= deltaX
-        mainWindow_.y += deltaY
-        mainWindow_.height -= deltaY
+        if (resizeItem.setWidth(mainWindow_.width - deltaX))
+          mainWindow_.x += deltaX
+        if (resizeItem.setHeight(mainWindow_.height - deltaY))
+          mainWindow_.y += deltaY
       }
     }
   }
@@ -221,8 +239,8 @@ Item {
       if(pressed) {
         var deltaY = mouseY - prevMouseY
 
-        mainWindow_.y += deltaY
-        mainWindow_.height -= deltaY
+        if (resizeItem.setHeight(mainWindow_.height - deltaY))
+          mainWindow_.y += deltaY
       }
     }
   }
@@ -241,7 +259,7 @@ Item {
     width: globalProperties.windowResizerThickness
     height: globalProperties.windowResizerThickness
 
-    cursorShape: containsMouse ? Qt.SizeAllCursor : Qt.ArrowCursor
+    cursorShape: containsMouse ? Qt.SizeBDiagCursor : Qt.ArrowCursor
 
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
@@ -254,9 +272,9 @@ Item {
         var deltaX = mouseX - prevMouseX
         var deltaY = mouseY - prevMouseY
 
-        mainWindow_.width += deltaX
-        mainWindow_.y += deltaY
-        mainWindow_.height -= deltaY
+        resizeItem.setWidth(mainWindow_.width + deltaX)
+        if (resizeItem.setHeight(mainWindow_.height - deltaY))
+          mainWindow_.y += deltaY
       }
     }
   }

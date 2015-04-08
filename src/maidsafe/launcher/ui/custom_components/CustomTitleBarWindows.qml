@@ -33,7 +33,6 @@ CustomTitleBar {
   ResizeMainWindowHelper {
     id: globalWindowResizeHelper
     anchors.fill: parent
-    visible: mainWindowItem.resizeable
   }
 
   DragMainWindowHelper {
@@ -73,6 +72,7 @@ CustomTitleBar {
       MouseArea {
         id: minimiseMouseArea
         anchors.fill: parent
+        anchors.topMargin: globalProperties.windowResizerThickness
         hoverEnabled: true
         onClicked: mainWindow_.showMinimized()
       }
@@ -81,15 +81,17 @@ CustomTitleBar {
     Rectangle {
       id: maximiseHighlighter
 
-      enabled: mainWindowItem.resizeable
       implicitWidth: maximiseImage.implicitWidth
       implicitHeight: maximiseImage.implicitHeight
 
-      color: maximiseMouseArea.containsMouse ? "#1a050708" : "#00000000"
+      color: mainWindowItem.resizeable && maximiseMouseArea.containsMouse ?
+               "#1a050708" : "#00000000"
 
       Image {
         id: maximiseImage
-        source: mainWindow_.visibility === Window.Maximized ?
+        source: !mainWindowItem.resizeable ?
+                  "/resources/images/window_details/windows_maximise_disabled.png"
+                : mainWindow_.visibility === Window.Maximized ?
                   "/resources/images/window_details/windows_restore.png"
                 :
                   "/resources/images/window_details/windows_maximise.png"
@@ -98,12 +100,15 @@ CustomTitleBar {
       MouseArea {
         id: maximiseMouseArea
         anchors.fill: parent
+        anchors.topMargin: globalProperties.windowResizerThickness
         hoverEnabled: true
         onClicked: {
-          if (mainWindow_.visibility === Window.Maximized) {
-            mainWindow_.showNormal()
-          } else {
-            mainWindow_.showMaximized()
+          if (mainWindowItem.resizeable) {
+            if (mainWindow_.visibility === Window.Maximized) {
+              mainWindow_.showNormal()
+            } else {
+              mainWindow_.showMaximized()
+            }
           }
         }
       }
@@ -125,6 +130,8 @@ CustomTitleBar {
       MouseArea {
         id: closeMouseArea
         anchors.fill: parent
+        anchors.topMargin: globalProperties.windowResizerThickness
+        anchors.rightMargin: globalProperties.windowResizerThickness
         hoverEnabled: true
         onClicked: Qt.quit()
       }
@@ -167,10 +174,10 @@ CustomTitleBar {
 
       height: 16
       width: 132
-      font.pixelSize: 8
+      font.pixelSize: 10
       anchors {
         top: parent.top
-        topMargin: 2
+        topMargin: 4
         right: parent.right
         rightMargin: 7
       }

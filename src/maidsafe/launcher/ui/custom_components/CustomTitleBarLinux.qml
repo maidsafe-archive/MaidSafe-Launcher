@@ -67,10 +67,10 @@ CustomTitleBar {
 
       height: 19
       width: 154
-      font.pixelSize: 10
+      font.pixelSize: 12
       anchors {
         top: parent.top
-        topMargin: 11
+        topMargin: 13
         right: profileMenu.left
         rightMargin: 12
       }
