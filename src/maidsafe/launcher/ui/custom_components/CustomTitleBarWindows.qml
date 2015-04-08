@@ -63,7 +63,7 @@ CustomTitleBar {
       implicitWidth: minimiseImage.implicitWidth
       implicitHeight: minimiseImage.implicitHeight
 
-      color: minimiseMouseArea.containsMouse ? "#2e050708" : "#00000000"
+      color: minimiseMouseArea.containsMouse ? "#1a050708" : "#00000000"
 
       Image {
         id: minimiseImage
@@ -85,7 +85,7 @@ CustomTitleBar {
       implicitWidth: maximiseImage.implicitWidth
       implicitHeight: maximiseImage.implicitHeight
 
-      color: maximiseMouseArea.containsMouse ? "#2e050708" : "#00000000"
+      color: maximiseMouseArea.containsMouse ? "#1a050708" : "#00000000"
 
       Image {
         id: maximiseImage
@@ -115,7 +115,7 @@ CustomTitleBar {
       implicitWidth: closeImage.implicitWidth
       implicitHeight: closeImage.implicitHeight
 
-      color: closeMouseArea.containsMouse ? "#99e63725" : "#00000000"
+      color: closeMouseArea.containsMouse ? "#1a050708" : "#00000000"
 
       Image {
         id: closeImage
@@ -170,7 +170,7 @@ CustomTitleBar {
       font.pixelSize: 8
       anchors {
         top: parent.top
-        topMargin: 1
+        topMargin: 2
         right: parent.right
         rightMargin: 7
       }
