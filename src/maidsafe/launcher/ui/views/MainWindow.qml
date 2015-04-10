@@ -17,92 +17,117 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.3
-import QtQuick.Controls.Styles 1.3
+import QtQuick.Window 2.2
 
 import SAFEAppLauncher.MainController 1.0
 
 import "./detail"
-import "../custom_components"
 
 Item {
   id: mainWindowItem
-  objectName: "mainWindowItem"
+
+  width: 800
+  height: 570
+
+  // TODO(Spandan) Check this for other flavours of linux and for stability
+  readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
+
+  property bool resizeable: true
+  onResizeableChanged: {
+    if (resizeable) {
+      mainWindow_.minimumWidth = 640
+      mainWindow_.maximumWidth = Screen.desktopAvailableWidth
+      mainWindow_.minimumHeight = 480
+      mainWindow_.maximumHeight = Screen.desktopAvailableHeight
+    } else {
+      mainWindow_.minimumWidth = width
+      mainWindow_.maximumWidth = width
+      mainWindow_.minimumHeight = height
+      mainWindow_.maximumHeight = height + correctionFactor
+    }
+  }
+
+//  minimumWidth:
 
   FontLoader       { id: globalFontFamily; name      : "OpenSans"         }
   GlobalBrushes    { id: globalBrushes;    objectName: "globalBrushes"    }
   GlobalProperties { id: globalProperties; objectName: "globalProperties" }
 
-  DragMainWindowHelper {
-    id: dragMainWindowHelper
-    objectName: "dragMainWindowHelper"
-
-    anchors {
-      top: parent.top
-      right: parent.right
-      left: parent.left
-      bottom: mainWindowTitleBar.bottom
-      leftMargin: Qt.platform.os === "linux" || Qt.platform.os === "osx" ?
-                    mainWindowTitleBar.buttonLoaderwidth + 10 : 0
-      rightMargin: Qt.platform.os === "windows" ? mainWindowTitleBar.buttonLoaderwidth + 10 : 0
-    }
-    enabled: mainWindowTitleBar.visible
+  Image {
+    source: "/resources/images/login_bg.png"
+    anchors.fill: parent
   }
 
+  // when the controller say login success and go to HomePage
   Connections {
     target: mainController_
     onCurrentViewChanged: {
       if (mainController_.currentView === MainController.HomePage) {
-        mainWindowLoader.item.loadingView.showSuccess();
+        // hide buttons/logo and launch the rocket
+        accountHandlerLoader.item.showSuccess();
       }
     }
   }
 
-  Connections {
-    target: mainWindowLoader.item.loadingView
-    onLoadingFinished: mainWindowLoader.y = - mainWindowLoader.height
-  }
-
   Loader {
-    id: mainWindowLoader
-    objectName: "mainWindowLoader"
+    id: accountHandlerLoader
 
     width: parent.width
     height: parent.height
     source: "account_handling/AccountHandlerView.qml"
-
     focus: true
-    onLoaded: item.focus = true
+    onLoaded: mainWindowItem.resizeable = false
+  }
 
-    Behavior on y {
-      NumberAnimation {
-        duration: 800; easing.type: Easing.Bezier
-        easing.bezierCurve: [ 1, 0, 0.64, 1, 1, 1 ]
-        onStopped: mainWindowLoader.source = ""
+  Connections {
+    target: accountHandlerLoader.item
+    onShowSuccessFinished: {
+      homePage.y = mainWindow_.height
+      homePage.visible = true
+      rocketLaunchAnimation.start()
+      mainWindowItem.resizeable = true
+    }
+  }
+  ParallelAnimation {
+    id: rocketLaunchAnimation
+    NumberAnimation {
+      target: accountHandlerLoader.item; property: "y"
+      to: -mainWindow_.height
+      duration: 800; easing.type: Easing.Bezier
+      easing.bezierCurve: globalProperties.animationColapseEasingCurve
+    }
+    NumberAnimation {
+      target: homePage; property: "y"
+      to: customTitleBarLoader.item.titleBarHeight
+      duration: 800; easing.type: Easing.Bezier
+      easing.bezierCurve: globalProperties.animationColapseEasingCurve
+    }
+    onStopped: {
+      customTitleBarLoader.item.showHomePageControls()
+      accountHandlerLoader.source = ""
+    }
+  }
+
+  Rectangle {
+    id: homePage
+    visible: false
+    y: customTitleBarLoader.item.titleBarHeight
+    width: parent.width
+    height: parent.height - customTitleBarLoader.item.titleBarHeight
+    color: "#aacfcfcf"
+  }
+
+  Loader {
+    id: customTitleBarLoader
+    anchors.fill: parent
+    source: {
+      if (Qt.platform.os === "windows") {
+        "../custom_components/CustomTitleBarWindows.qml"
+      } else if (Qt.platform.os === "osx") {
+        "../custom_components/CustomTitleBarMacOs.qml"
+      } else {
+        "../custom_components/CustomTitleBarLinux.qml"
       }
     }
-  }
-
-  ResizeMainWindowHelper {
-    id: globalWindowResizeHelper
-    objectName: "globalWindowResizeHelper"
-
-    anchors.fill: parent
-    enabled: Qt.platform.os !== "linux"
-  }
-
-  CustomTitleBar {
-    id: mainWindowTitleBar
-    objectName: "mainWindowTitleBar"
-
-    anchors {
-      top: parent.top
-      left: parent.left
-      right: parent.right
-      margins: 5
-    }
-
-    visible: Qt.platform.os !== "linux"
-    enabled: visible
   }
 }

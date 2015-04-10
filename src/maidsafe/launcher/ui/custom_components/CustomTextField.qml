@@ -24,6 +24,7 @@ TextField {
   id: textField
 
   echoMode: TextInput.Password
+  maximumLength: 100
 
   property bool showTickImage: false
   property bool showErrorImage: false
@@ -57,7 +58,7 @@ TextField {
   Keys.onReturnPressed: if (submitButton) submitButton.clicked()
 
   font {
-    pixelSize: customProperties.defaultFontPixelSize
+    pixelSize: globalProperties.defaultFontPixelSize
     family: globalFontFamily.name
   }
   horizontalAlignment: TextInput.AlignHCenter
