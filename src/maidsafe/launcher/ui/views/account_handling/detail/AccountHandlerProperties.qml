@@ -22,8 +22,6 @@ QtObject {
   id: properties
   objectName: "properties"
 
-  readonly property int defaultFontPixelSize: 18
-  readonly property int customTextPixelSize: 13
   readonly property int clickableTextPixelSize: 15
   readonly property int errorTextPixelSize: 20
 
@@ -42,6 +40,4 @@ QtObject {
   readonly property int blueButtonHeight: textFieldHeight
   readonly property int blueButtonRadius: textFieldRadius
   readonly property int blueButtonMargin: 16
-
-  readonly property var animationColapseEasingCurve: [ 1, 0, 0.64, 1, 1, 1 ]
 }
