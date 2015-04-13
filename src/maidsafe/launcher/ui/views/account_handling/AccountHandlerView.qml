@@ -30,6 +30,14 @@ FocusScope {
   readonly property var passwordStrength: new PasswordStrength.StrengthChecker()
   readonly property LoadingView loadingView: currentView.loadingView
 
+  focus: true
+
+  signal showSuccessFinished()
+  function showSuccess() {
+    loadingView.showSuccess()
+    logo.opacity = 0
+  }
+
   AccountHandlerBrushes {
     id: customBrushes
     objectName: "customBrushes"
@@ -41,40 +49,13 @@ FocusScope {
   }
 
   Connections {
+    target: loadingView
+    onLoadingFinished: showSuccessFinished()
+  }
+  Connections {
     target: accountHandlerController_
     onLoginError: loadingView.showFailed()
   }
-
-  Image {
-    // TODO(Spandan) Check this for other flavours of linux and for stability
-    readonly property int correctionFactor: Qt.platform.os === "linux" ? -1 : 0
-
-    Component.onCompleted: {
-      mainWindow_.width = implicitWidth
-      mainWindow_.minimumWidth = implicitWidth
-      mainWindow_.maximumWidth = implicitWidth
-
-      mainWindow_.height = implicitHeight
-      mainWindow_.minimumHeight = implicitHeight
-      mainWindow_.maximumHeight = implicitHeight + correctionFactor
-
-      if (Qt.platform.os !== "linux") {
-        mainWindowTitleBar.maximiseRestoreEnabled = false
-        globalWindowResizeHelper.enabled = false
-      }
-    }
-
-    Component.onDestruction: {
-      if (Qt.platform.os !== "linux") {
-        mainWindowTitleBar.maximiseRestoreEnabled = true
-        globalWindowResizeHelper.enabled = true
-      }
-    }
-
-    source: "/resources/images/login_bg.png"
-    anchors.fill: parent
-  }
-
 
   state: "state" + accountHandlerController_.currentView
   readonly property int bottomButtonY: accountHandlerView.height -
@@ -133,9 +114,11 @@ FocusScope {
 
   Image {
      id: logo
+     opacity: 1
      source: "/resources/images/launcher_logo.png"
      y: 50
      anchors.horizontalCenter: parent.horizontalCenter
+     Behavior on opacity { NumberAnimation { duration: 800 } }
    }
 
   Login {
