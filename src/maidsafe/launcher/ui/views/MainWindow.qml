@@ -35,9 +35,9 @@ Item {
   property bool resizeable: true
   onResizeableChanged: {
     if (resizeable) {
-      mainWindow_.minimumWidth = 640
+      mainWindow_.minimumWidth = 800 // TODO(Spandan) this was 640 - Why?
       mainWindow_.maximumWidth = Screen.desktopAvailableWidth
-      mainWindow_.minimumHeight = 480
+      mainWindow_.minimumHeight = 570 // TODO(Spandan) this was 480 - Why?
       mainWindow_.maximumHeight = Screen.desktopAvailableHeight
     } else {
       mainWindow_.minimumWidth = width
