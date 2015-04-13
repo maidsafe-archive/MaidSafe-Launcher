@@ -22,16 +22,19 @@ import QtQuick.Controls 1.3
 Image {
   state: "GRID"
 
-  source: state === "GRID" ?
-            Qt.platform.os === "windows" ?
-              "/resources/images/window_details/windows_view_type-grid.png"
-            :
-              "/resources/images/window_details/view_type-grid.png"
-          :
-            Qt.platform.os === "windows" ?
-              "/resources/images/window_details/windows_view_type-list.png"
-            :
-              "/resources/images/window_details/view_type-list.png"
+  source: {
+    if (state === "GRID") {
+      if (Qt.platform.os === "windows") {
+        "/resources/images/window_details/windows_view_type-grid.png"
+      } else {
+        "/resources/images/window_details/view_type-grid.png"
+      }
+    } else if (Qt.platform.os === "windows") {
+      "/resources/images/window_details/windows_view_type-list.png"
+    } else {
+      "/resources/images/window_details/view_type-list.png"
+    }
+  }
 
   fillMode: Image.PreserveAspectFit
 
