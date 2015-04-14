@@ -95,16 +95,19 @@ void MainController::RegisterQmlTypes() const {
 void MainController::RegisterQtMetaTypes() const {}
 
 void MainController::SetupConnections() const {
-  Q_ASSERT_X(connect(this, SIGNAL(InvokeAccountHandlerController()), account_handler_controller_,
-                     SLOT(Invoke()), Qt::UniqueConnection),
-             "Connection Failure", "Account Handler Controller must implement slot void Invoke()");
-  Q_ASSERT_X(connect(account_handler_controller_, SIGNAL(LoginCompleted(Launcher*)), this, // NOLINT - Spandan
-                     SLOT(LoginCompleted(Launcher*)), Qt::UniqueConnection), // NOLINT - Spandan
-             "Connection Failure",
+  bool connect_result{connect(this, SIGNAL(InvokeAccountHandlerController()),
+                              account_handler_controller_, SLOT(Invoke()), Qt::UniqueConnection)};
+  Q_ASSERT_X(connect_result, "Connection Failure",
+             "Account Handler Controller must implement slot void Invoke()");
+
+  connect_result = connect(account_handler_controller_, SIGNAL(LoginCompleted(Launcher*)), this, // NOLINT - Spandan
+                           SLOT(LoginCompleted(Launcher*)), Qt::UniqueConnection); // NOLINT - Spandan
+  Q_ASSERT_X(connect_result, "Connection Failure",// NOLINT - Spandan
              "Account Handler Controller must implement signal void LoginCompleted(Launcher*)");
-  Q_ASSERT_X(
-      connect(main_window_->engine(), SIGNAL(quit()), qApp, SLOT(quit()), Qt::UniqueConnection),
-      "Connection Failure", "QQmlEngine::quit() -> qApp::quit()");
+
+  connect_result = connect(main_window_->engine(), SIGNAL(quit()),
+                           qApp, SLOT(quit()), Qt::UniqueConnection);
+  Q_ASSERT_X(connect_result, "Connection Failure", "QQmlEngine::quit() -> qApp::quit()");
 }
 
 void MainController::SetContexProperties() {
