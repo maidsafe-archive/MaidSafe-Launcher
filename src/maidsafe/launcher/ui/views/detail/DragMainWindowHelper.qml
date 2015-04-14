@@ -17,6 +17,7 @@
     use of the MaidSafe Software.                                                                 */
 
 import QtQuick 2.4
+import QtQuick.Window 2.2
 
 MouseArea {
   id: dragMainWindow
@@ -28,7 +29,7 @@ MouseArea {
   acceptedButtons: Qt.LeftButton
   cursorShape: containsPress ? Qt.ClosedHandCursor : Qt.ArrowCursor
 
-  onPressed:  {
+  onPressed: {
     prevMouseX = mouseX
     prevMouseY = mouseY
   }
@@ -39,5 +40,15 @@ MouseArea {
 
     mainWindow_.x += deltaX
     mainWindow_.y += deltaY
+  }
+
+  onDoubleClicked: {
+    if (mainWindowItem.resizeable) {
+      if (mainWindow_.visibility === Window.Maximized) {
+        mainWindow_.showNormal()
+      } else {
+        mainWindow_.showMaximized()
+      }
+    }
   }
 }
