@@ -120,6 +120,6 @@ Item {
         loadingCanceled()
       }
     }
-    Behavior on opacity { NumberAnimation { duration: 1000 } }
+    Behavior on opacity { NumberAnimation { duration: 800 } }
   }
 }

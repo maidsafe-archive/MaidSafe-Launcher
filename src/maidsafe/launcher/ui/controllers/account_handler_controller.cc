@@ -32,14 +32,14 @@ AccountHandlerController::AccountHandlerController(MainWindow& main_window,
     : QObject{parent},
       main_window_{main_window},
       account_handler_model_{new AccountHandlerModel{this}} {
-  Q_ASSERT_X(connect(account_handler_model_, SIGNAL(LoginResultAvailable()), this,
-                     SLOT(LoginResultAvailable()), Qt::QueuedConnection),
-             "Connection Failure",
+  bool connect_result{connect(account_handler_model_, SIGNAL(LoginResultAvailable()), this,
+                              SLOT(LoginResultAvailable()), Qt::QueuedConnection)};
+  Q_ASSERT_X(connect_result, "Connection Failure",
              "Account Handler Model must implement signal void LoginResultAvailable()");
 
-  Q_ASSERT_X(connect(account_handler_model_, SIGNAL(CreateAccountResultAvailable()), this,
-                     SLOT(CreateAccountResultAvailable()), Qt::QueuedConnection),
-             "Connection Failure",
+  connect_result = connect(account_handler_model_, SIGNAL(CreateAccountResultAvailable()), this,
+                           SLOT(CreateAccountResultAvailable()), Qt::QueuedConnection);
+  Q_ASSERT_X(connect_result, "Connection Failure",
              "Account Handler Model must implement signal void CreateAccountResultAvailable()");
 }
 
